@@ -31,4 +31,3 @@ class SystemService:
             ram_available_gb=round(memory.available / (1024**3), 2),
             git_installed=shutil.which("git") is not None,
         )
-    

@@ -33,11 +33,7 @@ class OllamaService:
             version_data = version_response.json()
             models_data = models_response.json()
 
-            models = [
-                model["name"]
-                for model in models_data.get("models", [])
-                if "name" in model
-            ]
+            models = [model["name"] for model in models_data.get("models", []) if "name" in model]
 
             return OllamaInfo(
                 available=True,
