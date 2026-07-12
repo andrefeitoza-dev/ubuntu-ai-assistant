@@ -67,3 +67,15 @@
 - [ ] Execution Report
 
 - [x] Execution Pipeline
+
+## Milestone 3 — Execution Foundation
+
+- [x] Executor
+- [x] Tool Registry
+- [x] Shell Tool
+- [x] Integração Executor e Tool Registry
+- [x] Execution Preview
+- [x] Preview Renderer
+- [x] Execution Pipeline
+
+Status: concluída na versão v0.5.0.

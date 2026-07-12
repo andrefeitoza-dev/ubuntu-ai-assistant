@@ -13,7 +13,7 @@ def create_preview() -> ExecutionPreview:
                 number=1,
                 title="Verificar Docker",
                 description="Verifica se o Docker está instalado.",
-                command="docker --version",
+                command=["docker", "--version"],
             ),
             PreviewStep(
                 number=2,

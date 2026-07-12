@@ -1,13 +1,18 @@
 from ubuntu_ai.executor.preview import ExecutionPreview
+from ubuntu_ai.renderer.command_formatter import CommandFormatter
 
 
 class PreviewRenderer:
     """Transforma uma prévia de execução em texto para apresentação."""
 
+    def __init__(
+        self,
+        command_formatter: CommandFormatter | None = None,
+    ) -> None:
+        self._command_formatter = command_formatter or CommandFormatter()
+
     def render(self, preview: ExecutionPreview) -> str:
         """Retorna uma representação textual da prévia."""
-
-        risk_name = preview.risk.name
 
         lines = [
             "=" * 50,
@@ -19,7 +24,7 @@ class PreviewRenderer:
             preview.goal,
             "",
             "Risco:",
-            risk_name,
+            preview.risk.name,
             "",
             "Tempo estimado:",
             f"{preview.estimated_seconds} segundos",
@@ -29,11 +34,13 @@ class PreviewRenderer:
         ]
 
         for step in preview.steps:
+            formatted_command = self._command_formatter.format(step.command)
+
             lines.extend(
                 [
                     f"{step.number}. {step.title}",
                     f"   Descrição: {step.description}",
-                    f"   Comando: {step.command}",
+                    f"   Comando: {formatted_command}",
                     "",
                 ]
             )

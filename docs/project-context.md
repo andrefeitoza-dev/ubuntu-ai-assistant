@@ -351,3 +351,46 @@ Execution
 Sprint 10.4
 
 Execution Pipeline
+
+## Sprint 10.4 — Concluída
+
+Implementado:
+
+- PipelineResult
+- ExecutionPipeline
+- integração entre Planner, PreviewBuilder e PreviewRenderer
+- validação de solicitações vazias
+- fluxo de dry run sem execução de comandos
+- 30 testes passando
+- Ruff sem erros
+
+## Próxima Sprint
+
+Sprint 10.5 — Integração do ExecutionPipeline com a CLI
+
+---
+
+## Milestone 3 — Execution Foundation concluída
+
+Versão: v0.5.0
+
+Implementado:
+
+- Executor
+- Tool Registry
+- ShellTool
+- PreviewBuilder
+- PreviewRenderer
+- ExecutionPipeline
+- PipelineResult
+- fluxo seguro de dry run
+- 30 testes automatizados
+- Ruff sem erros
+
+## Milestone atual
+
+Milestone 4 — User Experience
+
+### Próxima Sprint
+
+Sprint 11.1 — Integração do ExecutionPipeline com a CLI.
