@@ -45,3 +45,17 @@ Todas as alterações importantes do Ubuntu AI Assistant serão documentadas aqu
 
 - 27 testes automatizados
 - Ruff validando todo o projeto
+
+## Sprint 10.4
+
+### Adicionado
+
+- Execution Pipeline
+- PipelineResult
+- orquestração do fluxo de planejamento e preview
+- validação de solicitações vazias
+
+### Qualidade
+
+- 30 testes automatizados
+- Ruff sem erros

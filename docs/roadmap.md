@@ -65,3 +65,5 @@
 - [ ] Execution Pipeline
 - [ ] Confirmation
 - [ ] Execution Report
+
+- [x] Execution Pipeline
