@@ -1,6 +1,7 @@
 import typer
 
 from ubuntu_ai.cli.doctor import doctor
+from ubuntu_ai.cli.plan import plan
 
 app = typer.Typer(
     name="ubuntu-ai",
@@ -15,3 +16,4 @@ def main() -> None:
 
 
 app.command(name="doctor")(doctor)
+app.command(name="plan")(plan)
