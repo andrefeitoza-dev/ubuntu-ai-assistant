@@ -1,19 +1,35 @@
+import shlex
+
 from ubuntu_ai.domain.plan import Plan
-from ubuntu_ai.services.shell import ShellService
+from ubuntu_ai.services.shell import CommandResult
+from ubuntu_ai.tools.registry import ToolRegistry
 
 
 class Executor:
-    """Executa um plano passo a passo."""
+    """Executa as etapas de um plano por meio de ferramentas registradas."""
 
-    def __init__(self) -> None:
-        self._shell = ShellService()
+    def __init__(self, registry: ToolRegistry) -> None:
+        self._registry = registry
 
-    def execute(self, plan: Plan) -> list[str]:
-        """Executa todas as etapas do plano."""
+    def execute(self, plan: Plan) -> list[CommandResult]:
+        """Executa as etapas em ordem e interrompe na primeira falha."""
 
-        results: list[str] = []
+        shell_tool = self._registry.get("shell")
+        results: list[CommandResult] = []
 
         for step in plan.steps:
-            results.append(f"Executando: {step.title}")
+            command = shlex.split(step.command)
+
+            result = shell_tool.execute(command=command)
+
+            if not isinstance(result, CommandResult):
+                raise TypeError(
+                    "A ferramenta shell deve retornar um CommandResult."
+                )
+
+            results.append(result)
+
+            if not result.success:
+                break
 
         return results

@@ -13,3 +13,6 @@ Todas as alterações importantes do Ubuntu AI Assistant serão documentadas aqu
 - Integração do Core Engine
 - Testes do Core Engine
 - Fluxo de planejamento e explicação validado
+
+- Executor básico para processamento sequencial de planos
+- Testes do Executor

@@ -236,3 +236,17 @@ Implementado e validado:
 ## Próxima Sprint
 
 Sprint 9 — Executor
+
+## Sprint 9.1 — Concluída
+
+Implementado:
+
+- Executor básico
+- Execução sequencial das etapas do plano
+- Teste inicial do Executor
+- 13 testes passando
+- Ruff sem erros
+
+## Próxima etapa
+
+Sprint 9.2 — Tool Registry
