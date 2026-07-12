@@ -250,3 +250,72 @@ Implementado:
 ## Próxima etapa
 
 Sprint 9.2 — Tool Registry
+---
+
+# Engineering Checkpoint
+
+## Sprint 9.4 — Concluída
+
+### Estado do projeto
+
+- Ruff: All checks passed
+- Pytest: 22 passed
+
+### Funcionalidades implementadas
+
+- CLI
+- Doctor
+- Core Engine
+- Intent Analyzer
+- Planner
+- Explainer
+- ShellService
+- Tool Registry
+- ShellTool
+- Executor integrado ao Tool Registry
+
+### Arquitetura
+
+Usuário
+
+↓
+
+CLI
+
+↓
+
+Core Engine
+
+↓
+
+Planner
+
+↓
+
+Executor
+
+↓
+
+Tool Registry
+
+↓
+
+Shell Tool
+
+↓
+
+Shell Service
+
+↓
+
+Ubuntu
+
+### Próxima Sprint
+
+Sprint 10
+
+Dry Run
+
+Execution Preview
+
+Execution Report

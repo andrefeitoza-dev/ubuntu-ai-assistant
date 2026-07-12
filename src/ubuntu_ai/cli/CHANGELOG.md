@@ -16,3 +16,20 @@ Todas as alterações importantes do Ubuntu AI Assistant serão documentadas aqu
 
 - Executor básico para processamento sequencial de planos
 - Testes do Executor
+
+# Changelog
+
+## Sprint 9.4
+
+### Adicionado
+
+- Executor
+- Tool Registry
+- Shell Tool
+- Integração entre Executor e Tool Registry
+- 22 testes automatizados
+
+### Qualidade
+
+- Ruff validando todo o projeto
+- Pytest: 22 testes passando
