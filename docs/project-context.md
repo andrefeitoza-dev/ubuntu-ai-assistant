@@ -220,3 +220,19 @@ Executor
 # Objetivo final
 
 Criar um assistente profissional de administração do Ubuntu semelhante ao Claude Code, porém especializado em Linux e totalmente executado localmente através do Ollama.
+
+## Sprint 8 — Concluída
+
+Implementado e validado:
+
+- CoreEngine
+- detecção de intenção
+- integração com Planner
+- integração com Explainer
+- testes do CoreEngine
+- 12 testes passando
+- Ruff sem erros
+
+## Próxima Sprint
+
+Sprint 9 — Executor
