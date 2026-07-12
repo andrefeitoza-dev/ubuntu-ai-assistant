@@ -319,3 +319,35 @@ Dry Run
 Execution Preview
 
 Execution Report
+
+---
+
+# Engineering Checkpoint 2
+
+## Milestone
+
+Execution
+
+## Estado atual
+
+### Qualidade
+
+- Ruff: All checks passed
+- Pytest: 27 passed
+
+### Componentes implementados
+
+- Core Engine
+- Planner
+- Explainer
+- Executor
+- Tool Registry
+- Shell Tool
+- Preview Builder
+- Preview Renderer
+
+### Próxima Sprint
+
+Sprint 10.4
+
+Execution Pipeline

@@ -1,74 +1,67 @@
-# Ubuntu AI Assistant — Roadmap
+# Ubuntu AI Assistant Roadmap
 
-## Version 0.1 — Foundation
+## Foundation
 
 - [x] Estrutura do projeto
-- [x] Ambiente Python com uv
-- [x] CLI com Typer
+- [x] CLI
 - [x] Doctor
 - [x] SystemService
-- [x] OllamaService
 - [x] ShellService
-- [x] Ruff
-- [x] Pytest
-- [x] Documentação inicial
+- [x] OllamaService
 
-## Version 0.2 — AI Core
+---
 
-- [ ] ConfigService
-- [ ] Cliente Ollama
-- [ ] Chat local
-- [ ] Prompts estruturados
-- [ ] Validação de respostas
+## Core
 
-## Version 0.3 — Planning
+- [x] Intent Analyzer
+- [x] Planner
+- [x] Explainer
+- [x] Core Engine
 
-- [ ] Modelos de plano
-- [ ] Planner
-- [ ] Risk Evaluator
-- [ ] Explain Mode
-- [ ] Dry-run
+---
 
-## Version 0.4 — Execution
+## Execution
 
-- [ ] Executor
-- [ ] Tool Registry
-- [ ] Confirmação de ações
-- [ ] Progresso
-- [ ] Logs
-- [ ] Tratamento de falhas
+- [x] Executor
+- [x] Tool Registry
+- [x] Shell Tool
+- [ ] Dry Run
+- [ ] Execution Preview
+- [ ] Execution Report
 
-## Version 0.5 — Linux Tools
+---
 
-- [ ] APT
-- [ ] systemctl
-- [ ] processos
-- [ ] disco
-- [ ] arquivos
-- [ ] rede
-- [ ] journalctl
-- [ ] Docker
-- [ ] Git
+## Memory
 
-## Version 0.6 — Memory
+- [ ] Context Manager
+- [ ] SQLite Storage
 
-- [ ] Histórico
-- [ ] Preferências
-- [ ] Contexto de projetos
-- [ ] SQLite
+---
 
-## Version 0.7 — Remote Administration
+## Remote
 
-- [ ] SSH
-- [ ] Inventário de servidores
-- [ ] Execução remota
-- [ ] Auditoria
+- [ ] SSH Executor
 
-## Version 1.0 — Stable Release
+---
+
+## Integrations
 
 - [ ] VS Code
 - [ ] Antigravity
-- [ ] Plugins
-- [ ] Outros provedores de IA
-- [ ] Documentação completa
-- [ ] Release estável
+
+---
+
+## Release
+
+- [ ] Ubuntu AI Assistant 1.0
+
+## Execution
+
+- [x] Executor
+- [x] Tool Registry
+- [x] Shell Tool
+- [x] Execution Preview
+- [x] Preview Renderer
+- [ ] Execution Pipeline
+- [ ] Confirmation
+- [ ] Execution Report

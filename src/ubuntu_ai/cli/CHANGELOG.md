@@ -33,3 +33,15 @@ Todas as alterações importantes do Ubuntu AI Assistant serão documentadas aqu
 
 - Ruff validando todo o projeto
 - Pytest: 22 testes passando
+
+## Sprint 10.3
+
+### Adicionado
+
+- Execution Preview
+- Preview Renderer
+
+### Qualidade
+
+- 27 testes automatizados
+- Ruff validando todo o projeto
