@@ -79,3 +79,12 @@
 - [x] Execution Pipeline
 
 Status: concluída na versão v0.5.0.
+
+## Engineering Excellence
+
+- Dependency Injection
+- SDK
+- Container
+- Architecture Reviews
+- CI/CD
+- Release Process

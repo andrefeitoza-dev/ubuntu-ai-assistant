@@ -17,3 +17,9 @@ def test_container_creates_pipeline() -> None:
     pipeline = container.execution_pipeline()
 
     assert isinstance(pipeline, ExecutionPipeline)
+
+
+def test_singleton_cache_starts_empty() -> None:
+    container = Container()
+
+    assert container._singletons == {}

@@ -7,6 +7,17 @@ from ubuntu_ai.renderer.preview_renderer import PreviewRenderer
 class Container:
     """Container simples para gerenciamento de dependências."""
 
+    def __init__(self) -> None:
+        self._singletons: dict[str, object] = {}
+
+    def _singleton(self, key: str, factory):
+        """Obtém ou cria um singleton."""
+
+        if key not in self._singletons:
+            self._singletons[key] = factory()
+
+        return self._singletons[key]
+
     def planner(self) -> Planner:
         return Planner()
 
