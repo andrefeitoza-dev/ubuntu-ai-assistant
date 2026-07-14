@@ -1,7 +1,7 @@
 import typer
 from rich.console import Console
 
-from ubuntu_ai.pipeline.execution_pipeline import ExecutionPipeline
+from ubuntu_ai.container.bootstrap import container
 
 console = Console()
 
@@ -9,7 +9,7 @@ console = Console()
 def plan(request: str = typer.Argument(..., help="Solicitação a ser planejada.")) -> None:
     """Gera e exibe uma prévia segura, sem executar comandos."""
 
-    pipeline = ExecutionPipeline()
+    pipeline = container.execution_pipeline()
 
     try:
         result = pipeline.run(request)
