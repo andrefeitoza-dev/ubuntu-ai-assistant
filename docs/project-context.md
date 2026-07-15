@@ -394,3 +394,18 @@ Milestone 4 — User Experience
 ### Próxima Sprint
 
 Sprint 11.1 — Integração do ExecutionPipeline com a CLI.
+
+## Sprint E1.3 — Concluída
+
+Implementado:
+
+- Lifetime.SINGLETON
+- Lifetime.TRANSIENT
+- cache interno de singletons no Container
+- preparação para Config, OllamaService, Logger e MemoryService
+- 44 testes passando
+- Ruff sem erros
+
+## Próxima Sprint
+
+Sprint E1.4 — Primeiro serviço singleton real.

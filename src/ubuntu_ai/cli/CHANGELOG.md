@@ -59,3 +59,16 @@ Todas as alterações importantes do Ubuntu AI Assistant serão documentadas aqu
 
 - 30 testes automatizados
 - Ruff sem erros
+
+## Sprint E1.3
+
+### Adicionado
+
+- Modelo de tempo de vida das dependências
+- Cache de singletons no Container
+- Testes do Container e dos lifetimes
+
+### Qualidade
+
+- 44 testes automatizados
+- Ruff sem erros

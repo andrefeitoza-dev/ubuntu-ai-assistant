@@ -13,27 +13,36 @@ class OllamaInfo:
 class OllamaService:
     """Responsável pela comunicação com a API local do Ollama."""
 
-    def __init__(self, base_url: str = "http://localhost:11434") -> None:
+    def __init__(
+        self,
+        base_url: str = "http://localhost:11434",
+        timeout: int = 120,
+    ) -> None:
         self.base_url = base_url.rstrip("/")
+        self.timeout = timeout
 
     def get_info(self) -> OllamaInfo:
         try:
             version_response = requests.get(
                 f"{self.base_url}/api/version",
-                timeout=3,
+                timeout=self.timeout,
             )
             version_response.raise_for_status()
 
             models_response = requests.get(
                 f"{self.base_url}/api/tags",
-                timeout=3,
+                timeout=self.timeout,
             )
             models_response.raise_for_status()
 
             version_data = version_response.json()
             models_data = models_response.json()
 
-            models = [model["name"] for model in models_data.get("models", []) if "name" in model]
+            models = [
+                model["name"]
+                for model in models_data.get("models", [])
+                if "name" in model
+            ]
 
             return OllamaInfo(
                 available=True,
