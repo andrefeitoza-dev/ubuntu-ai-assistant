@@ -1,6 +1,8 @@
 from collections.abc import Callable
 from typing import TypeVar, cast
 
+from ubuntu_ai.ai.ollama_provider import OllamaProvider
+from ubuntu_ai.ai.provider import AIProvider
 from ubuntu_ai.core.config import AppConfig
 from ubuntu_ai.executor.preview import PreviewBuilder
 from ubuntu_ai.pipeline.execution_pipeline import ExecutionPipeline
@@ -46,6 +48,24 @@ class Container:
                 timeout=config.request_timeout,
             ),
         )
+
+    def ollama_provider(self) -> OllamaProvider:
+        """Retorna o provedor único baseado no Ollama."""
+
+        config = self.config()
+
+        return self._singleton(
+            "ollama_provider",
+            lambda: OllamaProvider(
+                service=self.ollama_service(),
+                model=config.ollama_model,
+            ),
+        )
+
+    def ai_provider(self) -> AIProvider:
+        """Retorna o provedor de IA configurado para a aplicação."""
+
+        return self.ollama_provider()
 
     def planner(self) -> Planner:
         return Planner()

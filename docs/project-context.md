@@ -409,3 +409,24 @@ Implementado:
 ## Próxima Sprint
 
 Sprint E1.4 — Primeiro serviço singleton real.
+
+## Sprint E1.5 — Concluída
+
+Implementado:
+
+- AppConfig centralizado
+- configuração do Ollama
+- timeout global de requisições
+- diretórios padrão da aplicação
+- AppConfig como singleton
+- OllamaService configurado pelo Container
+- 50 testes passando
+- Ruff sem erros
+
+## Próxima Milestone
+
+AI Brain
+
+### Próxima Sprint
+
+AI.1 — AI Provider Interface

@@ -72,3 +72,17 @@ Todas as alterações importantes do Ubuntu AI Assistant serão documentadas aqu
 
 - 44 testes automatizados
 - Ruff sem erros
+
+## Sprint E1.5
+
+### Adicionado
+
+- Configuration System
+- AppConfig
+- configuração central do Ollama
+- injeção de configuração pelo Container
+
+### Qualidade
+
+- 50 testes automatizados
+- Ruff sem erros

@@ -1,3 +1,4 @@
+from ubuntu_ai.ai.ollama_provider import OllamaProvider
 from ubuntu_ai.container import Container
 from ubuntu_ai.core.config import AppConfig
 from ubuntu_ai.pipeline.execution_pipeline import ExecutionPipeline
@@ -57,10 +58,37 @@ def test_ollama_service_uses_application_config() -> None:
     assert service.timeout == config.request_timeout
 
 
+def test_ollama_provider_is_singleton() -> None:
+    container = Container()
+
+    first = container.ollama_provider()
+    second = container.ollama_provider()
+
+    assert isinstance(first, OllamaProvider)
+    assert first is second
+
+
+def test_ai_provider_returns_configured_provider() -> None:
+    container = Container()
+
+    provider = container.ai_provider()
+
+    assert provider is container.ollama_provider()
+
+
 def test_planner_is_transient() -> None:
     container = Container()
 
     first = container.planner()
     second = container.planner()
+
+    assert first is not second
+
+
+def test_execution_pipeline_is_transient() -> None:
+    container = Container()
+
+    first = container.execution_pipeline()
+    second = container.execution_pipeline()
 
     assert first is not second
