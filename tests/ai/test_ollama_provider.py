@@ -1,3 +1,5 @@
+import pytest
+
 from ubuntu_ai.ai import AIRequest, AIResponse, OllamaProvider
 
 
@@ -11,6 +13,11 @@ class FakeOllamaService:
         self.model = model
 
         return "Resposta produzida pelo Ollama."
+
+
+class FailingOllamaService:
+    def generate(self, prompt: str, model: str) -> str:
+        raise RuntimeError("Falha ao gerar resposta com o Ollama.")
 
 
 def test_ollama_provider_generates_ai_response() -> None:
@@ -39,3 +46,16 @@ def test_ollama_provider_uses_configured_model() -> None:
 
     assert service.prompt == "Explique Docker"
     assert service.model == "qwen2.5:3b"
+
+
+def test_ollama_provider_propagates_service_error() -> None:
+    provider = OllamaProvider(
+        service=FailingOllamaService(),
+        model="qwen2.5:3b",
+    )
+
+    with pytest.raises(
+        RuntimeError,
+        match="Falha ao gerar resposta com o Ollama",
+    ):
+        provider.generate(AIRequest(prompt="Explique Docker"))

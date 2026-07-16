@@ -11,12 +11,12 @@ def create_plan() -> Plan:
             PlanStep(
                 title="Verificar Docker",
                 description="Verifica se o Docker está instalado.",
-                command="docker --version",
+                command=["docker", "--version"],
             ),
             PlanStep(
                 title="Verificar serviço",
                 description="Verifica o estado atual do serviço Docker.",
-                command="systemctl status docker",
+                command=["systemctl", "status", "docker"],
             ),
         ],
     )
@@ -38,8 +38,17 @@ def test_preview_contains_numbered_steps() -> None:
 
     assert preview.steps[0].number == 1
     assert preview.steps[0].title == "Verificar Docker"
-    assert preview.steps[0].command == "docker --version"
+    assert preview.steps[0].command == ["docker", "--version"]
 
     assert preview.steps[1].number == 2
     assert preview.steps[1].title == "Verificar serviço"
-    assert preview.steps[1].command == "systemctl status docker"
+    assert preview.steps[1].command == ["systemctl", "status", "docker"]
+
+
+def test_preview_copies_step_commands() -> None:
+    plan = create_plan()
+
+    preview = PreviewBuilder().build(plan)
+    plan.steps[0].command.append("--verbose")
+
+    assert preview.steps[0].command == ["docker", "--version"]

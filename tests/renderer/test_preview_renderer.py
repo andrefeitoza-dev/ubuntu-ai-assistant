@@ -19,7 +19,7 @@ def create_preview() -> ExecutionPreview:
                 number=2,
                 title="Verificar serviço",
                 description="Verifica o estado do serviço Docker.",
-                command="systemctl status docker",
+                command=["systemctl", "status", "docker"],
             ),
         ),
     )

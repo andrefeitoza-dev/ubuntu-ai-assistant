@@ -1,8 +1,9 @@
-from ubuntu_ai.ai.ollama_provider import OllamaProvider
 from ubuntu_ai.container import Container
 from ubuntu_ai.core.config import AppConfig
 from ubuntu_ai.pipeline.execution_pipeline import ExecutionPipeline
+from ubuntu_ai.planner.ai_planner import AIPlanner
 from ubuntu_ai.planner.planner import Planner
+from ubuntu_ai.planner.rule_planner import RulePlanner
 from ubuntu_ai.services.ollama import OllamaService
 
 
@@ -58,24 +59,6 @@ def test_ollama_service_uses_application_config() -> None:
     assert service.timeout == config.request_timeout
 
 
-def test_ollama_provider_is_singleton() -> None:
-    container = Container()
-
-    first = container.ollama_provider()
-    second = container.ollama_provider()
-
-    assert isinstance(first, OllamaProvider)
-    assert first is second
-
-
-def test_ai_provider_returns_configured_provider() -> None:
-    container = Container()
-
-    provider = container.ai_provider()
-
-    assert provider is container.ollama_provider()
-
-
 def test_planner_is_transient() -> None:
     container = Container()
 
@@ -85,10 +68,26 @@ def test_planner_is_transient() -> None:
     assert first is not second
 
 
-def test_execution_pipeline_is_transient() -> None:
+def test_container_creates_rule_planner() -> None:
     container = Container()
 
-    first = container.execution_pipeline()
-    second = container.execution_pipeline()
+    planner = container.rule_planner()
 
-    assert first is not second
+    assert isinstance(planner, RulePlanner)
+
+
+def test_container_creates_ai_planner() -> None:
+    container = Container()
+
+    planner = container.ai_planner()
+
+    assert isinstance(planner, AIPlanner)
+
+
+def test_container_planner_uses_configured_strategies() -> None:
+    container = Container()
+
+    planner = container.planner()
+
+    assert isinstance(planner._rule_planner, RulePlanner)
+    assert isinstance(planner._ai_planner, AIPlanner)

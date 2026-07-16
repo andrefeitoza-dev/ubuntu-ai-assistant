@@ -7,7 +7,7 @@ from ubuntu_ai.domain.risk import RiskLevel
 class PlanStep:
     title: str
     description: str
-    command: str
+    command: list[str]
 
 
 @dataclass(slots=True)

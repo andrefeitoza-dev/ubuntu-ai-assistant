@@ -6,7 +6,9 @@ from ubuntu_ai.ai.provider import AIProvider
 from ubuntu_ai.core.config import AppConfig
 from ubuntu_ai.executor.preview import PreviewBuilder
 from ubuntu_ai.pipeline.execution_pipeline import ExecutionPipeline
+from ubuntu_ai.planner.ai_planner import AIPlanner
 from ubuntu_ai.planner.planner import Planner
+from ubuntu_ai.planner.rule_planner import RulePlanner
 from ubuntu_ai.renderer.preview_renderer import PreviewRenderer
 from ubuntu_ai.services.ollama import OllamaService
 
@@ -67,8 +69,23 @@ class Container:
 
         return self.ollama_provider()
 
+    def rule_planner(self) -> RulePlanner:
+        """Cria um planejador determinístico."""
+
+        return RulePlanner()
+
+    def ai_planner(self) -> AIPlanner:
+        """Cria um planejador baseado em IA."""
+
+        return AIPlanner(provider=self.ai_provider())
+
     def planner(self) -> Planner:
-        return Planner()
+        """Cria o orquestrador de planejamento."""
+
+        return Planner(
+            rule_planner=self.rule_planner(),
+            ai_planner=self.ai_planner(),
+        )
 
     def preview_builder(self) -> PreviewBuilder:
         return PreviewBuilder()

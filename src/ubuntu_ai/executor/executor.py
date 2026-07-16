@@ -1,5 +1,3 @@
-import shlex
-
 from ubuntu_ai.domain.plan import Plan
 from ubuntu_ai.services.shell import CommandResult
 from ubuntu_ai.tools.registry import ToolRegistry
@@ -18,9 +16,7 @@ class Executor:
         results: list[CommandResult] = []
 
         for step in plan.steps:
-            command = shlex.split(step.command)
-
-            result = shell_tool.execute(command=command)
+            result = shell_tool.execute(command=step.command)
 
             if not isinstance(result, CommandResult):
                 raise TypeError(

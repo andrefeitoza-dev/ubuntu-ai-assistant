@@ -13,8 +13,9 @@ def test_add_step() -> None:
         PlanStep(
             title="Atualizar repositórios",
             description="Executa apt update",
-            command="sudo apt update",
+            command=["sudo", "apt", "update"],
         )
     )
 
     assert len(plan.steps) == 1
+    assert plan.steps[0].command == ["sudo", "apt", "update"]

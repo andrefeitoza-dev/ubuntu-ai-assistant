@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 
-from ubuntu_ai.domain.plan import Plan, RiskLevel
+from ubuntu_ai.domain.plan import Plan
+from ubuntu_ai.domain.risk import RiskLevel
 
 
 @dataclass(frozen=True, slots=True)
@@ -10,7 +11,7 @@ class PreviewStep:
     number: int
     title: str
     description: str
-    command: str
+    command: list[str]
 
 
 @dataclass(frozen=True, slots=True)
@@ -33,7 +34,7 @@ class PreviewBuilder:
                 number=index,
                 title=step.title,
                 description=step.description,
-                command=step.command,
+                command=step.command.copy(),
             )
             for index, step in enumerate(plan.steps, start=1)
         )

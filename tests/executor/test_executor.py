@@ -41,12 +41,12 @@ def create_plan() -> Plan:
             PlanStep(
                 title="Primeira etapa",
                 description="Executa o primeiro comando.",
-                command="echo primeiro",
+                command=["echo", "primeiro"],
             ),
             PlanStep(
                 title="Segunda etapa",
                 description="Executa o segundo comando.",
-                command="echo segundo",
+                command=["echo", "segundo"],
             ),
         ],
     )
