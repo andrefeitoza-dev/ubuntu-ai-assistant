@@ -1,3 +1,4 @@
+from ubuntu_ai.agent.runtime import AgentRuntime
 from ubuntu_ai.container import Container
 from ubuntu_ai.core.config import AppConfig
 from ubuntu_ai.pipeline.execution_pipeline import ExecutionPipeline
@@ -5,6 +6,14 @@ from ubuntu_ai.planner.ai_planner import AIPlanner
 from ubuntu_ai.planner.planner import Planner
 from ubuntu_ai.planner.rule_planner import RulePlanner
 from ubuntu_ai.services.ollama import OllamaService
+
+
+def test_container_creates_agent_runtime() -> None:
+    container = Container()
+
+    runtime = container.agent_runtime()
+
+    assert isinstance(runtime, AgentRuntime)
 
 
 def test_container_creates_planner() -> None:
@@ -64,6 +73,24 @@ def test_planner_is_transient() -> None:
 
     first = container.planner()
     second = container.planner()
+
+    assert first is not second
+
+
+def test_pipeline_is_transient() -> None:
+    container = Container()
+
+    first = container.execution_pipeline()
+    second = container.execution_pipeline()
+
+    assert first is not second
+
+
+def test_agent_runtime_is_transient() -> None:
+    container = Container()
+
+    first = container.agent_runtime()
+    second = container.agent_runtime()
 
     assert first is not second
 

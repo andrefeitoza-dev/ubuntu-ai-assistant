@@ -1,6 +1,7 @@
 from collections.abc import Callable
 from typing import TypeVar, cast
 
+from ubuntu_ai.agent.runtime import AgentRuntime
 from ubuntu_ai.ai.ollama_provider import OllamaProvider
 from ubuntu_ai.ai.provider import AIProvider
 from ubuntu_ai.core.config import AppConfig
@@ -88,14 +89,27 @@ class Container:
         )
 
     def preview_builder(self) -> PreviewBuilder:
+        """Cria o construtor de previews."""
+
         return PreviewBuilder()
 
     def preview_renderer(self) -> PreviewRenderer:
+        """Cria o renderizador de previews."""
+
         return PreviewRenderer()
 
     def execution_pipeline(self) -> ExecutionPipeline:
+        """Cria o pipeline de planejamento e preview."""
+
         return ExecutionPipeline(
             planner=self.planner(),
             preview_builder=self.preview_builder(),
             preview_renderer=self.preview_renderer(),
+        )
+
+    def agent_runtime(self) -> AgentRuntime:
+        """Cria o runtime central do agente."""
+
+        return AgentRuntime(
+            execution_pipeline=self.execution_pipeline(),
         )
