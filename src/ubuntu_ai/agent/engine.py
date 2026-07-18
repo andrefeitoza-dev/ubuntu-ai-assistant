@@ -1,8 +1,15 @@
 from ubuntu_ai.agent.models import AgentResult, AgentTask
+from ubuntu_ai.agent.runtime import AgentRuntime
 
 
 class AgentEngine:
-    """Coordena o ciclo completo do agente."""
+    """Fachada de alto nível para execução do agente."""
+
+    def __init__(
+        self,
+        runtime: AgentRuntime | None = None,
+    ) -> None:
+        self._runtime = runtime or AgentRuntime()
 
     def run(self, task: AgentTask) -> AgentResult:
-        raise NotImplementedError
+        return self._runtime.run(task)
