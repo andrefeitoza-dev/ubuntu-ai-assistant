@@ -54,8 +54,7 @@ class AgentRuntime:
         message = pipeline_result.rendered_preview
 
         self._session_manager.remember(f"Agente: {message}")
-
-        self._lifecycle = AgentLifecycle.COMPLETED
+        self._lifecycle = AgentLifecycle.WAITING_CONFIRMATION
 
         return AgentResult(
             success=True,
