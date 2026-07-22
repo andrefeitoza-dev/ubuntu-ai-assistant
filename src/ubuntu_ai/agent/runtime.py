@@ -8,7 +8,11 @@ from ubuntu_ai.confirmation.engine import ConfirmationEngine
 from ubuntu_ai.confirmation.models import Confirmation
 from ubuntu_ai.execution.controlled_executor import ControlledExecutor
 from ubuntu_ai.execution.default_policy import DefaultExecutionPolicy
-from ubuntu_ai.execution.models import ExecutionRequest, ExecutionResult
+from ubuntu_ai.execution.models import (
+    ExecutionRequest,
+    ExecutionResult,
+    ExecutionStatus,
+)
 from ubuntu_ai.pipeline.execution_pipeline import ExecutionPipeline
 from ubuntu_ai.pipeline.models import PipelineResult
 
@@ -98,19 +102,43 @@ class AgentRuntime:
         self._confirmation_engine.confirm(self._confirmation)
         self._lifecycle = AgentLifecycle.EXECUTING
 
-        results = tuple(
-            self._controlled_executor.execute(
-                ExecutionRequest(
-                    command=join(step.command),
-                )
+        results: list[ExecutionResult] = []
+
+        for step in self._pipeline_result.plan.steps:
+            command = join(step.command)
+
+            result = self._controlled_executor.execute(
+                ExecutionRequest(command=command)
             )
-            for step in self._pipeline_result.plan.steps
-        )
+
+            results.append(result)
+            self._remember_execution_result(command, result)
+
+            if result.status is ExecutionStatus.BLOCKED:
+                break
 
         self._confirmation = None
         self._lifecycle = AgentLifecycle.COMPLETED
 
-        return results
+        return tuple(results)
+
+    def _remember_execution_result(
+        self,
+        command: str,
+        result: ExecutionResult,
+    ) -> None:
+        """Registra o resultado da autorização no histórico da sessão."""
+
+        status_description = {
+            ExecutionStatus.APPROVED: "aprovada",
+            ExecutionStatus.BLOCKED: "bloqueada",
+            ExecutionStatus.EXECUTED: "executada",
+            ExecutionStatus.FAILED: "falhou",
+        }[result.status]
+
+        self._session_manager.remember(
+            f"Execução {status_description}: {command} — {result.message}"
+        )
 
     @staticmethod
     def _format_context_message(context: AgentContext) -> str:
