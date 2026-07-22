@@ -13,12 +13,13 @@ from ubuntu_ai.execution.models import (
     ExecutionResult,
     ExecutionStatus,
 )
+from ubuntu_ai.execution.system_executor import SystemExecutor
 from ubuntu_ai.pipeline.execution_pipeline import ExecutionPipeline
 from ubuntu_ai.pipeline.models import PipelineResult
 
 
 class AgentRuntime:
-    """Orquestra contexto, sessão, planejamento e autorização do agente."""
+    """Orquestra planejamento, confirmação e execução do agente."""
 
     def __init__(
         self,
@@ -33,7 +34,8 @@ class AgentRuntime:
         self._context_provider = context_provider or ContextProvider()
         self._confirmation_engine = confirmation_engine or ConfirmationEngine()
         self._controlled_executor = controlled_executor or ControlledExecutor(
-            DefaultExecutionPolicy()
+            policy=DefaultExecutionPolicy(),
+            system_executor=SystemExecutor(),
         )
 
         self._confirmation: Confirmation | None = None
@@ -71,7 +73,7 @@ class AgentRuntime:
 
         self._session_manager.remember(f"Usuário: {request}")
         self._session_manager.remember(
-            self._format_context_message(context),
+            self._format_context_message(context)
         )
 
         pipeline_result = self._execution_pipeline.run(request)
@@ -91,7 +93,7 @@ class AgentRuntime:
         )
 
     def confirm(self) -> tuple[ExecutionResult, ...]:
-        """Confirma e avalia os comandos do plano pendente."""
+        """Confirma e executa os comandos autorizados do plano pendente."""
 
         if self._confirmation is None:
             raise RuntimeError("Não existe confirmação pendente.")
@@ -127,7 +129,7 @@ class AgentRuntime:
         command: str,
         result: ExecutionResult,
     ) -> None:
-        """Registra o resultado da autorização no histórico da sessão."""
+        """Registra o resultado da execução no histórico da sessão."""
 
         status_description = {
             ExecutionStatus.APPROVED: "aprovada",
