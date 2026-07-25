@@ -1,5 +1,8 @@
 from __future__ import annotations
 
+from shlex import join
+
+from ubuntu_ai.domain.plan import Plan
 from ubuntu_ai.execution.models import (
     ExecutionRequest,
     ExecutionResult,
@@ -24,7 +27,7 @@ class ControlledExecutor:
         self,
         request: ExecutionRequest,
     ) -> ExecutionResult:
-        """Avalia a solicitação e executa somente quando permitido."""
+        """Executa um único comando."""
 
         decision = self._policy.evaluate(request)
 
@@ -43,3 +46,25 @@ class ControlledExecutor:
             )
 
         return self._system_executor.execute(request)
+
+    def execute_plan(
+        self,
+        plan: Plan,
+    ) -> tuple[ExecutionResult, ...]:
+        """Executa todas as etapas de um plano."""
+
+        results: list[ExecutionResult] = []
+
+        for step in plan.steps:
+            request = ExecutionRequest(
+                command=join(step.command),
+            )
+
+            result = self.execute(request)
+
+            results.append(result)
+
+            if result.status == ExecutionStatus.BLOCKED:
+                break
+
+        return tuple(results)

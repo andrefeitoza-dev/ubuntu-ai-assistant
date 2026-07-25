@@ -45,18 +45,15 @@ class AgentRuntime:
     @property
     def session_manager(self) -> SessionManager:
         """Retorna o gerenciador de sessão utilizado pelo runtime."""
-
         return self._session_manager
 
     @property
     def lifecycle(self) -> AgentLifecycle:
         """Retorna o estado atual do runtime."""
-
         return self._lifecycle
 
     def get_context(self) -> AgentContext:
         """Obtém o contexto atual do ambiente."""
-
         return self._context_provider.get_context()
 
     def run(self, task: AgentTask) -> AgentResult:
@@ -101,6 +98,11 @@ class AgentRuntime:
         if self._pipeline_result is None:
             raise RuntimeError("Não existe plano pendente para execução.")
 
+        if not self._pipeline_result.plan.steps:
+            raise RuntimeError(
+                "O plano não possui etapas executáveis."
+            )
+
         self._confirmation_engine.confirm(self._confirmation)
         self._lifecycle = AgentLifecycle.EXECUTING
 
@@ -114,12 +116,18 @@ class AgentRuntime:
             )
 
             results.append(result)
-            self._remember_execution_result(command, result)
 
+            self._remember_execution_result(
+                command,
+                result,
+            )
+
+            # Apenas comandos bloqueados interrompem o fluxo.
             if result.status is ExecutionStatus.BLOCKED:
                 break
 
         self._confirmation = None
+        self._pipeline_result = None
         self._lifecycle = AgentLifecycle.COMPLETED
 
         return tuple(results)
@@ -139,7 +147,8 @@ class AgentRuntime:
         }[result.status]
 
         self._session_manager.remember(
-            f"Execução {status_description}: {command} — {result.message}"
+            f"Execução {status_description}: "
+            f"{command} — {result.message}"
         )
 
     @staticmethod
