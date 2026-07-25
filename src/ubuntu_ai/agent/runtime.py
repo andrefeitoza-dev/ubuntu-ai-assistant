@@ -1,3 +1,4 @@
+from inspect import signature
 from shlex import join
 from uuid import uuid4
 
@@ -7,6 +8,8 @@ from ubuntu_ai.agent.models import AgentResult, AgentTask
 from ubuntu_ai.agent.session import SessionManager
 from ubuntu_ai.confirmation.engine import ConfirmationEngine
 from ubuntu_ai.confirmation.models import Confirmation
+from ubuntu_ai.context.engine import ContextEngine
+from ubuntu_ai.context.models import ContextSnapshot
 from ubuntu_ai.execution.controlled_executor import ControlledExecutor
 from ubuntu_ai.execution.default_policy import DefaultExecutionPolicy
 from ubuntu_ai.execution.models import (
@@ -31,6 +34,7 @@ class AgentRuntime:
         confirmation_engine: ConfirmationEngine | None = None,
         controlled_executor: ControlledExecutor | None = None,
         memory_service: MemoryService | None = None,
+        context_engine: ContextEngine | None = None,
     ) -> None:
         self._execution_pipeline = execution_pipeline or ExecutionPipeline()
         self._session_manager = session_manager or SessionManager()
@@ -41,11 +45,17 @@ class AgentRuntime:
             system_executor=SystemExecutor(),
         )
         self._memory_service = memory_service
+        self._context_engine = context_engine or ContextEngine(
+            context_provider=self._context_provider,
+            session_manager=self._session_manager,
+            memory_service=self._memory_service,
+        )
 
         self._confirmation: Confirmation | None = None
         self._pipeline_result: PipelineResult | None = None
         self._pending_request: str | None = None
         self._pending_context: AgentContext | None = None
+        self._context_snapshot: ContextSnapshot | None = None
         self._session_id = str(uuid4())
         self._lifecycle = AgentLifecycle.IDLE
 
@@ -60,6 +70,18 @@ class AgentRuntime:
         """Retorna o estado atual do runtime."""
 
         return self._lifecycle
+
+    @property
+    def session_id(self) -> str:
+        """Retorna o identificador da sessão atual."""
+
+        return self._session_id
+
+    @property
+    def context_snapshot(self) -> ContextSnapshot | None:
+        """Retorna o snapshot contextual mais recente."""
+
+        return self._context_snapshot
 
     def get_context(self) -> AgentContext:
         """Obtém o contexto atual do ambiente."""
@@ -76,7 +98,13 @@ class AgentRuntime:
 
         self._lifecycle = AgentLifecycle.PLANNING
 
-        context = self.get_context()
+        context_snapshot = self._context_engine.build(session_id=self._session_id)
+        context = AgentContext(
+            working_directory=context_snapshot.working_directory,
+            operating_system=context_snapshot.operating_system,
+            project_name=context_snapshot.project_name,
+        )
+        self._context_snapshot = context_snapshot
         self._pending_request = request
         self._pending_context = context
 
@@ -85,7 +113,7 @@ class AgentRuntime:
             self._format_context_message(context)
         )
 
-        pipeline_result = self._execution_pipeline.run(request)
+        pipeline_result = self._run_pipeline(request, context_snapshot)
         self._pipeline_result = pipeline_result
 
         message = pipeline_result.rendered_preview
@@ -143,6 +171,21 @@ class AgentRuntime:
         self._lifecycle = AgentLifecycle.COMPLETED
 
         return tuple(results)
+
+    def _run_pipeline(
+        self,
+        request: str,
+        context: ContextSnapshot,
+    ) -> PipelineResult:
+        """Run context-aware pipelines while preserving legacy test doubles."""
+
+        run_method = self._execution_pipeline.run
+        parameters = signature(run_method).parameters
+
+        if "context" in parameters:
+            return run_method(request, context=context)
+
+        return run_method(request)
 
     def _persist_execution_result(self, result: ExecutionResult) -> None:
         """Persiste o resultado quando um serviço de memória está configurado."""
