@@ -1,6 +1,5 @@
-from ubuntu_ai.knowledge.models import KnowledgeDocument, KnowledgeSource
-
 from tests.knowledge.fakes import FakeKnowledgeRepository
+from ubuntu_ai.knowledge.models import KnowledgeDocument, KnowledgeSource
 
 
 def test_repository_contract_supports_document_lifecycle() -> None:

@@ -1,13 +1,12 @@
 import pytest
 
+from tests.knowledge.fakes import FakeKnowledgeRepository
 from ubuntu_ai.knowledge.exceptions import (
     KnowledgeNotFoundError,
     KnowledgeValidationError,
 )
 from ubuntu_ai.knowledge.models import KnowledgeResult, KnowledgeSource
 from ubuntu_ai.knowledge.service import KnowledgeService
-
-from tests.knowledge.fakes import FakeKnowledgeRepository
 
 
 def test_service_adds_document_through_repository() -> None:

@@ -29,7 +29,7 @@ class ConversationMessage:
         role: ConversationRole,
         content: str,
         sequence: int,
-    ) -> "ConversationMessage":
+    ) -> ConversationMessage:
         normalized_session = session_id.strip()
         normalized_content = content.strip()
 

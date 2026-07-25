@@ -1,9 +1,8 @@
 import pytest
 
+from tests.knowledge.fakes import FakeKnowledgeRepository
 from ubuntu_ai.container.container import Container
 from ubuntu_ai.knowledge.exceptions import KnowledgeRepositoryNotConfiguredError
-
-from tests.knowledge.fakes import FakeKnowledgeRepository
 
 
 def test_container_requires_explicit_knowledge_backend() -> None:
