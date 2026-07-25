@@ -1,4 +1,5 @@
 from shlex import join
+from uuid import uuid4
 
 from ubuntu_ai.agent.context import AgentContext, ContextProvider
 from ubuntu_ai.agent.lifecycle import AgentLifecycle
@@ -14,6 +15,7 @@ from ubuntu_ai.execution.models import (
     ExecutionStatus,
 )
 from ubuntu_ai.execution.system_executor import SystemExecutor
+from ubuntu_ai.memory.service import MemoryService
 from ubuntu_ai.pipeline.execution_pipeline import ExecutionPipeline
 from ubuntu_ai.pipeline.models import PipelineResult
 
@@ -28,6 +30,7 @@ class AgentRuntime:
         context_provider: ContextProvider | None = None,
         confirmation_engine: ConfirmationEngine | None = None,
         controlled_executor: ControlledExecutor | None = None,
+        memory_service: MemoryService | None = None,
     ) -> None:
         self._execution_pipeline = execution_pipeline or ExecutionPipeline()
         self._session_manager = session_manager or SessionManager()
@@ -37,23 +40,30 @@ class AgentRuntime:
             policy=DefaultExecutionPolicy(),
             system_executor=SystemExecutor(),
         )
+        self._memory_service = memory_service
 
         self._confirmation: Confirmation | None = None
         self._pipeline_result: PipelineResult | None = None
+        self._pending_request: str | None = None
+        self._pending_context: AgentContext | None = None
+        self._session_id = str(uuid4())
         self._lifecycle = AgentLifecycle.IDLE
 
     @property
     def session_manager(self) -> SessionManager:
         """Retorna o gerenciador de sessão utilizado pelo runtime."""
+
         return self._session_manager
 
     @property
     def lifecycle(self) -> AgentLifecycle:
         """Retorna o estado atual do runtime."""
+
         return self._lifecycle
 
     def get_context(self) -> AgentContext:
         """Obtém o contexto atual do ambiente."""
+
         return self._context_provider.get_context()
 
     def run(self, task: AgentTask) -> AgentResult:
@@ -67,6 +77,8 @@ class AgentRuntime:
         self._lifecycle = AgentLifecycle.PLANNING
 
         context = self.get_context()
+        self._pending_request = request
+        self._pending_context = context
 
         self._session_manager.remember(f"Usuário: {request}")
         self._session_manager.remember(
@@ -121,16 +133,39 @@ class AgentRuntime:
                 command,
                 result,
             )
+            self._persist_execution_result(result)
 
             # Apenas comandos bloqueados interrompem o fluxo.
             if result.status is ExecutionStatus.BLOCKED:
                 break
 
-        self._confirmation = None
-        self._pipeline_result = None
+        self._clear_pending_execution()
         self._lifecycle = AgentLifecycle.COMPLETED
 
         return tuple(results)
+
+    def _persist_execution_result(self, result: ExecutionResult) -> None:
+        """Persiste o resultado quando um serviço de memória está configurado."""
+
+        if self._memory_service is None:
+            return
+
+        if self._pending_request is None or self._pending_context is None:
+            raise RuntimeError("O contexto da execução pendente não está disponível.")
+
+        self._memory_service.record_execution(
+            session_id=self._session_id,
+            user_request=self._pending_request,
+            working_directory=self._pending_context.working_directory,
+            project_name=self._pending_context.project_name,
+            result=result,
+        )
+
+    def _clear_pending_execution(self) -> None:
+        self._confirmation = None
+        self._pipeline_result = None
+        self._pending_request = None
+        self._pending_context = None
 
     def _remember_execution_result(
         self,

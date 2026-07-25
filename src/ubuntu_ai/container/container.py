@@ -6,6 +6,9 @@ from ubuntu_ai.ai.ollama_provider import OllamaProvider
 from ubuntu_ai.ai.provider import AIProvider
 from ubuntu_ai.core.config import AppConfig
 from ubuntu_ai.executor.preview import PreviewBuilder
+from ubuntu_ai.memory.repository import MemoryRepository
+from ubuntu_ai.memory.service import MemoryService
+from ubuntu_ai.memory.sqlite_repository import SQLiteMemoryRepository
 from ubuntu_ai.pipeline.execution_pipeline import ExecutionPipeline
 from ubuntu_ai.planner.ai_planner import AIPlanner
 from ubuntu_ai.planner.planner import Planner
@@ -107,9 +110,26 @@ class Container:
             preview_renderer=self.preview_renderer(),
         )
 
+    def memory_repository(self) -> MemoryRepository:
+        """Retorna o repositório persistente de memória."""
+
+        return self._singleton(
+            "memory_repository",
+            SQLiteMemoryRepository,
+        )
+
+    def memory_service(self) -> MemoryService:
+        """Retorna o serviço único de memória."""
+
+        return self._singleton(
+            "memory_service",
+            lambda: MemoryService(self.memory_repository()),
+        )
+
     def agent_runtime(self) -> AgentRuntime:
         """Cria o runtime central do agente."""
 
         return AgentRuntime(
             execution_pipeline=self.execution_pipeline(),
+            memory_service=self.memory_service(),
         )
