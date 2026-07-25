@@ -1,3 +1,4 @@
+from dataclasses import replace
 from inspect import signature
 from shlex import join
 from uuid import uuid4
@@ -10,6 +11,7 @@ from ubuntu_ai.confirmation.engine import ConfirmationEngine
 from ubuntu_ai.confirmation.models import Confirmation
 from ubuntu_ai.context.engine import ContextEngine
 from ubuntu_ai.context.models import ContextSnapshot
+from ubuntu_ai.conversation.engine import ConversationEngine
 from ubuntu_ai.execution.controlled_executor import ControlledExecutor
 from ubuntu_ai.execution.default_policy import DefaultExecutionPolicy
 from ubuntu_ai.execution.models import (
@@ -35,6 +37,7 @@ class AgentRuntime:
         controlled_executor: ControlledExecutor | None = None,
         memory_service: MemoryService | None = None,
         context_engine: ContextEngine | None = None,
+        conversation_engine: ConversationEngine | None = None,
     ) -> None:
         self._execution_pipeline = execution_pipeline or ExecutionPipeline()
         self._session_manager = session_manager or SessionManager()
@@ -45,6 +48,7 @@ class AgentRuntime:
             system_executor=SystemExecutor(),
         )
         self._memory_service = memory_service
+        self._conversation_engine = conversation_engine
         self._context_engine = context_engine or ContextEngine(
             context_provider=self._context_provider,
             session_manager=self._session_manager,
@@ -98,7 +102,20 @@ class AgentRuntime:
 
         self._lifecycle = AgentLifecycle.PLANNING
 
+        if self._conversation_engine is not None:
+            self._conversation_engine.remember_user(
+                session_id=self._session_id,
+                content=request,
+            )
+
         context_snapshot = self._context_engine.build(session_id=self._session_id)
+        if self._conversation_engine is not None:
+            context_snapshot = replace(
+                context_snapshot,
+                conversation_history=self._conversation_engine.history_for_prompt(
+                    session_id=self._session_id
+                ),
+            )
         context = AgentContext(
             working_directory=context_snapshot.working_directory,
             operating_system=context_snapshot.operating_system,
@@ -119,6 +136,11 @@ class AgentRuntime:
         message = pipeline_result.rendered_preview
 
         self._session_manager.remember(f"Agente: {message}")
+        if self._conversation_engine is not None:
+            self._conversation_engine.remember_assistant(
+                session_id=self._session_id,
+                content=message,
+            )
 
         self._confirmation = self._confirmation_engine.create()
         self._lifecycle = AgentLifecycle.WAITING_CONFIRMATION

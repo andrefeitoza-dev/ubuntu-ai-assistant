@@ -5,6 +5,10 @@ from ubuntu_ai.agent.runtime import AgentRuntime
 from ubuntu_ai.ai.ollama_provider import OllamaProvider
 from ubuntu_ai.ai.provider import AIProvider
 from ubuntu_ai.context.engine import ContextEngine
+from ubuntu_ai.conversation.engine import ConversationEngine
+from ubuntu_ai.conversation.repository import ConversationRepository
+from ubuntu_ai.conversation.service import ConversationService
+from ubuntu_ai.conversation.sqlite_repository import SQLiteConversationRepository
 from ubuntu_ai.core.config import AppConfig
 from ubuntu_ai.executor.preview import PreviewBuilder
 from ubuntu_ai.memory.repository import MemoryRepository
@@ -127,6 +131,31 @@ class Container:
             lambda: MemoryService(self.memory_repository()),
         )
 
+
+    def conversation_repository(self) -> ConversationRepository:
+        """Retorna o repositório persistente de conversas."""
+
+        return self._singleton(
+            "conversation_repository",
+            SQLiteConversationRepository,
+        )
+
+    def conversation_service(self) -> ConversationService:
+        """Retorna o serviço único de conversas."""
+
+        return self._singleton(
+            "conversation_service",
+            lambda: ConversationService(self.conversation_repository()),
+        )
+
+    def conversation_engine(self) -> ConversationEngine:
+        """Retorna o mecanismo persistente de conversação."""
+
+        return self._singleton(
+            "conversation_engine",
+            lambda: ConversationEngine(self.conversation_service()),
+        )
+
     def context_engine(self) -> ContextEngine:
         """Cria o mecanismo de contexto para uma sessão do runtime."""
 
@@ -139,4 +168,5 @@ class Container:
             execution_pipeline=self.execution_pipeline(),
             memory_service=self.memory_service(),
             context_engine=self.context_engine(),
+            conversation_engine=self.conversation_engine(),
         )

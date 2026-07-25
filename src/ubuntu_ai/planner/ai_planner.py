@@ -1,6 +1,7 @@
 import json
 
 from ubuntu_ai.ai import AIProvider, AIRequest
+from ubuntu_ai.ai.prompt_builder import PlanningPromptBuilder
 from ubuntu_ai.context.models import ContextSnapshot
 from ubuntu_ai.domain.plan import Plan, PlanStep
 from ubuntu_ai.domain.risk import RiskLevel
@@ -9,8 +10,13 @@ from ubuntu_ai.domain.risk import RiskLevel
 class AIPlanner:
     """Cria planos estruturados usando um provedor de IA."""
 
-    def __init__(self, provider: AIProvider) -> None:
+    def __init__(
+        self,
+        provider: AIProvider,
+        prompt_builder: PlanningPromptBuilder | None = None,
+    ) -> None:
         self._provider = provider
+        self._prompt_builder = prompt_builder or PlanningPromptBuilder()
 
     def create_plan(
         self,
@@ -33,31 +39,7 @@ class AIPlanner:
         request: str,
         context: ContextSnapshot | None = None,
     ) -> str:
-        context_section = (
-            f"Contexto disponível:\n{context.to_prompt()}\n"
-            if context is not None
-            else ""
-        )
-
-        return (
-            "Crie um plano seguro para Ubuntu em JSON válido.\n"
-            f"{context_section}"
-            "Use exatamente esta estrutura:\n"
-            "{\n"
-            '  "goal": "objetivo",\n'
-            '  "estimated_seconds": 120,\n'
-            '  "risk": "low|medium|high|critical",\n'
-            '  "steps": [\n'
-            "    {\n"
-            '      "title": "etapa",\n'
-            '      "description": "descrição",\n'
-            '      "command": ["comando", "argumento"]\n'
-            "    }\n"
-            "  ]\n"
-            "}\n"
-            "Não inclua Markdown nem explicações fora do JSON.\n"
-            f"Solicitação: {request}"
-        )
+        return self._prompt_builder.build(request=request, context=context)
 
     def _parse_plan(self, content: str) -> Plan:
         try:

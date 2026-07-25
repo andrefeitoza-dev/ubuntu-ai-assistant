@@ -13,6 +13,7 @@ class ContextSnapshot:
     last_commands: tuple[str, ...] = ()
     last_errors: tuple[str, ...] = ()
     previous_request: str | None = None
+    conversation_history: tuple[str, ...] = ()
 
     def to_prompt(self) -> str:
         """Render the snapshot as compact planning context."""
@@ -21,6 +22,7 @@ class ContextSnapshot:
         previous_request = self.previous_request or "none"
         commands = ", ".join(self.last_commands) or "none"
         errors = " | ".join(self.last_errors) or "none"
+        conversation = " | ".join(self.conversation_history) or "none"
 
         return (
             f"session_id={self.session_id}\n"
@@ -29,5 +31,6 @@ class ContextSnapshot:
             f"project_name={project}\n"
             f"previous_request={previous_request}\n"
             f"last_commands={commands}\n"
-            f"last_errors={errors}"
+            f"last_errors={errors}\n"
+            f"conversation_history={conversation}"
         )
