@@ -11,6 +11,9 @@ from ubuntu_ai.conversation.service import ConversationService
 from ubuntu_ai.conversation.sqlite_repository import SQLiteConversationRepository
 from ubuntu_ai.core.config import AppConfig
 from ubuntu_ai.executor.preview import PreviewBuilder
+from ubuntu_ai.knowledge.exceptions import KnowledgeRepositoryNotConfiguredError
+from ubuntu_ai.knowledge.repository import KnowledgeRepository
+from ubuntu_ai.knowledge.service import KnowledgeService
 from ubuntu_ai.memory.repository import MemoryRepository
 from ubuntu_ai.memory.service import MemoryService
 from ubuntu_ai.memory.sqlite_repository import SQLiteMemoryRepository
@@ -115,6 +118,33 @@ class Container:
             preview_renderer=self.preview_renderer(),
         )
 
+    def register_knowledge_repository(
+        self,
+        repository: KnowledgeRepository,
+    ) -> None:
+        """Registra a implementação concreta do repositório de conhecimento."""
+
+        self._singletons["knowledge_repository"] = repository
+        self._singletons.pop("knowledge_service", None)
+
+    def knowledge_repository(self) -> KnowledgeRepository:
+        """Retorna o backend de conhecimento previamente registrado."""
+
+        repository = self._singletons.get("knowledge_repository")
+        if repository is None:
+            raise KnowledgeRepositoryNotConfiguredError(
+                "Nenhum KnowledgeRepository foi registrado no container."
+            )
+        return cast(KnowledgeRepository, repository)
+
+    def knowledge_service(self) -> KnowledgeService:
+        """Retorna o serviço de conhecimento desacoplado do backend."""
+
+        return self._singleton(
+            "knowledge_service",
+            lambda: KnowledgeService(self.knowledge_repository()),
+        )
+
     def memory_repository(self) -> MemoryRepository:
         """Retorna o repositório persistente de memória."""
 
@@ -130,7 +160,6 @@ class Container:
             "memory_service",
             lambda: MemoryService(self.memory_repository()),
         )
-
 
     def conversation_repository(self) -> ConversationRepository:
         """Retorna o repositório persistente de conversas."""
