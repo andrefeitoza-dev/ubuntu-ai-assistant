@@ -21,6 +21,12 @@ class KnowledgeService:
     def __init__(self, repository: KnowledgeRepository) -> None:
         self._repository = repository
 
+    @property
+    def repository(self) -> KnowledgeRepository:
+        """Expõe o repositório para operações administrativas controladas."""
+
+        return self._repository
+
     def add_document(
         self,
         *,

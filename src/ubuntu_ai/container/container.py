@@ -11,9 +11,10 @@ from ubuntu_ai.conversation.service import ConversationService
 from ubuntu_ai.conversation.sqlite_repository import SQLiteConversationRepository
 from ubuntu_ai.core.config import AppConfig
 from ubuntu_ai.executor.preview import PreviewBuilder
-from ubuntu_ai.knowledge.exceptions import KnowledgeRepositoryNotConfiguredError
+from ubuntu_ai.knowledge.engine import KnowledgeEngine
 from ubuntu_ai.knowledge.repository import KnowledgeRepository
 from ubuntu_ai.knowledge.service import KnowledgeService
+from ubuntu_ai.knowledge.sqlite_repository import SQLiteKnowledgeRepository
 from ubuntu_ai.memory.repository import MemoryRepository
 from ubuntu_ai.memory.service import MemoryService
 from ubuntu_ai.memory.sqlite_repository import SQLiteMemoryRepository
@@ -89,7 +90,10 @@ class Container:
     def ai_planner(self) -> AIPlanner:
         """Cria um planejador baseado em IA."""
 
-        return AIPlanner(provider=self.ai_provider())
+        return AIPlanner(
+            provider=self.ai_provider(),
+            knowledge_service=self.knowledge_service(),
+        )
 
     def planner(self) -> Planner:
         """Cria o orquestrador de planejamento."""
@@ -126,16 +130,15 @@ class Container:
 
         self._singletons["knowledge_repository"] = repository
         self._singletons.pop("knowledge_service", None)
+        self._singletons.pop("knowledge_engine", None)
 
     def knowledge_repository(self) -> KnowledgeRepository:
         """Retorna o backend de conhecimento previamente registrado."""
 
-        repository = self._singletons.get("knowledge_repository")
-        if repository is None:
-            raise KnowledgeRepositoryNotConfiguredError(
-                "Nenhum KnowledgeRepository foi registrado no container."
-            )
-        return cast(KnowledgeRepository, repository)
+        return self._singleton(
+            "knowledge_repository",
+            SQLiteKnowledgeRepository,
+        )
 
     def knowledge_service(self) -> KnowledgeService:
         """Retorna o serviço de conhecimento desacoplado do backend."""
@@ -143,6 +146,14 @@ class Container:
         return self._singleton(
             "knowledge_service",
             lambda: KnowledgeService(self.knowledge_repository()),
+        )
+
+    def knowledge_engine(self) -> KnowledgeEngine:
+        """Retorna o mecanismo de ingestão e busca de conhecimento."""
+
+        return self._singleton(
+            "knowledge_engine",
+            lambda: KnowledgeEngine(self.knowledge_service()),
         )
 
     def memory_repository(self) -> MemoryRepository:

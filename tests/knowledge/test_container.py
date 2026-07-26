@@ -1,15 +1,12 @@
-import pytest
-
 from tests.knowledge.fakes import FakeKnowledgeRepository
 from ubuntu_ai.container.container import Container
-from ubuntu_ai.knowledge.exceptions import KnowledgeRepositoryNotConfiguredError
+from ubuntu_ai.knowledge.sqlite_repository import SQLiteKnowledgeRepository
 
 
-def test_container_requires_explicit_knowledge_backend() -> None:
+def test_container_builds_default_sqlite_knowledge_backend() -> None:
     container = Container()
 
-    with pytest.raises(KnowledgeRepositoryNotConfiguredError):
-        container.knowledge_repository()
+    assert isinstance(container.knowledge_repository(), SQLiteKnowledgeRepository)
 
 
 def test_container_builds_service_from_registered_repository() -> None:

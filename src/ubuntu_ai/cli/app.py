@@ -1,6 +1,7 @@
 import typer
 
 from ubuntu_ai.cli.doctor import doctor
+from ubuntu_ai.cli.knowledge import app as knowledge_app
 from ubuntu_ai.cli.plan import plan
 
 app = typer.Typer(
@@ -15,5 +16,6 @@ def main() -> None:
     """Ubuntu AI Assistant."""
 
 
+app.add_typer(knowledge_app, name="knowledge")
 app.command(name="doctor")(doctor)
 app.command(name="plan")(plan)

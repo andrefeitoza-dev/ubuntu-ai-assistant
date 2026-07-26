@@ -5,6 +5,7 @@ from ubuntu_ai.ai.prompt_builder import PlanningPromptBuilder
 from ubuntu_ai.context.models import ContextSnapshot
 from ubuntu_ai.domain.plan import Plan, PlanStep
 from ubuntu_ai.domain.risk import RiskLevel
+from ubuntu_ai.knowledge.service import KnowledgeService
 
 
 class AIPlanner:
@@ -14,9 +15,11 @@ class AIPlanner:
         self,
         provider: AIProvider,
         prompt_builder: PlanningPromptBuilder | None = None,
+        knowledge_service: KnowledgeService | None = None,
     ) -> None:
         self._provider = provider
         self._prompt_builder = prompt_builder or PlanningPromptBuilder()
+        self._knowledge_service = knowledge_service
 
     def create_plan(
         self,
@@ -39,7 +42,22 @@ class AIPlanner:
         request: str,
         context: ContextSnapshot | None = None,
     ) -> str:
-        return self._prompt_builder.build(request=request, context=context)
+        knowledge_context = self._knowledge_context(request)
+        return self._prompt_builder.build(
+            request=request,
+            context=context,
+            knowledge_context=knowledge_context,
+        )
+
+    def _knowledge_context(self, request: str) -> str | None:
+        if self._knowledge_service is None:
+            return None
+        results = self._knowledge_service.search(request, limit=3)
+        if not results:
+            return None
+        return "\n".join(
+            f"- {result.document.title}: {result.excerpt}" for result in results
+        )
 
     def _parse_plan(self, content: str) -> Plan:
         try:

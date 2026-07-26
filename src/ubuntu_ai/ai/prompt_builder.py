@@ -11,10 +11,16 @@ class PlanningPromptBuilder:
         *,
         request: str,
         context: ContextSnapshot | None = None,
+        knowledge_context: str | None = None,
     ) -> str:
         context_section = (
             f"Contexto disponível:\n{context.to_prompt()}\n"
             if context is not None
+            else ""
+        )
+        knowledge_section = (
+            f"Conhecimento local relevante:\n{knowledge_context}\n"
+            if knowledge_context
             else ""
         )
         conversation_section = ""
@@ -29,6 +35,7 @@ class PlanningPromptBuilder:
             "Crie um plano seguro para Ubuntu em JSON válido.\n"
             f"{context_section}"
             f"{conversation_section}"
+            f"{knowledge_section}"
             "Use exatamente esta estrutura:\n"
             "{\n"
             '  "goal": "objetivo",\n'
