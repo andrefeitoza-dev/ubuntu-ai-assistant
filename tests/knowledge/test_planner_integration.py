@@ -26,11 +26,9 @@ def test_ai_planner_includes_relevant_knowledge_in_prompt(tmp_path: Path) -> Non
         source=KnowledgeSource.MANUAL,
     )
     provider = FakeAIProvider(
-        (
-            '{"goal":"Instalar Docker","estimated_seconds":60,'
-            '"risk":"medium","steps":[{"title":"Instalar",'
-            '"description":"Instala Docker","command":["echo","ok"]}]}'
-        )
+        '{"goal":"Instalar Docker","estimated_seconds":60,'
+        '"risk":"medium","steps":[{"title":"Instalar",'
+        '"description":"Instala Docker","command":["echo","ok"]}]}'
     )
 
     AIPlanner(provider, knowledge_service=service).create_plan("instalar docker")
