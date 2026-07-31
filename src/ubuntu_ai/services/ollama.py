@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from typing import Any
 
 import requests
 
@@ -16,12 +17,26 @@ class OllamaService:
     def __init__(
         self,
         base_url: str = "http://localhost:11434",
-        timeout: int = 120,
+        timeout: int = 300,
         session: requests.Session | None = None,
+        *,
+        response_format: str | None = None,
+        num_predict: int | None = None,
+        temperature: float | None = None,
+        keep_alive: str | None = None,
     ) -> None:
+        if timeout <= 0:
+            raise ValueError("O timeout deve ser maior que zero.")
+        if num_predict is not None and num_predict <= 0:
+            raise ValueError("num_predict deve ser maior que zero.")
+
         self.base_url = base_url.rstrip("/")
         self.timeout = timeout
         self._session = session or requests.Session()
+        self._response_format = response_format
+        self._num_predict = num_predict
+        self._temperature = temperature
+        self._keep_alive = keep_alive
 
     def get_info(self) -> OllamaInfo:
         """Obtém informações sobre o servidor e os modelos instalados."""
@@ -64,17 +79,43 @@ class OllamaService:
     def generate(self, prompt: str, model: str) -> str:
         """Gera uma resposta textual usando um modelo do Ollama."""
 
+        normalized_prompt = prompt.strip()
+        normalized_model = model.strip()
+        if not normalized_prompt:
+            raise ValueError("O prompt não pode estar vazio.")
+        if not normalized_model:
+            raise ValueError("O modelo não pode estar vazio.")
+
+        payload: dict[str, Any] = {
+            "model": normalized_model,
+            "prompt": normalized_prompt,
+            "stream": False,
+        }
+        if self._response_format is not None:
+            payload["format"] = self._response_format
+        if self._keep_alive is not None:
+            payload["keep_alive"] = self._keep_alive
+
+        options: dict[str, int | float] = {}
+        if self._num_predict is not None:
+            options["num_predict"] = self._num_predict
+        if self._temperature is not None:
+            options["temperature"] = self._temperature
+        if options:
+            payload["options"] = options
+
         try:
             response = self._session.post(
                 f"{self.base_url}/api/generate",
-                json={
-                    "model": model,
-                    "prompt": prompt,
-                    "stream": False,
-                },
+                json=payload,
                 timeout=self.timeout,
             )
             response.raise_for_status()
+        except requests.Timeout as error:
+            raise RuntimeError(
+                "O Ollama não respondeu dentro do tempo configurado "
+                f"({self.timeout}s)."
+            ) from error
         except requests.RequestException as error:
             raise RuntimeError(
                 "Falha ao gerar resposta com o Ollama."

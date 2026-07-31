@@ -75,3 +75,26 @@ def test_service_lists_today_and_counts_failures(tmp_path: Path) -> None:
 
     assert len(service.executions_today(now=now)) == 1
     assert service.count_failures_today(now=now) == 1
+
+
+def test_service_normalizes_path_working_directory(tmp_path: Path) -> None:
+    service = build_service(tmp_path)
+    working_directory = tmp_path / "project"
+    result = ExecutionResult(
+        status=ExecutionStatus.EXECUTED,
+        message="Executado.",
+        command="pwd",
+        return_code=0,
+        stdout=str(working_directory),
+    )
+
+    record = service.record_execution(
+        session_id="session-1",
+        user_request="Mostre o diretório atual",
+        working_directory=working_directory,
+        project_name="project",
+        result=result,
+    )
+
+    assert record.working_directory == str(working_directory)
+    assert service.last_execution() == record

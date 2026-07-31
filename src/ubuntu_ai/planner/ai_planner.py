@@ -59,7 +59,11 @@ class AIPlanner:
 
     def _knowledge_context(self, request: str) -> str | None:
         if self._rag_context_builder is not None:
-            return self._rag_context_builder.build(request, limit=5)
+            return self._rag_context_builder.build(
+                request,
+                limit=3,
+                max_chars=1_500,
+            )
         if self._knowledge_service is None:
             return None
         results = self._knowledge_service.search(request, limit=3)
@@ -77,11 +81,14 @@ class AIPlanner:
         if self._learning_service is None:
             return None
         project_name = context.project_name if context is not None else None
-        return self._learning_service.context_for_prompt(
+        context_text = self._learning_service.context_for_prompt(
             request,
             project_name=project_name,
-            limit=5,
+            limit=3,
         )
+        if context_text is None:
+            return None
+        return context_text[:1_000]
 
     def _parse_plan(self, content: str) -> Plan:
         try:

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from datetime import UTC, datetime, time, timedelta
+from os import PathLike
 
 from ubuntu_ai.execution.models import ExecutionResult
 from ubuntu_ai.memory.models import ExecutionRecord
@@ -18,7 +19,7 @@ class MemoryService:
         *,
         session_id: str,
         user_request: str,
-        working_directory: str,
+        working_directory: str | PathLike[str],
         project_name: str | None,
         result: ExecutionResult,
     ) -> ExecutionRecord:
@@ -34,7 +35,7 @@ class MemoryService:
             command=command,
             status=result.status.value,
             message=result.message,
-            working_directory=working_directory,
+            working_directory=str(working_directory),
             project_name=project_name,
             return_code=result.return_code,
             stdout=result.stdout,

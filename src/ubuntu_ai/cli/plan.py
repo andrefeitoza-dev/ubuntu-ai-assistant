@@ -12,8 +12,11 @@ def plan(request: str = typer.Argument(..., help="Solicitação a ser planejada.
     pipeline = container.execution_pipeline()
 
     try:
-        result = pipeline.run(request)
-    except ValueError as error:
+        with console.status(
+            "[bold cyan]Gerando plano com o modelo local...[/bold cyan]"
+        ):
+            result = pipeline.run(request)
+    except (RuntimeError, ValueError) as error:
         console.print(f"[red]Erro:[/red] {error}")
         raise typer.Exit(code=1) from error
 

@@ -8,7 +8,7 @@ def test_app_config_has_expected_defaults() -> None:
 
     assert config.ollama_base_url == "http://localhost:11434"
     assert config.ollama_model == "qwen2.5:3b"
-    assert config.request_timeout == 120
+    assert config.request_timeout == 300
     assert config.command_timeout == 30
     assert config.language == "pt-BR"
     assert config.safe_mode is True

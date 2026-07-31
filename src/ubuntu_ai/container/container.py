@@ -89,6 +89,10 @@ class Container:
             lambda: OllamaService(
                 base_url=config.ollama_base_url,
                 timeout=config.request_timeout,
+                response_format="json",
+                num_predict=config.ollama_num_predict,
+                temperature=config.ollama_temperature,
+                keep_alive=config.ollama_keep_alive,
             ),
         )
 

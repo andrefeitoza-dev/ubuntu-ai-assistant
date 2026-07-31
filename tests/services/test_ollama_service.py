@@ -92,3 +92,27 @@ def test_ollama_service_converts_request_error() -> None:
             prompt="Explique Docker",
             model="qwen2.5:3b",
         )
+
+def test_ollama_service_applies_generation_limits() -> None:
+    session = FakeSession({"response": '{"goal": "Teste"}'})
+    service = OllamaService(
+        session=session,
+        response_format="json",
+        num_predict=384,
+        temperature=0.1,
+        keep_alive="10m",
+    )
+
+    service.generate(prompt="Crie um plano", model="qwen2.5:3b")
+
+    assert session.last_json == {
+        "model": "qwen2.5:3b",
+        "prompt": "Crie um plano",
+        "stream": False,
+        "format": "json",
+        "keep_alive": "10m",
+        "options": {
+            "num_predict": 384,
+            "temperature": 0.1,
+        },
+    }

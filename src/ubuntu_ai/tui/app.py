@@ -52,7 +52,15 @@ class TerminalApp:
     def _run_goal(self, goal: str) -> None:
         if self._config.clear_between_tasks:
             self._console.clear()
-        snapshot = self._controller.start(goal)
+        try:
+            with self._console.status(
+                "[bold cyan]Gerando plano com o modelo local...[/bold cyan]"
+            ):
+                snapshot = self._controller.start(goal)
+        except (RuntimeError, ValueError) as error:
+            self._console.print(f"[red]Não foi possível gerar o plano:[/red] {error}")
+            return
+
         self._renderer.plan(snapshot)
 
         while snapshot.requires_confirmation:
