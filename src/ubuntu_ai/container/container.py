@@ -31,6 +31,7 @@ from ubuntu_ai.pipeline.execution_pipeline import ExecutionPipeline
 from ubuntu_ai.planner.ai_planner import AIPlanner
 from ubuntu_ai.planner.planner import Planner
 from ubuntu_ai.planner.rule_planner import RulePlanner
+from ubuntu_ai.plugins import PluginManager, PluginPolicy, PluginRegistry
 from ubuntu_ai.renderer.preview_renderer import PreviewRenderer
 from ubuntu_ai.reflection.engine import ReflectionEngine
 from ubuntu_ai.semantic import (
@@ -137,6 +138,27 @@ class Container:
         return self._singleton(
             "ai_provider",
             lambda: self.ai_provider_registry().create(config.ai_provider),
+        )
+
+    def plugin_registry(self) -> PluginRegistry:
+        """Retorna o registro de plugins carregados."""
+
+        return self._singleton("plugin_registry", PluginRegistry)
+
+    def plugin_policy(self) -> PluginPolicy:
+        """Retorna a política de admissão de plugins."""
+
+        return self._singleton("plugin_policy", PluginPolicy)
+
+    def plugin_manager(self) -> PluginManager:
+        """Retorna o gerenciador do SDK de plugins."""
+
+        return self._singleton(
+            "plugin_manager",
+            lambda: PluginManager(
+                registry=self.plugin_registry(),
+                skill_registry=self.skill_registry(),
+            ),
         )
 
     def skill_registry(self) -> SkillRegistry:

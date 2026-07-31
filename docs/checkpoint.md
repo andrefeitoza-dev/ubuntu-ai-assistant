@@ -95,3 +95,13 @@ Implementar M4.6 — Autonomous Decision Engine usando memória, conhecimento e 
 - `RAGContextBuilder` injeta trechos relevantes e suas fontes no `AIPlanner`.
 - Índice semântico é sincronizado automaticamente com alterações dos documentos.
 - Próxima milestone: ➡ M5.6 — Plugin SDK.
+
+## M5.6 — Plugin SDK
+
+- Última milestone concluída: ✅ M5.6 — Plugin SDK.
+- API pública v1 para plugins e manifesto TOML/JSON.
+- Loader valida compatibilidade e permissões antes da inicialização.
+- PluginManager oferece descoberta, instalação com rollback e remoção.
+- Plugins podem fornecer Skills sem acesso direto ao Runtime interno.
+- A política atual é uma barreira de capacidades, não isolamento de processo.
+- Próxima milestone: ➡ M5.7 — Agent Loop.
