@@ -20,6 +20,7 @@ from ubuntu_ai.execution.models import (
     ExecutionStatus,
 )
 from ubuntu_ai.execution.system_executor import SystemExecutor
+from ubuntu_ai.execution_intelligence.engine import ExecutionIntelligence
 from ubuntu_ai.learning.service import LearningService
 from ubuntu_ai.memory.service import MemoryService
 from ubuntu_ai.pipeline.execution_pipeline import ExecutionPipeline
@@ -40,6 +41,7 @@ class AgentRuntime:
         context_engine: ContextEngine | None = None,
         conversation_engine: ConversationEngine | None = None,
         learning_service: LearningService | None = None,
+        execution_intelligence: ExecutionIntelligence | None = None,
     ) -> None:
         self._execution_pipeline = execution_pipeline or ExecutionPipeline()
         self._session_manager = session_manager or SessionManager()
@@ -52,6 +54,7 @@ class AgentRuntime:
         self._memory_service = memory_service
         self._conversation_engine = conversation_engine
         self._learning_service = learning_service
+        self._execution_intelligence = execution_intelligence
         self._context_engine = context_engine or ContextEngine(
             context_provider=self._context_provider,
             session_manager=self._session_manager,
@@ -176,9 +179,22 @@ class AgentRuntime:
         for step in self._pipeline_result.plan.steps:
             command = join(step.command)
 
-            result = self._controlled_executor.execute(
-                ExecutionRequest(command=command)
-            )
+            if self._execution_intelligence is not None:
+                report = self._execution_intelligence.inspect_step(step)
+                if not report.ready:
+                    result = ExecutionResult(
+                        status=ExecutionStatus.BLOCKED,
+                        message=report.summary(),
+                        command=command,
+                    )
+                else:
+                    result = self._controlled_executor.execute(
+                        ExecutionRequest(command=command)
+                    )
+            else:
+                result = self._controlled_executor.execute(
+                    ExecutionRequest(command=command)
+                )
 
             results.append(result)
 

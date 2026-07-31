@@ -26,6 +26,8 @@ class ToolCapability:
     executables: tuple[str, ...]
     intents: tuple[str, ...] = ()
     operating_systems: tuple[str, ...] = ("linux",)
+    dependencies: tuple[str, ...] = ()
+    minimum_version: str | None = None
     requires_elevation: bool = False
     risk: RiskLevel = RiskLevel.LOW
     priority: int = 50

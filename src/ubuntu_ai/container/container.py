@@ -13,6 +13,9 @@ from ubuntu_ai.conversation.service import ConversationService
 from ubuntu_ai.conversation.sqlite_repository import SQLiteConversationRepository
 from ubuntu_ai.core.config import AppConfig
 from ubuntu_ai.executor.preview import PreviewBuilder
+from ubuntu_ai.execution_intelligence.discovery import DiscoveryEngine
+from ubuntu_ai.execution_intelligence.engine import ExecutionIntelligence
+from ubuntu_ai.execution_intelligence.preflight import PreflightEngine
 from ubuntu_ai.knowledge.engine import KnowledgeEngine
 from ubuntu_ai.knowledge.repository import KnowledgeRepository
 from ubuntu_ai.knowledge.service import KnowledgeService
@@ -129,7 +132,6 @@ class Container:
             lambda: self.ai_provider_registry().create(config.ai_provider),
         )
 
-
     def capability_registry(self) -> CapabilityRegistry:
         """Retorna o catálogo único de capacidades do agente."""
 
@@ -146,6 +148,30 @@ class Container:
             lambda: ToolSelectionEngine(
                 registry=self.capability_registry(),
                 learning_service=self.learning_service(),
+            ),
+        )
+
+    def discovery_engine(self) -> DiscoveryEngine:
+        """Retorna o mecanismo de descoberta do ambiente."""
+
+        return self._singleton("discovery_engine", DiscoveryEngine)
+
+    def preflight_engine(self) -> PreflightEngine:
+        """Retorna o mecanismo de verificações prévias."""
+
+        return self._singleton(
+            "preflight_engine",
+            lambda: PreflightEngine(self.discovery_engine()),
+        )
+
+    def execution_intelligence(self) -> ExecutionIntelligence:
+        """Retorna a camada de inteligência anterior à execução."""
+
+        return self._singleton(
+            "execution_intelligence",
+            lambda: ExecutionIntelligence(
+                registry=self.capability_registry(),
+                preflight=self.preflight_engine(),
             ),
         )
 
@@ -310,4 +336,5 @@ class Container:
             context_engine=self.context_engine(),
             conversation_engine=self.conversation_engine(),
             learning_service=self.learning_service(),
+            execution_intelligence=self.execution_intelligence(),
         )
