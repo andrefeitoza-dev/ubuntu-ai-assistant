@@ -45,6 +45,7 @@ from ubuntu_ai.services.ollama import OllamaService
 from ubuntu_ai.skills import Skill, SkillManager, SkillRegistry, default_skills
 from ubuntu_ai.tools.capability_registry import CapabilityRegistry
 from ubuntu_ai.tools.selection import ToolSelectionEngine
+from ubuntu_ai.tui.app import TerminalApp
 
 T = TypeVar("T")
 
@@ -443,6 +444,16 @@ class Container:
                     ),
                 ),
             ),
+        )
+
+
+    def terminal_app(self) -> TerminalApp:
+        """Retorna a interface interativa de terminal."""
+
+        return TerminalApp(
+            controller=self.agent_loop_controller(),
+            memory_service=self.memory_service(),
+            plugin_registry=self.plugin_registry(),
         )
 
     def agent_runtime(self) -> AgentRuntime:

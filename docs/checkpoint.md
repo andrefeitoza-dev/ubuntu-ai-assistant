@@ -115,3 +115,11 @@ Implementar M4.6 — Autonomous Decision Engine usando memória, conhecimento e 
 - Watchdog detecta repetição sem progresso.
 - Limites configuráveis impedem loops infinitos.
 - Próxima fase: evolução de produto, TUI/GUI, SSH remoto e agentes especializados.
+
+## M6.0 — Terminal UI
+
+- Interface interativa adicionada em `ubuntu_ai.tui`.
+- Novo comando `ubuntu-ai tui`.
+- Operação segura do Agent Loop com confirmação por iteração.
+- Consultas locais de status, histórico e plugins.
+- Implementação baseada em Rich, sem nova dependência.
