@@ -230,7 +230,6 @@ class AgentRuntime:
             result=result,
         )
 
-
     def _learn_from_execution(self, result: ExecutionResult) -> None:
         """Atualiza o aprendizado persistente após cada tentativa."""
 

@@ -4,6 +4,7 @@ from pathlib import Path
 
 @dataclass(frozen=True, slots=True)
 class AppConfig:
+    ai_provider: str = "ollama"
     ollama_base_url: str = "http://localhost:11434"
     ollama_model: str = "qwen2.5:3b"
     request_timeout: int = 120

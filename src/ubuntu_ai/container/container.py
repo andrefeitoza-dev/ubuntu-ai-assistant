@@ -1,9 +1,11 @@
 from collections.abc import Callable
+from dataclasses import replace
 from typing import TypeVar, cast
 
 from ubuntu_ai.agent.runtime import AgentRuntime
 from ubuntu_ai.ai.ollama_provider import OllamaProvider
 from ubuntu_ai.ai.provider import AIProvider
+from ubuntu_ai.ai.registry import AIProviderRegistry
 from ubuntu_ai.context.engine import ContextEngine
 from ubuntu_ai.conversation.engine import ConversationEngine
 from ubuntu_ai.conversation.repository import ConversationRepository
@@ -50,6 +52,11 @@ class Container:
 
         return cast(T, self._singletons[key])
 
+    def reset(self) -> None:
+        """Descarta singletons para recompor a aplicação com segurança."""
+
+        self._singletons.clear()
+
     def config(self) -> AppConfig:
         """Retorna a configuração única da aplicação."""
 
@@ -81,10 +88,43 @@ class Container:
             ),
         )
 
-    def ai_provider(self) -> AIProvider:
-        """Retorna o provedor de IA configurado para a aplicação."""
+    def ai_provider_registry(self) -> AIProviderRegistry:
+        """Retorna o registro de provedores disponível na aplicação."""
 
-        return self.ollama_provider()
+        def factory() -> AIProviderRegistry:
+            registry = AIProviderRegistry()
+            registry.register("ollama", self.ollama_provider)
+            return registry
+
+        return self._singleton("ai_provider_registry", factory)
+
+    def register_ai_provider(
+        self,
+        name: str,
+        provider: AIProvider,
+        *,
+        replace_existing: bool = False,
+        select: bool = False,
+    ) -> None:
+        """Registra uma instância de provedor para composição ou testes."""
+
+        self.ai_provider_registry().register(
+            name,
+            lambda: provider,
+            replace=replace_existing,
+        )
+        if select:
+            self._singletons["config"] = replace(self.config(), ai_provider=name)
+        self._singletons.pop("ai_provider", None)
+
+    def ai_provider(self) -> AIProvider:
+        """Retorna o provedor de IA selecionado pela configuração."""
+
+        config = self.config()
+        return self._singleton(
+            "ai_provider",
+            lambda: self.ai_provider_registry().create(config.ai_provider),
+        )
 
     def rule_planner(self) -> RulePlanner:
         """Cria um planejador determinístico."""

@@ -64,7 +64,6 @@ class AIPlanner:
             f"- {result.document.title}: {result.excerpt}" for result in results
         )
 
-
     def _learning_context(
         self,
         request: str,

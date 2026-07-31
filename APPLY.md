@@ -1,8 +1,12 @@
-# Aplicação da M4.5 — Learning Engine
+# Aplicação — Sprint 5.0
 
-Copie todo o conteúdo deste pacote para a raiz do repositório, preservando os diretórios e substituindo os arquivos existentes quando solicitado.
+Extraia este pacote na raiz do repositório Ubuntu AI:
 
-Validação:
+```bash
+unzip -o ubuntu-ai-s5.0-architectural-consolidation.zip -d .
+```
+
+Valide:
 
 ```bash
 uv run ruff check src tests
@@ -13,5 +17,5 @@ Commit sugerido:
 
 ```bash
 git add .
-git commit -m "feat(learning): implement persistent learning engine"
+git commit -m "refactor(core): consolidate AI provider composition"
 ```

@@ -51,3 +51,10 @@ Implementar M4.6 — Autonomous Decision Engine usando memória, conhecimento e 
 2. Ler `docs/project-context.md` quando necessário.
 3. Inspecionar apenas módulos afetados.
 4. Continuar diretamente pela próxima milestone.
+
+## Sprint 5.0 — Consolidação arquitetural
+
+- Auditoria concluiu que Brain facade e Result genérico seriam abstrações prematuras.
+- Adicionado registro configurável de provedores de IA.
+- Container ganhou seleção de provider e recomposição segura via `reset()`.
+- Compatibilidade com Ollama e fluxo atual preservada.
