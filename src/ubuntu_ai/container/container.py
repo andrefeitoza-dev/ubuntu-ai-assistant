@@ -32,6 +32,7 @@ from ubuntu_ai.planner.ai_planner import AIPlanner
 from ubuntu_ai.planner.planner import Planner
 from ubuntu_ai.planner.rule_planner import RulePlanner
 from ubuntu_ai.renderer.preview_renderer import PreviewRenderer
+from ubuntu_ai.reflection.engine import ReflectionEngine
 from ubuntu_ai.services.ollama import OllamaService
 from ubuntu_ai.skills import Skill, SkillManager, SkillRegistry, default_skills
 from ubuntu_ai.tools.capability_registry import CapabilityRegistry
@@ -353,6 +354,11 @@ class Container:
 
         return ContextEngine(memory_service=self.memory_service())
 
+    def reflection_engine(self) -> ReflectionEngine:
+        """Retorna o mecanismo único de autorreflexão."""
+
+        return self._singleton("reflection_engine", ReflectionEngine)
+
     def agent_runtime(self) -> AgentRuntime:
         """Cria o runtime central do agente."""
 
@@ -363,4 +369,5 @@ class Container:
             conversation_engine=self.conversation_engine(),
             learning_service=self.learning_service(),
             execution_intelligence=self.execution_intelligence(),
+            reflection_engine=self.reflection_engine(),
         )

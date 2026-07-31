@@ -76,3 +76,12 @@ Implementar M4.6 — Autonomous Decision Engine usando memória, conhecimento e 
 - `SkillManager` prepara e valida etapas antes do preflight.
 - Skills nativas agrupam Apt/Snap, systemd, Docker, Git, Python, SSH e Shell.
 - Próxima milestone: ➡ M5.4 — Self Reflection.
+
+## M5.4 — Self Reflection
+
+- Última milestone concluída: ✅ M5.4 — Self Reflection.
+- Reflexão pré-execução avalia coerência, redundância, seleção de ferramentas e risco.
+- Achados críticos bloqueiam a execução sem contornar confirmação ou preflight.
+- Reflexão pós-execução diagnostica sucesso, bloqueio, falha e comandos indisponíveis.
+- Relatórios estruturados ficam disponíveis no `AgentRuntime` e no histórico da sessão.
+- Próxima milestone: ➡ M5.5 — Semantic Knowledge / Local RAG.

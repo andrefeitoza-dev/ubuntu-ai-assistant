@@ -25,6 +25,8 @@ from ubuntu_ai.learning.service import LearningService
 from ubuntu_ai.memory.service import MemoryService
 from ubuntu_ai.pipeline.execution_pipeline import ExecutionPipeline
 from ubuntu_ai.pipeline.models import PipelineResult
+from ubuntu_ai.reflection.engine import ReflectionEngine
+from ubuntu_ai.reflection.models import ReflectionReport
 
 
 class AgentRuntime:
@@ -42,6 +44,7 @@ class AgentRuntime:
         conversation_engine: ConversationEngine | None = None,
         learning_service: LearningService | None = None,
         execution_intelligence: ExecutionIntelligence | None = None,
+        reflection_engine: ReflectionEngine | None = None,
     ) -> None:
         self._execution_pipeline = execution_pipeline or ExecutionPipeline()
         self._session_manager = session_manager or SessionManager()
@@ -55,6 +58,7 @@ class AgentRuntime:
         self._conversation_engine = conversation_engine
         self._learning_service = learning_service
         self._execution_intelligence = execution_intelligence
+        self._reflection_engine = reflection_engine
         self._context_engine = context_engine or ContextEngine(
             context_provider=self._context_provider,
             session_manager=self._session_manager,
@@ -68,6 +72,8 @@ class AgentRuntime:
         self._context_snapshot: ContextSnapshot | None = None
         self._session_id = str(uuid4())
         self._lifecycle = AgentLifecycle.IDLE
+        self._plan_reflection: ReflectionReport | None = None
+        self._execution_reflections: list[ReflectionReport] = []
 
     @property
     def session_manager(self) -> SessionManager:
@@ -92,6 +98,19 @@ class AgentRuntime:
         """Retorna o snapshot contextual mais recente."""
 
         return self._context_snapshot
+
+
+    @property
+    def plan_reflection(self) -> ReflectionReport | None:
+        """Retorna a reflexão mais recente sobre o plano."""
+
+        return self._plan_reflection
+
+    @property
+    def execution_reflections(self) -> tuple[ReflectionReport, ...]:
+        """Retorna as reflexões da execução mais recente."""
+
+        return tuple(self._execution_reflections)
 
     def get_context(self) -> AgentContext:
         """Obtém o contexto atual do ambiente."""
@@ -140,6 +159,19 @@ class AgentRuntime:
         self._pipeline_result = pipeline_result
 
         message = pipeline_result.rendered_preview
+        self._execution_reflections.clear()
+        if self._reflection_engine is not None:
+            self._plan_reflection = self._reflection_engine.before_execution(
+                pipeline_result.plan
+            )
+            if self._plan_reflection.findings:
+                message = (
+                    f"{message}\n\nReflexão do plano "
+                    f"(score={self._plan_reflection.score:.2f}):\n"
+                    f"{self._plan_reflection.summary()}"
+                )
+        else:
+            self._plan_reflection = None
 
         self._session_manager.remember(f"Agente: {message}")
         if self._conversation_engine is not None:
@@ -176,7 +208,16 @@ class AgentRuntime:
 
         results: list[ExecutionResult] = []
 
-        for step in self._pipeline_result.plan.steps:
+        if self._plan_reflection is not None and not self._plan_reflection.approved:
+            result = ExecutionResult(
+                status=ExecutionStatus.BLOCKED,
+                message=self._plan_reflection.summary(),
+            )
+            self._clear_pending_execution()
+            self._lifecycle = AgentLifecycle.COMPLETED
+            return (result,)
+
+        for step_index, step in enumerate(self._pipeline_result.plan.steps):
             command = join(step.command)
 
             if self._execution_intelligence is not None:
@@ -204,6 +245,16 @@ class AgentRuntime:
             )
             self._persist_execution_result(result)
             self._learn_from_execution(result)
+            if self._reflection_engine is not None:
+                reflection = self._reflection_engine.after_execution(
+                    command=command,
+                    result=result,
+                    step_index=step_index,
+                )
+                self._execution_reflections.append(reflection)
+                self._session_manager.remember(
+                    f"Reflexão pós-execução: {reflection.summary()}"
+                )
 
             # Apenas comandos bloqueados interrompem o fluxo.
             if result.status is ExecutionStatus.BLOCKED:
