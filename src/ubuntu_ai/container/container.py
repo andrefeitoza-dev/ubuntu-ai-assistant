@@ -33,8 +33,8 @@ from ubuntu_ai.planner.planner import Planner
 from ubuntu_ai.planner.rule_planner import RulePlanner
 from ubuntu_ai.renderer.preview_renderer import PreviewRenderer
 from ubuntu_ai.services.ollama import OllamaService
+from ubuntu_ai.skills import Skill, SkillManager, SkillRegistry, default_skills
 from ubuntu_ai.tools.capability_registry import CapabilityRegistry
-from ubuntu_ai.tools.default_capabilities import default_capabilities
 from ubuntu_ai.tools.selection import ToolSelectionEngine
 
 T = TypeVar("T")
@@ -132,12 +132,37 @@ class Container:
             lambda: self.ai_provider_registry().create(config.ai_provider),
         )
 
+    def skill_registry(self) -> SkillRegistry:
+        """Retorna o registro único de skills instaladas."""
+
+        return self._singleton("skill_registry", lambda: SkillRegistry(default_skills()))
+
+    def register_skill(self, skill: Skill, *, replace_existing: bool = False) -> None:
+        """Registra uma skill e recompõe os componentes derivados."""
+
+        self.skill_registry().register(skill, replace=replace_existing)
+        for key in (
+            "capability_registry",
+            "skill_manager",
+            "tool_selection_engine",
+            "execution_intelligence",
+            "execution_pipeline",
+        ):
+            self._singletons.pop(key, None)
+
+    def skill_manager(self) -> SkillManager:
+        """Retorna o orquestrador de skills."""
+
+        return self._singleton(
+            "skill_manager", lambda: SkillManager(self.skill_registry())
+        )
+
     def capability_registry(self) -> CapabilityRegistry:
-        """Retorna o catálogo único de capacidades do agente."""
+        """Compõe capacidades a partir das skills registradas."""
 
         return self._singleton(
             "capability_registry",
-            lambda: CapabilityRegistry(default_capabilities()),
+            lambda: CapabilityRegistry(self.skill_registry().capabilities()),
         )
 
     def tool_selection_engine(self) -> ToolSelectionEngine:
@@ -172,6 +197,7 @@ class Container:
             lambda: ExecutionIntelligence(
                 registry=self.capability_registry(),
                 preflight=self.preflight_engine(),
+                skill_manager=self.skill_manager(),
             ),
         )
 

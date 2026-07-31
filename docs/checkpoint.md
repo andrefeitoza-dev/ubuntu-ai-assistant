@@ -58,3 +58,21 @@ Implementar M4.6 — Autonomous Decision Engine usando memória, conhecimento e 
 - Adicionado registro configurável de provedores de IA.
 - Container ganhou seleção de provider e recomposição segura via `reset()`.
 - Compatibilidade com Ollama e fluxo atual preservada.
+
+## M5.1 — Tool Selection Engine
+
+- Capacidades selecionadas por executável, intenção, prioridade e aprendizado.
+- `PlanStep.tool_name` preserva a ferramenta escolhida até a execução.
+
+## M5.2 — Execution Intelligence
+
+- Discovery e preflight verificam disponibilidade, dependências, versão e elevação.
+- Etapas incompatíveis são bloqueadas antes do executor.
+
+## M5.3 — Skill System
+
+- Última milestone concluída: ✅ M5.3 — Skill System.
+- Skills registráveis passam a fornecer as capacidades do agente.
+- `SkillManager` prepara e valida etapas antes do preflight.
+- Skills nativas agrupam Apt/Snap, systemd, Docker, Git, Python, SSH e Shell.
+- Próxima milestone: ➡ M5.4 — Self Reflection.
