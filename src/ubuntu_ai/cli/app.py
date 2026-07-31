@@ -1,5 +1,6 @@
 import typer
 
+from ubuntu_ai.cli.diagnose_ai import diagnose_ai
 from ubuntu_ai.cli.doctor import doctor
 from ubuntu_ai.cli.knowledge import app as knowledge_app
 from ubuntu_ai.cli.plan import plan
@@ -18,6 +19,7 @@ def main() -> None:
 
 
 app.add_typer(knowledge_app, name="knowledge")
+app.command(name="diagnose-ai")(diagnose_ai)
 app.command(name="doctor")(doctor)
 app.command(name="plan")(plan)
 app.command(name="tui")(tui)

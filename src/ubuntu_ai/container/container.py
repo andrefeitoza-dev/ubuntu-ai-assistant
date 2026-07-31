@@ -13,6 +13,7 @@ from ubuntu_ai.conversation.repository import ConversationRepository
 from ubuntu_ai.conversation.service import ConversationService
 from ubuntu_ai.conversation.sqlite_repository import SQLiteConversationRepository
 from ubuntu_ai.core.config import AppConfig
+from ubuntu_ai.diagnostics.ai_diagnostics import AIDiagnosticsService
 from ubuntu_ai.executor.preview import PreviewBuilder
 from ubuntu_ai.execution_intelligence.discovery import DiscoveryEngine
 from ubuntu_ai.execution_intelligence.engine import ExecutionIntelligence
@@ -88,6 +89,17 @@ class Container:
             lambda: OllamaService(
                 base_url=config.ollama_base_url,
                 timeout=config.request_timeout,
+            ),
+        )
+
+    def ai_diagnostics_service(self) -> AIDiagnosticsService:
+        """Retorna o diagnóstico do runtime local de IA."""
+
+        return self._singleton(
+            "ai_diagnostics_service",
+            lambda: AIDiagnosticsService(
+                config=self.config(),
+                ollama_service=self.ollama_service(),
             ),
         )
 

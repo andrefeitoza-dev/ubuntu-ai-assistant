@@ -23,3 +23,5 @@ class OllamaProvider(AIProvider):
         )
 
         return AIResponse(content=content)
+    
+    
