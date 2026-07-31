@@ -1,0 +1,82 @@
+from ubuntu_ai.domain.risk import RiskLevel
+from ubuntu_ai.tools.capability import CapabilityCategory, ToolCapability
+
+
+def default_capabilities() -> tuple[ToolCapability, ...]:
+    return (
+        ToolCapability(
+            name="apt",
+            description="Gerencia pacotes Debian e Ubuntu.",
+            category=CapabilityCategory.PACKAGE,
+            executables=("apt", "apt-get", "dpkg"),
+            intents=("instalar", "remover", "atualizar", "pacote", "repositório"),
+            requires_elevation=True,
+            risk=RiskLevel.HIGH,
+            priority=90,
+        ),
+        ToolCapability(
+            name="snap",
+            description="Gerencia pacotes Snap.",
+            category=CapabilityCategory.PACKAGE,
+            executables=("snap",),
+            intents=("instalar", "remover", "pacote", "snap"),
+            requires_elevation=True,
+            risk=RiskLevel.HIGH,
+            priority=65,
+        ),
+        ToolCapability(
+            name="systemctl",
+            description="Gerencia serviços do systemd.",
+            category=CapabilityCategory.SERVICE,
+            executables=("systemctl",),
+            intents=("serviço", "iniciar", "parar", "habilitar", "status"),
+            requires_elevation=True,
+            risk=RiskLevel.HIGH,
+            priority=90,
+        ),
+        ToolCapability(
+            name="docker",
+            description="Gerencia containers, imagens e redes Docker.",
+            category=CapabilityCategory.CONTAINER,
+            executables=("docker", "docker-compose"),
+            intents=("container", "imagem", "docker", "compose"),
+            risk=RiskLevel.MEDIUM,
+            priority=90,
+        ),
+        ToolCapability(
+            name="git",
+            description="Gerencia repositórios Git.",
+            category=CapabilityCategory.VERSION_CONTROL,
+            executables=("git",),
+            intents=("git", "commit", "branch", "clone", "repositório"),
+            risk=RiskLevel.MEDIUM,
+            priority=85,
+        ),
+        ToolCapability(
+            name="python",
+            description="Executa Python e gerenciadores de pacotes Python.",
+            category=CapabilityCategory.PROGRAMMING,
+            executables=("python", "python3", "pip", "pip3", "uv"),
+            intents=("python", "pip", "dependência", "ambiente virtual", "teste"),
+            risk=RiskLevel.MEDIUM,
+            priority=80,
+        ),
+        ToolCapability(
+            name="ssh",
+            description="Executa operações remotas via SSH.",
+            category=CapabilityCategory.REMOTE,
+            executables=("ssh", "scp", "sftp"),
+            intents=("ssh", "remoto", "servidor", "copiar"),
+            risk=RiskLevel.HIGH,
+            priority=80,
+        ),
+        ToolCapability(
+            name="shell",
+            description="Fallback para comandos sem capacidade especializada.",
+            category=CapabilityCategory.GENERAL,
+            executables=("sh", "bash", "zsh"),
+            intents=("comando", "shell", "terminal"),
+            risk=RiskLevel.MEDIUM,
+            priority=10,
+        ),
+    )

@@ -8,6 +8,7 @@ class PlanStep:
     title: str
     description: str
     command: list[str]
+    tool_name: str | None = None
 
 
 @dataclass(slots=True)

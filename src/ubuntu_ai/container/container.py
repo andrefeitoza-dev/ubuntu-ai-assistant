@@ -30,6 +30,9 @@ from ubuntu_ai.planner.planner import Planner
 from ubuntu_ai.planner.rule_planner import RulePlanner
 from ubuntu_ai.renderer.preview_renderer import PreviewRenderer
 from ubuntu_ai.services.ollama import OllamaService
+from ubuntu_ai.tools.capability_registry import CapabilityRegistry
+from ubuntu_ai.tools.default_capabilities import default_capabilities
+from ubuntu_ai.tools.selection import ToolSelectionEngine
 
 T = TypeVar("T")
 
@@ -126,6 +129,26 @@ class Container:
             lambda: self.ai_provider_registry().create(config.ai_provider),
         )
 
+
+    def capability_registry(self) -> CapabilityRegistry:
+        """Retorna o catálogo único de capacidades do agente."""
+
+        return self._singleton(
+            "capability_registry",
+            lambda: CapabilityRegistry(default_capabilities()),
+        )
+
+    def tool_selection_engine(self) -> ToolSelectionEngine:
+        """Retorna o mecanismo de seleção de ferramentas."""
+
+        return self._singleton(
+            "tool_selection_engine",
+            lambda: ToolSelectionEngine(
+                registry=self.capability_registry(),
+                learning_service=self.learning_service(),
+            ),
+        )
+
     def rule_planner(self) -> RulePlanner:
         """Cria um planejador determinístico."""
 
@@ -146,6 +169,7 @@ class Container:
         return Planner(
             rule_planner=self.rule_planner(),
             ai_planner=self.ai_planner(),
+            tool_selector=self.tool_selection_engine(),
         )
 
     def preview_builder(self) -> PreviewBuilder:
