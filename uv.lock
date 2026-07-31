@@ -937,7 +937,7 @@ wheels = [
 
 [[package]]
 name = "ubuntu-ai-assistant"
-version = "0.1.0"
+version = "0.6.0rc1"
 source = { editable = "." }
 dependencies = [
     { name = "psutil" },

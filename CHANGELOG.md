@@ -30,3 +30,16 @@
 - CodeQL
 - Dependabot
 - Releases automáticas
+
+## [0.6.0rc1] - 2026-07-31
+
+### Added
+
+- Comando `ubuntu-ai version` com versão do pacote, Python, Ollama e modelo.
+- Opção global `--debug` para preservar exceções e tracebacks durante diagnóstico.
+- Tratamento uniforme de falhas operacionais da CLI.
+
+### Changed
+
+- Versão do pacote atualizada para `0.6.0rc1`.
+- Comandos `plan` e `tui` agora exibem mensagens amigáveis no modo normal.
