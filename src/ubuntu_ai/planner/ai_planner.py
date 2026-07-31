@@ -6,6 +6,7 @@ from ubuntu_ai.context.models import ContextSnapshot
 from ubuntu_ai.domain.plan import Plan, PlanStep
 from ubuntu_ai.domain.risk import RiskLevel
 from ubuntu_ai.knowledge.service import KnowledgeService
+from ubuntu_ai.learning.service import LearningService
 
 
 class AIPlanner:
@@ -16,10 +17,12 @@ class AIPlanner:
         provider: AIProvider,
         prompt_builder: PlanningPromptBuilder | None = None,
         knowledge_service: KnowledgeService | None = None,
+        learning_service: LearningService | None = None,
     ) -> None:
         self._provider = provider
         self._prompt_builder = prompt_builder or PlanningPromptBuilder()
         self._knowledge_service = knowledge_service
+        self._learning_service = learning_service
 
     def create_plan(
         self,
@@ -43,10 +46,12 @@ class AIPlanner:
         context: ContextSnapshot | None = None,
     ) -> str:
         knowledge_context = self._knowledge_context(request)
+        learning_context = self._learning_context(request, context)
         return self._prompt_builder.build(
             request=request,
             context=context,
             knowledge_context=knowledge_context,
+            learning_context=learning_context,
         )
 
     def _knowledge_context(self, request: str) -> str | None:
@@ -57,6 +62,21 @@ class AIPlanner:
             return None
         return "\n".join(
             f"- {result.document.title}: {result.excerpt}" for result in results
+        )
+
+
+    def _learning_context(
+        self,
+        request: str,
+        context: ContextSnapshot | None,
+    ) -> str | None:
+        if self._learning_service is None:
+            return None
+        project_name = context.project_name if context is not None else None
+        return self._learning_service.context_for_prompt(
+            request,
+            project_name=project_name,
+            limit=5,
         )
 
     def _parse_plan(self, content: str) -> Plan:

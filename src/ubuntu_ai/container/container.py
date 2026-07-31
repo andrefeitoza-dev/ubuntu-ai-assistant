@@ -15,6 +15,10 @@ from ubuntu_ai.knowledge.engine import KnowledgeEngine
 from ubuntu_ai.knowledge.repository import KnowledgeRepository
 from ubuntu_ai.knowledge.service import KnowledgeService
 from ubuntu_ai.knowledge.sqlite_repository import SQLiteKnowledgeRepository
+from ubuntu_ai.learning.engine import LearningEngine
+from ubuntu_ai.learning.repository import LearningRepository
+from ubuntu_ai.learning.service import LearningService
+from ubuntu_ai.learning.sqlite_repository import SQLiteLearningRepository
 from ubuntu_ai.memory.repository import MemoryRepository
 from ubuntu_ai.memory.service import MemoryService
 from ubuntu_ai.memory.sqlite_repository import SQLiteMemoryRepository
@@ -93,6 +97,7 @@ class Container:
         return AIPlanner(
             provider=self.ai_provider(),
             knowledge_service=self.knowledge_service(),
+            learning_service=self.learning_service(),
         )
 
     def planner(self) -> Planner:
@@ -156,6 +161,37 @@ class Container:
             lambda: KnowledgeEngine(self.knowledge_service()),
         )
 
+    def register_learning_repository(
+        self,
+        repository: LearningRepository,
+    ) -> None:
+        """Registra uma implementação de persistência do aprendizado."""
+
+        self._singletons["learning_repository"] = repository
+        self._singletons.pop("learning_service", None)
+        self._singletons.pop("learning_engine", None)
+
+    def learning_repository(self) -> LearningRepository:
+        """Retorna o repositório persistente de aprendizado."""
+
+        return self._singleton("learning_repository", SQLiteLearningRepository)
+
+    def learning_service(self) -> LearningService:
+        """Retorna o serviço único de aprendizado."""
+
+        return self._singleton(
+            "learning_service",
+            lambda: LearningService(self.learning_repository()),
+        )
+
+    def learning_engine(self) -> LearningEngine:
+        """Retorna a fachada de alto nível do aprendizado."""
+
+        return self._singleton(
+            "learning_engine",
+            lambda: LearningEngine(self.learning_service()),
+        )
+
     def memory_repository(self) -> MemoryRepository:
         """Retorna o repositório persistente de memória."""
 
@@ -209,4 +245,5 @@ class Container:
             memory_service=self.memory_service(),
             context_engine=self.context_engine(),
             conversation_engine=self.conversation_engine(),
+            learning_service=self.learning_service(),
         )

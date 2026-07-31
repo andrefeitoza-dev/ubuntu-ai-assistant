@@ -20,6 +20,7 @@ from ubuntu_ai.execution.models import (
     ExecutionStatus,
 )
 from ubuntu_ai.execution.system_executor import SystemExecutor
+from ubuntu_ai.learning.service import LearningService
 from ubuntu_ai.memory.service import MemoryService
 from ubuntu_ai.pipeline.execution_pipeline import ExecutionPipeline
 from ubuntu_ai.pipeline.models import PipelineResult
@@ -38,6 +39,7 @@ class AgentRuntime:
         memory_service: MemoryService | None = None,
         context_engine: ContextEngine | None = None,
         conversation_engine: ConversationEngine | None = None,
+        learning_service: LearningService | None = None,
     ) -> None:
         self._execution_pipeline = execution_pipeline or ExecutionPipeline()
         self._session_manager = session_manager or SessionManager()
@@ -49,6 +51,7 @@ class AgentRuntime:
         )
         self._memory_service = memory_service
         self._conversation_engine = conversation_engine
+        self._learning_service = learning_service
         self._context_engine = context_engine or ContextEngine(
             context_provider=self._context_provider,
             session_manager=self._session_manager,
@@ -184,6 +187,7 @@ class AgentRuntime:
                 result,
             )
             self._persist_execution_result(result)
+            self._learn_from_execution(result)
 
             # Apenas comandos bloqueados interrompem o fluxo.
             if result.status is ExecutionStatus.BLOCKED:
@@ -222,6 +226,20 @@ class AgentRuntime:
             session_id=self._session_id,
             user_request=self._pending_request,
             working_directory=self._pending_context.working_directory,
+            project_name=self._pending_context.project_name,
+            result=result,
+        )
+
+
+    def _learn_from_execution(self, result: ExecutionResult) -> None:
+        """Atualiza o aprendizado persistente após cada tentativa."""
+
+        if self._learning_service is None:
+            return
+        if self._pending_request is None or self._pending_context is None:
+            raise RuntimeError("O contexto da execução pendente não está disponível.")
+        self._learning_service.learn_from_execution(
+            user_request=self._pending_request,
             project_name=self._pending_context.project_name,
             result=result,
         )

@@ -12,6 +12,7 @@ class PlanningPromptBuilder:
         request: str,
         context: ContextSnapshot | None = None,
         knowledge_context: str | None = None,
+        learning_context: str | None = None,
     ) -> str:
         context_section = (
             f"Contexto disponível:\n{context.to_prompt()}\n"
@@ -21,6 +22,11 @@ class PlanningPromptBuilder:
         knowledge_section = (
             f"Conhecimento local relevante:\n{knowledge_context}\n"
             if knowledge_context
+            else ""
+        )
+        learning_section = (
+            f"Aprendizado de execuções anteriores:\n{learning_context}\n"
+            if learning_context
             else ""
         )
         conversation_section = ""
@@ -36,6 +42,7 @@ class PlanningPromptBuilder:
             f"{context_section}"
             f"{conversation_section}"
             f"{knowledge_section}"
+            f"{learning_section}"
             "Use exatamente esta estrutura:\n"
             "{\n"
             '  "goal": "objetivo",\n'
