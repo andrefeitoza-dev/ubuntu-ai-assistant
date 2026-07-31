@@ -155,6 +155,27 @@ class SQLiteKnowledgeRepository(KnowledgeRepository):
             if result.document.id != document_id
         )[:limit]
 
+    def list_chunks(self, document_id: str | None = None) -> tuple[KnowledgeChunk, ...]:
+        """Lista trechos persistidos para indexação semântica local."""
+
+        query = "SELECT id, document_id, position, content FROM knowledge_chunks"
+        parameters: tuple[str, ...] = ()
+        if document_id is not None:
+            query += " WHERE document_id = ?"
+            parameters = (document_id,)
+        query += " ORDER BY document_id, position"
+        with self._connect() as connection:
+            rows = connection.execute(query, parameters).fetchall()
+        return tuple(
+            KnowledgeChunk(
+                id=str(row["id"]),
+                document_id=str(row["document_id"]),
+                position=int(row["position"]),
+                content=str(row["content"]),
+            )
+            for row in rows
+        )
+
     def document_exists(self, document_id: str) -> bool:
         with self._connect() as connection:
             return self._exists(connection, document_id)

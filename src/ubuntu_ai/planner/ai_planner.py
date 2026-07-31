@@ -7,6 +7,7 @@ from ubuntu_ai.domain.plan import Plan, PlanStep
 from ubuntu_ai.domain.risk import RiskLevel
 from ubuntu_ai.knowledge.service import KnowledgeService
 from ubuntu_ai.learning.service import LearningService
+from ubuntu_ai.semantic.service import RAGContextBuilder
 
 
 class AIPlanner:
@@ -18,11 +19,13 @@ class AIPlanner:
         prompt_builder: PlanningPromptBuilder | None = None,
         knowledge_service: KnowledgeService | None = None,
         learning_service: LearningService | None = None,
+        rag_context_builder: RAGContextBuilder | None = None,
     ) -> None:
         self._provider = provider
         self._prompt_builder = prompt_builder or PlanningPromptBuilder()
         self._knowledge_service = knowledge_service
         self._learning_service = learning_service
+        self._rag_context_builder = rag_context_builder
 
     def create_plan(
         self,
@@ -55,6 +58,8 @@ class AIPlanner:
         )
 
     def _knowledge_context(self, request: str) -> str | None:
+        if self._rag_context_builder is not None:
+            return self._rag_context_builder.build(request, limit=5)
         if self._knowledge_service is None:
             return None
         results = self._knowledge_service.search(request, limit=3)

@@ -33,6 +33,12 @@ from ubuntu_ai.planner.planner import Planner
 from ubuntu_ai.planner.rule_planner import RulePlanner
 from ubuntu_ai.renderer.preview_renderer import PreviewRenderer
 from ubuntu_ai.reflection.engine import ReflectionEngine
+from ubuntu_ai.semantic import (
+    RAGContextBuilder,
+    SemanticKnowledgeService,
+    SemanticRepository,
+    SQLiteSemanticRepository,
+)
 from ubuntu_ai.services.ollama import OllamaService
 from ubuntu_ai.skills import Skill, SkillManager, SkillRegistry, default_skills
 from ubuntu_ai.tools.capability_registry import CapabilityRegistry
@@ -214,6 +220,7 @@ class Container:
             provider=self.ai_provider(),
             knowledge_service=self.knowledge_service(),
             learning_service=self.learning_service(),
+            rag_context_builder=self.rag_context_builder(),
         )
 
     def planner(self) -> Planner:
@@ -276,6 +283,45 @@ class Container:
         return self._singleton(
             "knowledge_engine",
             lambda: KnowledgeEngine(self.knowledge_service()),
+        )
+
+    def register_semantic_repository(
+        self,
+        repository: SemanticRepository,
+    ) -> None:
+        """Registra o backend de embeddings e recompõe o RAG."""
+
+        self._singletons["semantic_repository"] = repository
+        for key in ("semantic_knowledge_service", "rag_context_builder"):
+            self._singletons.pop(key, None)
+
+    def semantic_repository(self) -> SemanticRepository:
+        """Retorna a persistência local de embeddings."""
+
+        def factory() -> SemanticRepository:
+            knowledge_repository = self.knowledge_repository()
+            database_path = getattr(knowledge_repository, "database_path", None)
+            return SQLiteSemanticRepository(database_path)
+
+        return self._singleton("semantic_repository", factory)
+
+    def semantic_knowledge_service(self) -> SemanticKnowledgeService:
+        """Retorna o serviço de indexação e recuperação semântica."""
+
+        return self._singleton(
+            "semantic_knowledge_service",
+            lambda: SemanticKnowledgeService(
+                knowledge_service=self.knowledge_service(),
+                repository=self.semantic_repository(),
+            ),
+        )
+
+    def rag_context_builder(self) -> RAGContextBuilder:
+        """Retorna o construtor de contexto RAG usado pelo Planner."""
+
+        return self._singleton(
+            "rag_context_builder",
+            lambda: RAGContextBuilder(self.semantic_knowledge_service()),
         )
 
     def register_learning_repository(

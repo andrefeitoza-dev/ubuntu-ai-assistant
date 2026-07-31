@@ -85,3 +85,13 @@ Implementar M4.6 — Autonomous Decision Engine usando memória, conhecimento e 
 - Reflexão pós-execução diagnostica sucesso, bloqueio, falha e comandos indisponíveis.
 - Relatórios estruturados ficam disponíveis no `AgentRuntime` e no histórico da sessão.
 - Próxima milestone: ➡ M5.5 — Semantic Knowledge / Local RAG.
+
+## M5.5 — Semantic Knowledge / Local RAG
+
+- Última milestone concluída: ✅ M5.5 — Semantic Knowledge / Local RAG.
+- Embeddings locais determinísticos adicionados sem dependências externas.
+- Vetores persistidos no mesmo banco SQLite da base de conhecimento.
+- Recuperação híbrida combina FTS5 e similaridade semântica.
+- `RAGContextBuilder` injeta trechos relevantes e suas fontes no `AIPlanner`.
+- Índice semântico é sincronizado automaticamente com alterações dos documentos.
+- Próxima milestone: ➡ M5.6 — Plugin SDK.
