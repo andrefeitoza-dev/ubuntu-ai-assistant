@@ -11,5 +11,7 @@ class AppConfig:
     command_timeout: int = 30
     language: str = "pt-BR"
     safe_mode: bool = True
+    agent_loop_max_iterations: int = 5
+    agent_loop_max_stalled_iterations: int = 2
     data_dir: Path = Path.home() / ".local" / "share" / "ubuntu-ai"
     log_dir: Path = Path.home() / ".local" / "state" / "ubuntu-ai" / "logs"

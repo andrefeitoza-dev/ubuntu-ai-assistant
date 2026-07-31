@@ -3,6 +3,7 @@ from dataclasses import replace
 from typing import TypeVar, cast
 
 from ubuntu_ai.agent.runtime import AgentRuntime
+from ubuntu_ai.agent_loop import AgentLoopConfig, AgentLoopController
 from ubuntu_ai.ai.ollama_provider import OllamaProvider
 from ubuntu_ai.ai.provider import AIProvider
 from ubuntu_ai.ai.registry import AIProviderRegistry
@@ -426,6 +427,23 @@ class Container:
         """Retorna o mecanismo único de autorreflexão."""
 
         return self._singleton("reflection_engine", ReflectionEngine)
+
+    def agent_loop_controller(self) -> AgentLoopController:
+        """Retorna o controlador iterativo com limites configuráveis."""
+
+        config = self.config()
+        return self._singleton(
+            "agent_loop_controller",
+            lambda: AgentLoopController(
+                runtime=self.agent_runtime(),
+                config=AgentLoopConfig(
+                    max_iterations=config.agent_loop_max_iterations,
+                    max_stalled_iterations=(
+                        config.agent_loop_max_stalled_iterations
+                    ),
+                ),
+            ),
+        )
 
     def agent_runtime(self) -> AgentRuntime:
         """Cria o runtime central do agente."""

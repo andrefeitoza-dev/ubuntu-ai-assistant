@@ -105,3 +105,13 @@ Implementar M4.6 — Autonomous Decision Engine usando memória, conhecimento e 
 - Plugins podem fornecer Skills sem acesso direto ao Runtime interno.
 - A política atual é uma barreira de capacidades, não isolamento de processo.
 - Próxima milestone: ➡ M5.7 — Agent Loop.
+
+## M5.7 — Agent Loop concluída
+
+- Última milestone concluída: ✅ M5.7 — Agent Loop.
+- Máquina de estados para planejamento, confirmação, execução e replanejamento.
+- Cada nova iteração exige confirmação explícita.
+- Bloqueios de segurança encerram o ciclo sem tentativa de contorno.
+- Watchdog detecta repetição sem progresso.
+- Limites configuráveis impedem loops infinitos.
+- Próxima fase: evolução de produto, TUI/GUI, SSH remoto e agentes especializados.
