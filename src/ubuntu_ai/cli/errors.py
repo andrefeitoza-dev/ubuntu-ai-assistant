@@ -1,6 +1,5 @@
 from rich.console import Console
 
-
 _ERROR_HINTS = {
     "Ollama": (
         "Execute `ubuntu-ai doctor` e `ubuntu-ai diagnose-ai` para verificar "

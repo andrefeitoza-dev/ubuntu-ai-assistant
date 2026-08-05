@@ -1,4 +1,3 @@
-from typing import Any
 
 from ubuntu_ai.core.config import AppConfig
 from ubuntu_ai.diagnostics.ai_diagnostics import AIDiagnosticsService

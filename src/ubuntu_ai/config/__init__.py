@@ -9,6 +9,7 @@ from ubuntu_ai.config.defaults import (
     default_paths,
     default_state_directory,
 )
+from ubuntu_ai.config.loader import ConfigLoader, ConfigLoadError
 from ubuntu_ai.config.models import (
     AIConfig,
     AppSettings,
@@ -17,12 +18,18 @@ from ubuntu_ai.config.models import (
     PathConfig,
     UIConfig,
 )
+from ubuntu_ai.config.repository import ConfigRepository
+from ubuntu_ai.config.service import ConfigService
 
 __all__ = [
+    "ConfigService",
     "AIConfig",
     "APPLICATION_NAME",
     "AppSettings",
     "CONFIG_FILE_NAME",
+    "ConfigLoadError",
+    "ConfigLoader",
+    "ConfigRepository",
     "FeatureConfig",
     "LoggingConfig",
     "PathConfig",

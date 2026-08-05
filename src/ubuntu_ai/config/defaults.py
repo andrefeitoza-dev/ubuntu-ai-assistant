@@ -12,7 +12,6 @@ from ubuntu_ai.config.models import (
     UIConfig,
 )
 
-
 APPLICATION_NAME = "ubuntu-ai"
 CONFIG_FILE_NAME = "config.toml"
 

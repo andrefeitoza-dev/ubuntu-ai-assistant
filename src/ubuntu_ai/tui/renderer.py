@@ -10,7 +10,6 @@ from ubuntu_ai.execution.models import ExecutionResult, ExecutionStatus
 from ubuntu_ai.memory.models import ExecutionRecord
 from ubuntu_ai.plugins.registry import LoadedPlugin
 
-
 _STATE_LABELS = {
     LoopState.IDLE: "ocioso",
     LoopState.PLANNING: "planejando",

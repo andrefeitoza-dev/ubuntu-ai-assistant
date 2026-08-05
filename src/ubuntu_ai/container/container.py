@@ -14,10 +14,10 @@ from ubuntu_ai.conversation.service import ConversationService
 from ubuntu_ai.conversation.sqlite_repository import SQLiteConversationRepository
 from ubuntu_ai.core.config import AppConfig
 from ubuntu_ai.diagnostics.ai_diagnostics import AIDiagnosticsService
-from ubuntu_ai.executor.preview import PreviewBuilder
 from ubuntu_ai.execution_intelligence.discovery import DiscoveryEngine
 from ubuntu_ai.execution_intelligence.engine import ExecutionIntelligence
 from ubuntu_ai.execution_intelligence.preflight import PreflightEngine
+from ubuntu_ai.executor.preview import PreviewBuilder
 from ubuntu_ai.knowledge.engine import KnowledgeEngine
 from ubuntu_ai.knowledge.repository import KnowledgeRepository
 from ubuntu_ai.knowledge.service import KnowledgeService
@@ -34,8 +34,8 @@ from ubuntu_ai.planner.ai_planner import AIPlanner
 from ubuntu_ai.planner.planner import Planner
 from ubuntu_ai.planner.rule_planner import RulePlanner
 from ubuntu_ai.plugins import PluginManager, PluginPolicy, PluginRegistry
-from ubuntu_ai.renderer.preview_renderer import PreviewRenderer
 from ubuntu_ai.reflection.engine import ReflectionEngine
+from ubuntu_ai.renderer.preview_renderer import PreviewRenderer
 from ubuntu_ai.semantic import (
     RAGContextBuilder,
     SemanticKnowledgeService,
