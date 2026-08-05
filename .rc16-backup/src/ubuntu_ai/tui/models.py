@@ -20,11 +20,7 @@ class TerminalAppConfig:
 
     history_limit: int = 10
     clear_between_tasks: bool = False
-    show_benchmark_summary: bool = True
-    spinner_text: str = "Analisando solicitação e gerando plano..."
 
     def __post_init__(self) -> None:
         if self.history_limit < 1:
             raise ValueError("history_limit deve ser maior que zero.")
-        if not self.spinner_text.strip():
-            raise ValueError("spinner_text não pode estar vazio.")

@@ -486,7 +486,6 @@ class Container:
             controller=self.agent_loop_controller(),
             memory_service=self.memory_service(),
             plugin_registry=self.plugin_registry(),
-            benchmark_service=self.benchmark_service(),
         )
 
     def agent_runtime(self) -> AgentRuntime:
