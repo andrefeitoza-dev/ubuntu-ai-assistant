@@ -10,7 +10,7 @@ def test_container_reuses_benchmark_singletons() -> None:
 def test_pipeline_records_planner_and_pipeline() -> None:
     container = Container()
     service = container.benchmark_service()
-    container.execution_pipeline().run("Instale Docker")
+    container.execution_pipeline().run("mostrar o diretório atual")
     assert {record.operation for record in service.report().records} == {
         "planner",
         "pipeline",

@@ -1,45 +1,48 @@
 # Changelog
 
-## 0.6.0-rc.1 — Em preparação
+Todas as mudanças relevantes deste projeto são registradas neste arquivo.
+
+## [0.6.0] - 2026-08-05
 
 ### Added
 
-- Auditoria arquitetural RC1.1.
-- Documentação atualizada de arquitetura e roadmap.
-- Script reproduzível de métricas arquiteturais.
+- Framework de planejamento seguro para administração Linux.
+- Planejamento determinístico e por IA local com Ollama.
+- Runtime com contexto, confirmação, execução controlada e ciclo de vida.
+- Memória, conversa, conhecimento local, RAG, aprendizado e reflexão.
+- Tool Selection, Execution Intelligence, Skills e Plugin SDK.
+- Agent Loop com replanejamento controlado.
+- TUI interativa com Rich e experiência visual aprimorada.
+- Diagnóstico do runtime local de IA.
+- Configuração persistente e logging rotativo.
+- Benchmark de Planner e Pipeline com comando `ubuntu-ai benchmark`.
+- Comando `ubuntu-ai version` e opção global `--debug`.
+- SDK Python por meio de `UbuntuAI`.
+- Automação de CI, CodeQL, Dependabot e release por tag.
+
+### Changed
+
+- Versão promovida de `0.6.0rc1` para `0.6.0`.
+- README atualizado para apresentar o projeto como framework open source.
+- Metadados de empacotamento preparados para instalação com `pipx`.
+- Documentação de instalação, contribuição e release consolidada.
 
 ### Fixed
 
 - Confiabilidade do planejamento local com Ollama.
 - Validação de executáveis na skill shell.
 - Normalização de caminhos antes da persistência SQLite.
+- Colisões de nomes durante coleta de testes.
+- Compatibilidade de logging e benchmark com doubles de teste.
 
 ### Validation
 
-- Fluxo TUI completo validado com planejamento, confirmação e execução.
-- 266 testes automatizados aprovados na base auditada.
-
-## Unreleased
-
-### Added
-
-- DevOps Foundation
-- GitHub Actions
-- Coverage
-- Pre-commit
-- CodeQL
-- Dependabot
-- Releases automáticas
+- Ruff aprovado.
+- Mais de 300 testes automatizados aprovados.
+- TUI, benchmark, diagnóstico e fluxo de planejamento validados.
 
 ## [0.6.0rc1] - 2026-07-31
 
 ### Added
 
-- Comando `ubuntu-ai version` com versão do pacote, Python, Ollama e modelo.
-- Opção global `--debug` para preservar exceções e tracebacks durante diagnóstico.
-- Tratamento uniforme de falhas operacionais da CLI.
-
-### Changed
-
-- Versão do pacote atualizada para `0.6.0rc1`.
-- Comandos `plan` e `tui` agora exibem mensagens amigáveis no modo normal.
+- Primeira candidata à release com auditoria arquitetural e hardening.
