@@ -1,5 +1,6 @@
 import typer
 
+from ubuntu_ai.cli.benchmark import benchmark
 from ubuntu_ai.cli.context import CLIContext
 from ubuntu_ai.cli.diagnose_ai import diagnose_ai
 from ubuntu_ai.cli.doctor import doctor
@@ -32,6 +33,7 @@ def main(
 app.add_typer(knowledge_app, name="knowledge")
 app.command(name="diagnose-ai")(diagnose_ai)
 app.command(name="doctor")(doctor)
+app.command(name="benchmark")(benchmark)
 app.command(name="plan")(plan)
 app.command(name="tui")(tui)
 app.command(name="version")(version_command)

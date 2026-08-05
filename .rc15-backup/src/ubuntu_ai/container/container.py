@@ -7,7 +7,6 @@ from ubuntu_ai.agent_loop import AgentLoopConfig, AgentLoopController
 from ubuntu_ai.ai.ollama_provider import OllamaProvider
 from ubuntu_ai.ai.provider import AIProvider
 from ubuntu_ai.ai.registry import AIProviderRegistry
-from ubuntu_ai.benchmark import BenchmarkRecorder, BenchmarkService
 from ubuntu_ai.context.engine import ContextEngine
 from ubuntu_ai.conversation.engine import ConversationEngine
 from ubuntu_ai.conversation.repository import ConversationRepository
@@ -159,19 +158,6 @@ class Container:
             lambda: self.ai_provider_registry().create(config.ai_provider),
         )
 
-    def benchmark_recorder(self) -> BenchmarkRecorder:
-        """Retorna o recorder único de benchmarks."""
-
-        return self._singleton("benchmark_recorder", BenchmarkRecorder)
-
-    def benchmark_service(self) -> BenchmarkService:
-        """Retorna o serviço único de benchmarks."""
-
-        return self._singleton(
-            "benchmark_service",
-            lambda: BenchmarkService(self.benchmark_recorder()),
-        )
-
     def plugin_registry(self) -> PluginRegistry:
         """Retorna o registro de plugins carregados."""
 
@@ -284,7 +270,6 @@ class Container:
             rule_planner=self.rule_planner(),
             ai_planner=self.ai_planner(),
             tool_selector=self.tool_selection_engine(),
-            benchmark_service=self.benchmark_service(),
         )
 
     def preview_builder(self) -> PreviewBuilder:
@@ -304,7 +289,6 @@ class Container:
             planner=self.planner(),
             preview_builder=self.preview_builder(),
             preview_renderer=self.preview_renderer(),
-            benchmark_service=self.benchmark_service(),
         )
 
     def register_knowledge_repository(

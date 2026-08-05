@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 import logging
+from contextlib import AbstractContextManager, nullcontext
 
+from ubuntu_ai.benchmark import BenchmarkService
 from ubuntu_ai.context.models import ContextSnapshot
 from ubuntu_ai.executor.preview import PreviewBuilder
 from ubuntu_ai.pipeline.models import PipelineResult
@@ -19,61 +21,25 @@ class ExecutionPipeline:
         planner: Planner | None = None,
         preview_builder: PreviewBuilder | None = None,
         preview_renderer: PreviewRenderer | None = None,
+        benchmark_service: BenchmarkService | None = None,
     ) -> None:
         self._planner = planner or Planner()
         self._preview_builder = preview_builder or PreviewBuilder()
         self._preview_renderer = preview_renderer or PreviewRenderer()
+        self._benchmark_service = benchmark_service
 
-    def run(
-        self,
-        request: str,
-        context: ContextSnapshot | None = None,
-    ) -> PipelineResult:
-        """Processa uma solicitação sem executar alterações no sistema."""
-
+    def run(self, request: str, context: ContextSnapshot | None = None) -> PipelineResult:
         normalized_request = request.strip()
-
         if not normalized_request:
-            logger.warning(
-                "Pipeline recebeu uma solicitação vazia."
-            )
+            logger.warning("Pipeline recebeu uma solicitação vazia.")
             raise ValueError("A solicitação não pode estar vazia.")
+        with self._measurement("pipeline"):
+            plan = self._planner.create_plan(normalized_request, context=context)
+            preview = self._preview_builder.build(plan)
+            rendered_preview = self._preview_renderer.render(preview)
+            return PipelineResult(plan=plan, preview=preview, rendered_preview=rendered_preview)
 
-        logger.info(
-            "Pipeline iniciado.",
-            extra={
-                "request": normalized_request,
-            },
-        )
-
-        plan = self._planner.create_plan(
-            normalized_request,
-            context=context,
-        )
-
-        logger.info(
-            "Planejamento concluído.",
-            extra={
-                "steps": len(plan.steps),
-                "risk": plan.risk.value,
-            },
-        )
-
-        preview = self._preview_builder.build(plan)
-
-        logger.info(
-            "Preview criado.",
-            extra={
-                "steps": len(preview.steps),
-            },
-        )
-
-        rendered_preview = self._preview_renderer.render(preview)
-
-        logger.info("Pipeline finalizado com sucesso.")
-
-        return PipelineResult(
-            plan=plan,
-            preview=preview,
-            rendered_preview=rendered_preview,
-        )
+    def _measurement(self, operation: str) -> AbstractContextManager[object]:
+        if self._benchmark_service is None:
+            return nullcontext()
+        return self._benchmark_service.measure(operation)
