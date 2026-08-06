@@ -22,12 +22,18 @@ def benchmark(
     service = container.benchmark_service()
     service.clear()
     try:
-        container.execution_pipeline().run(request)
+        result = container.execution_pipeline().run(request)
     except (RuntimeError, ValueError) as error:
         console.print(f"[red]Erro:[/red] {error}")
         raise typer.Exit(code=1) from error
 
     report = service.report()
+    if result.intent is not None:
+        console.print(
+            f"[bold cyan]Intenção:[/bold cyan] "
+            f"{result.intent.category.value}/{result.intent.goal.value} "
+            f"({result.intent.confidence:.0%})"
+        )
     table = Table(title="Ubuntu AI — Benchmark")
     table.add_column("Operação")
     table.add_column("Tempo", justify="right")

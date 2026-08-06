@@ -1,0 +1,152 @@
+import json
+
+from ubuntu_ai.ai import AIProvider, AIRequest
+from ubuntu_ai.ai.prompt_builder import PlanningPromptBuilder
+from ubuntu_ai.context.models import ContextSnapshot
+from ubuntu_ai.domain.plan import Plan, PlanStep
+from ubuntu_ai.domain.risk import RiskLevel
+from ubuntu_ai.knowledge.service import KnowledgeService
+from ubuntu_ai.learning.service import LearningService
+from ubuntu_ai.semantic.service import RAGContextBuilder
+
+
+class AIPlanner:
+    """Cria planos estruturados usando um provedor de IA."""
+
+    def __init__(
+        self,
+        provider: AIProvider,
+        prompt_builder: PlanningPromptBuilder | None = None,
+        knowledge_service: KnowledgeService | None = None,
+        learning_service: LearningService | None = None,
+        rag_context_builder: RAGContextBuilder | None = None,
+    ) -> None:
+        self._provider = provider
+        self._prompt_builder = prompt_builder or PlanningPromptBuilder()
+        self._knowledge_service = knowledge_service
+        self._learning_service = learning_service
+        self._rag_context_builder = rag_context_builder
+
+    def create_plan(
+        self,
+        request: str,
+        context: ContextSnapshot | None = None,
+    ) -> Plan:
+        normalized_request = request.strip()
+
+        if not normalized_request:
+            raise ValueError("A solicitação não pode estar vazia.")
+
+        response = self._provider.generate(
+            AIRequest(prompt=self._build_prompt(normalized_request, context))
+        )
+
+        return self._parse_plan(response.content)
+
+    def _build_prompt(
+        self,
+        request: str,
+        context: ContextSnapshot | None = None,
+    ) -> str:
+        knowledge_context = self._knowledge_context(request)
+        learning_context = self._learning_context(request, context)
+        return self._prompt_builder.build(
+            request=request,
+            context=context,
+            knowledge_context=knowledge_context,
+            learning_context=learning_context,
+        )
+
+    def _knowledge_context(self, request: str) -> str | None:
+        if self._rag_context_builder is not None:
+            return self._rag_context_builder.build(
+                request,
+                limit=3,
+                max_chars=1_500,
+            )
+        if self._knowledge_service is None:
+            return None
+        results = self._knowledge_service.search(request, limit=3)
+        if not results:
+            return None
+        return "\n".join(
+            f"- {result.document.title}: {result.excerpt}" for result in results
+        )
+
+    def _learning_context(
+        self,
+        request: str,
+        context: ContextSnapshot | None,
+    ) -> str | None:
+        if self._learning_service is None:
+            return None
+        project_name = context.project_name if context is not None else None
+        context_text = self._learning_service.context_for_prompt(
+            request,
+            project_name=project_name,
+            limit=3,
+        )
+        if context_text is None:
+            return None
+        return context_text[:1_000]
+
+    def _parse_plan(self, content: str) -> Plan:
+        try:
+            data = json.loads(content)
+        except json.JSONDecodeError as error:
+            raise ValueError("A IA retornou um plano com JSON inválido.") from error
+
+        try:
+            goal = data["goal"]
+            estimated_seconds = data["estimated_seconds"]
+            risk = RiskLevel(data["risk"])
+            raw_steps = data["steps"]
+        except (KeyError, TypeError, ValueError) as error:
+            raise ValueError("A IA retornou um plano com estrutura inválida.") from error
+
+        if not isinstance(goal, str) or not goal.strip():
+            raise ValueError("A IA retornou um objetivo inválido.")
+
+        if not isinstance(estimated_seconds, int) or estimated_seconds <= 0:
+            raise ValueError("A IA retornou um tempo estimado inválido.")
+
+        if not isinstance(raw_steps, list) or not raw_steps:
+            raise ValueError("A IA retornou etapas inválidas.")
+
+        plan = Plan(
+            goal=goal.strip(),
+            estimated_seconds=estimated_seconds,
+            risk=risk,
+        )
+
+        for raw_step in raw_steps:
+            plan.add_step(self._parse_step(raw_step))
+
+        return plan
+
+    def _parse_step(self, raw_step: object) -> PlanStep:
+        if not isinstance(raw_step, dict):
+            raise ValueError("A IA retornou uma etapa inválida.")
+
+        title = raw_step.get("title")
+        description = raw_step.get("description")
+        command = raw_step.get("command")
+
+        if not isinstance(title, str) or not title.strip():
+            raise ValueError("A IA retornou um título de etapa inválido.")
+
+        if not isinstance(description, str) or not description.strip():
+            raise ValueError("A IA retornou uma descrição de etapa inválida.")
+
+        if (
+            not isinstance(command, list)
+            or not command
+            or not all(isinstance(item, str) and item for item in command)
+        ):
+            raise ValueError("A IA retornou um comando de etapa inválido.")
+
+        return PlanStep(
+            title=title.strip(),
+            description=description.strip(),
+            command=command,
+        )

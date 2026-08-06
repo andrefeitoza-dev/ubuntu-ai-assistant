@@ -1,10 +1,14 @@
 import json
+from contextlib import AbstractContextManager, nullcontext
 
 from ubuntu_ai.ai import AIProvider, AIRequest
 from ubuntu_ai.ai.prompt_builder import PlanningPromptBuilder
+from ubuntu_ai.benchmark import BenchmarkService
 from ubuntu_ai.context.models import ContextSnapshot
 from ubuntu_ai.domain.plan import Plan, PlanStep
 from ubuntu_ai.domain.risk import RiskLevel
+from ubuntu_ai.intent.context import IntentContextBuilder
+from ubuntu_ai.intent.models import Intent
 from ubuntu_ai.knowledge.service import KnowledgeService
 from ubuntu_ai.learning.service import LearningService
 from ubuntu_ai.semantic.service import RAGContextBuilder
@@ -20,25 +24,30 @@ class AIPlanner:
         knowledge_service: KnowledgeService | None = None,
         learning_service: LearningService | None = None,
         rag_context_builder: RAGContextBuilder | None = None,
+        benchmark_service: BenchmarkService | None = None,
+        intent_context_builder: IntentContextBuilder | None = None,
     ) -> None:
         self._provider = provider
         self._prompt_builder = prompt_builder or PlanningPromptBuilder()
         self._knowledge_service = knowledge_service
         self._learning_service = learning_service
         self._rag_context_builder = rag_context_builder
+        self._benchmark_service = benchmark_service
+        self._intent_context_builder = intent_context_builder or IntentContextBuilder()
 
     def create_plan(
         self,
-        request: str,
+        request: str | Intent,
         context: ContextSnapshot | None = None,
     ) -> Plan:
-        normalized_request = request.strip()
+        intent = request if isinstance(request, Intent) else None
+        normalized_request = (intent.request if intent is not None else request).strip()
 
         if not normalized_request:
             raise ValueError("A solicitação não pode estar vazia.")
 
         response = self._provider.generate(
-            AIRequest(prompt=self._build_prompt(normalized_request, context))
+            AIRequest(prompt=self._build_prompt(normalized_request, context, intent))
         )
 
         return self._parse_plan(response.content)
@@ -47,26 +56,48 @@ class AIPlanner:
         self,
         request: str,
         context: ContextSnapshot | None = None,
+        intent: Intent | None = None,
     ) -> str:
-        knowledge_context = self._knowledge_context(request)
-        learning_context = self._learning_context(request, context)
+        knowledge_context = self._knowledge_context(request, intent)
+        learning_context = self._learning_context(request, context, intent)
+        intent_context = (
+            self._intent_context_builder.prompt_context(intent)
+            if intent is not None
+            else None
+        )
         return self._prompt_builder.build(
             request=request,
             context=context,
             knowledge_context=knowledge_context,
             learning_context=learning_context,
+            intent_context=intent_context,
         )
 
-    def _knowledge_context(self, request: str) -> str | None:
+    def _knowledge_context(
+        self,
+        request: str,
+        intent: Intent | None,
+    ) -> str | None:
+        query = (
+            self._intent_context_builder.search_query(intent)
+            if intent is not None
+            else request
+        )
         if self._rag_context_builder is not None:
-            return self._rag_context_builder.build(
-                request,
+            with self._measurement("knowledge"):
+                return self._rag_context_builder.build(
+                query,
                 limit=3,
                 max_chars=1_500,
             )
         if self._knowledge_service is None:
             return None
-        results = self._knowledge_service.search(request, limit=3)
+        with self._measurement("knowledge"):
+            results = (
+                self._knowledge_service.search_for_intent(intent, limit=3)
+                if intent is not None
+                else self._knowledge_service.search(request, limit=3)
+            )
         if not results:
             return None
         return "\n".join(
@@ -77,18 +108,36 @@ class AIPlanner:
         self,
         request: str,
         context: ContextSnapshot | None,
+        intent: Intent | None,
     ) -> str | None:
         if self._learning_service is None:
             return None
         project_name = context.project_name if context is not None else None
-        context_text = self._learning_service.context_for_prompt(
-            request,
-            project_name=project_name,
-            limit=3,
-        )
+        with self._measurement("learning"):
+            context_text = (
+                self._learning_service.context_for_intent(
+                    intent,
+                    project_name=project_name,
+                    limit=3,
+                )
+                if intent is not None
+                else self._learning_service.context_for_prompt(
+                    request,
+                    project_name=project_name,
+                    limit=3,
+                )
+            )
         if context_text is None:
             return None
         return context_text[:1_000]
+
+    def _measurement(
+        self,
+        operation: str,
+    ) -> AbstractContextManager[object]:
+        if self._benchmark_service is None:
+            return nullcontext()
+        return self._benchmark_service.measure(operation)
 
     def _parse_plan(self, content: str) -> Plan:
         try:

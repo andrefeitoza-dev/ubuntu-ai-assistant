@@ -6,7 +6,6 @@ from rich.console import Console
 
 from ubuntu_ai.agent_loop.controller import AgentLoopController
 from ubuntu_ai.agent_loop.models import LoopSnapshot, LoopState
-from ubuntu_ai.benchmark import BenchmarkService
 from ubuntu_ai.memory.service import MemoryService
 from ubuntu_ai.plugins.registry import PluginRegistry
 from ubuntu_ai.tui.models import TerminalAppConfig, TerminalCommand
@@ -24,7 +23,6 @@ class TerminalApp:
         memory_service: MemoryService,
         plugin_registry: PluginRegistry,
         *,
-        benchmark_service: BenchmarkService | None = None,
         console: Console | None = None,
         input_reader: InputReader | None = None,
         config: TerminalAppConfig | None = None,
@@ -32,7 +30,6 @@ class TerminalApp:
         self._controller = controller
         self._memory_service = memory_service
         self._plugin_registry = plugin_registry
-        self._benchmark_service = benchmark_service
         self._console = console or Console()
         self._renderer = TerminalRenderer(self._console)
         self._input = input_reader or self._console.input
@@ -55,17 +52,22 @@ class TerminalApp:
     def _run_goal(self, goal: str) -> None:
         if self._config.clear_between_tasks:
             self._console.clear()
-        if self._benchmark_service is not None:
-            self._benchmark_service.clear()
         try:
             with self._console.status(
-                f"[bold cyan]{self._config.spinner_text}[/bold cyan]",
-                spinner="dots",
+                "[bold cyan]Gerando plano com o modelo local...[/bold cyan]"
             ):
                 snapshot = self._controller.start(goal)
         except (RuntimeError, ValueError) as error:
             self._console.print(f"[red]Não foi possível gerar o plano:[/red] {error}")
             return
+
+        pending = snapshot.pending_plan
+        if (
+            pending is not None
+            and pending.pipeline_result is not None
+            and pending.pipeline_result.intent is not None
+        ):
+            self._renderer.intent(pending.pipeline_result.intent)
 
         self._renderer.plan(snapshot)
 
@@ -74,11 +76,7 @@ class TerminalApp:
                 "[bold]Confirmar este plano?[/bold] [s/N/c] "
             ).strip().lower()
             if decision in {"s", "sim", "y", "yes"}:
-                with self._console.status(
-                    "[bold cyan]Executando plano confirmado...[/bold cyan]",
-                    spinner="dots",
-                ):
-                    snapshot = self._controller.confirm()
+                snapshot = self._controller.confirm()
                 self._render_latest_results(snapshot)
                 if snapshot.requires_confirmation:
                     self._renderer.plan(snapshot)
@@ -91,19 +89,11 @@ class TerminalApp:
             break
 
         self._renderer.completion(snapshot)
-        self._render_benchmark_summary()
 
     def _render_latest_results(self, snapshot: LoopSnapshot) -> None:
         if not snapshot.records:
             return
         self._renderer.results(snapshot.records[-1].execution_results)
-
-    def _render_benchmark_summary(self) -> None:
-        if not self._config.show_benchmark_summary:
-            return
-        if self._benchmark_service is None:
-            return
-        self._renderer.benchmark(self._benchmark_service.report())
 
     def _handle_command(self, raw_value: str) -> bool:
         command = raw_value.lower()

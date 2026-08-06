@@ -21,6 +21,7 @@ from ubuntu_ai.execution.models import (
 )
 from ubuntu_ai.execution.system_executor import SystemExecutor
 from ubuntu_ai.execution_intelligence.engine import ExecutionIntelligence
+from ubuntu_ai.intent.models import Intent
 from ubuntu_ai.learning.service import LearningService
 from ubuntu_ai.memory.service import MemoryService
 from ubuntu_ai.pipeline.execution_pipeline import ExecutionPipeline
@@ -74,6 +75,7 @@ class AgentRuntime:
         self._lifecycle = AgentLifecycle.IDLE
         self._plan_reflection: ReflectionReport | None = None
         self._execution_reflections: list[ReflectionReport] = []
+        self._last_intent: Intent | None = None
 
     @property
     def session_manager(self) -> SessionManager:
@@ -99,6 +101,12 @@ class AgentRuntime:
 
         return self._context_snapshot
 
+
+    @property
+    def last_intent(self) -> Intent | None:
+        """Retorna a intenção interpretada na tarefa mais recente."""
+
+        return self._last_intent
 
     @property
     def plan_reflection(self) -> ReflectionReport | None:
@@ -157,11 +165,12 @@ class AgentRuntime:
 
         pipeline_result = self._run_pipeline(request, context_snapshot)
         self._pipeline_result = pipeline_result
+        self._last_intent = getattr(pipeline_result, "intent", None)
 
         message = pipeline_result.rendered_preview
         self._execution_reflections.clear()
         if self._reflection_engine is not None:
-            self._plan_reflection = self._reflection_engine.before_execution(
+            self._plan_reflection = self._reflect_before_execution(
                 pipeline_result.plan
             )
             if self._plan_reflection.findings:
@@ -246,7 +255,7 @@ class AgentRuntime:
             self._persist_execution_result(result)
             self._learn_from_execution(result)
             if self._reflection_engine is not None:
-                reflection = self._reflection_engine.after_execution(
+                reflection = self._reflect_after_execution(
                     command=command,
                     result=result,
                     step_index=step_index,
@@ -264,6 +273,37 @@ class AgentRuntime:
         self._lifecycle = AgentLifecycle.COMPLETED
 
         return tuple(results)
+
+    def _reflect_before_execution(self, plan):
+        """Preserva compatibilidade com doubles antigos de reflexão."""
+
+        if self._reflection_engine is None:
+            raise RuntimeError("ReflectionEngine não configurado.")
+        method = self._reflection_engine.before_execution
+        if "intent" in signature(method).parameters:
+            return method(plan, intent=self._last_intent)
+        return method(plan)
+
+    def _reflect_after_execution(
+        self,
+        *,
+        command: str,
+        result: ExecutionResult,
+        step_index: int,
+    ) -> ReflectionReport:
+        """Preserva compatibilidade com doubles antigos de reflexão."""
+
+        if self._reflection_engine is None:
+            raise RuntimeError("ReflectionEngine não configurado.")
+        method = self._reflection_engine.after_execution
+        kwargs: dict[str, object] = {
+            "command": command,
+            "result": result,
+            "step_index": step_index,
+        }
+        if "intent" in signature(method).parameters:
+            kwargs["intent"] = self._last_intent
+        return method(**kwargs)
 
     def _run_pipeline(
         self,

@@ -4,6 +4,8 @@ import re
 from collections.abc import Iterable
 
 from ubuntu_ai.execution.models import ExecutionResult, ExecutionStatus
+from ubuntu_ai.intent.context import IntentContextBuilder
+from ubuntu_ai.intent.models import Intent
 from ubuntu_ai.learning.models import (
     LearningOutcome,
     LearningPattern,
@@ -54,6 +56,40 @@ class LearningService:
             recommendations.append(LearningRecommendation(pattern, relevance))
         recommendations.sort(key=lambda item: item.score, reverse=True)
         return tuple(recommendations[:limit])
+
+    def recommend_for_intent(
+        self,
+        intent: Intent,
+        *,
+        project_name: str | None = None,
+        limit: int = 5,
+        context_builder: IntentContextBuilder | None = None,
+    ) -> tuple[LearningRecommendation, ...]:
+        """Recomenda padrões usando a representação estruturada da intenção."""
+
+        builder = context_builder or IntentContextBuilder()
+        return self.recommend(
+            builder.search_query(intent),
+            project_name=project_name,
+            limit=limit,
+        )
+
+    def context_for_intent(
+        self,
+        intent: Intent,
+        *,
+        project_name: str | None = None,
+        limit: int = 5,
+        context_builder: IntentContextBuilder | None = None,
+    ) -> str | None:
+        """Monta contexto de aprendizado orientado pela intenção."""
+
+        builder = context_builder or IntentContextBuilder()
+        return self.context_for_prompt(
+            builder.search_query(intent),
+            project_name=project_name,
+            limit=limit,
+        )
 
     def context_for_prompt(
         self,

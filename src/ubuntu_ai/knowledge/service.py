@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from collections.abc import Sequence
 
+from ubuntu_ai.intent.context import IntentContextBuilder
+from ubuntu_ai.intent.models import Intent
 from ubuntu_ai.knowledge.exceptions import (
     KnowledgeNotFoundError,
     KnowledgeValidationError,
@@ -101,6 +103,18 @@ class KnowledgeService:
             raise KnowledgeValidationError("A consulta de busca não pode estar vazia.")
         self._validate_limit(limit)
         return self._repository.search(normalized_query, limit=limit)
+
+    def search_for_intent(
+        self,
+        intent: Intent,
+        *,
+        limit: int = 10,
+        context_builder: IntentContextBuilder | None = None,
+    ) -> Sequence[KnowledgeResult]:
+        """Pesquisa conhecimento usando categoria, objetivo e entidades da intenção."""
+
+        builder = context_builder or IntentContextBuilder()
+        return self.search(builder.search_query(intent), limit=limit)
 
     def find_related(
         self,

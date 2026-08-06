@@ -19,6 +19,9 @@ from ubuntu_ai.execution_intelligence.discovery import DiscoveryEngine
 from ubuntu_ai.execution_intelligence.engine import ExecutionIntelligence
 from ubuntu_ai.execution_intelligence.preflight import PreflightEngine
 from ubuntu_ai.executor.preview import PreviewBuilder
+from ubuntu_ai.intent.engine import IntentEngine
+from ubuntu_ai.intent.repository import InMemoryIntentRepository, IntentRepository
+from ubuntu_ai.intent.service import IntentService
 from ubuntu_ai.knowledge.engine import KnowledgeEngine
 from ubuntu_ai.knowledge.repository import KnowledgeRepository
 from ubuntu_ai.knowledge.service import KnowledgeService
@@ -172,6 +175,30 @@ class Container:
             lambda: BenchmarkService(self.benchmark_recorder()),
         )
 
+    def intent_repository(self) -> IntentRepository:
+        """Retorna o repositório de intenções da aplicação."""
+
+        return self._singleton(
+            "intent_repository",
+            InMemoryIntentRepository,
+        )
+
+    def intent_service(self) -> IntentService:
+        """Retorna o serviço central de interpretação de intenções."""
+
+        return self._singleton(
+            "intent_service",
+            lambda: IntentService(repository=self.intent_repository()),
+        )
+
+    def intent_engine(self) -> IntentEngine:
+        """Retorna a fachada pública do domínio de intenção."""
+
+        return self._singleton(
+            "intent_engine",
+            lambda: IntentEngine(self.intent_service()),
+        )
+
     def plugin_registry(self) -> PluginRegistry:
         """Retorna o registro de plugins carregados."""
 
@@ -275,6 +302,7 @@ class Container:
             knowledge_service=self.knowledge_service(),
             learning_service=self.learning_service(),
             rag_context_builder=self.rag_context_builder(),
+            benchmark_service=self.benchmark_service(),
         )
 
     def planner(self) -> Planner:
@@ -305,6 +333,7 @@ class Container:
             preview_builder=self.preview_builder(),
             preview_renderer=self.preview_renderer(),
             benchmark_service=self.benchmark_service(),
+            intent_engine=self.intent_engine(),
         )
 
     def register_knowledge_repository(
@@ -459,7 +488,12 @@ class Container:
     def reflection_engine(self) -> ReflectionEngine:
         """Retorna o mecanismo único de autorreflexão."""
 
-        return self._singleton("reflection_engine", ReflectionEngine)
+        return self._singleton(
+            "reflection_engine",
+            lambda: ReflectionEngine(
+                benchmark_service=self.benchmark_service(),
+            ),
+        )
 
     def agent_loop_controller(self) -> AgentLoopController:
         """Retorna o controlador iterativo com limites configuráveis."""
@@ -486,7 +520,6 @@ class Container:
             controller=self.agent_loop_controller(),
             memory_service=self.memory_service(),
             plugin_registry=self.plugin_registry(),
-            benchmark_service=self.benchmark_service(),
         )
 
     def agent_runtime(self) -> AgentRuntime:
