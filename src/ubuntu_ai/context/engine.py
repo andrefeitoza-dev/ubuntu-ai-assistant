@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from ubuntu_ai.agent.context import ContextProvider
 from ubuntu_ai.agent.session import SessionManager
+from ubuntu_ai.context.discovery.service import ContextDiscoveryService
 from ubuntu_ai.context.models import ContextSnapshot
 from ubuntu_ai.memory.models import ExecutionRecord
 from ubuntu_ai.memory.service import MemoryService
@@ -16,6 +17,7 @@ class ContextEngine:
         context_provider: ContextProvider | None = None,
         session_manager: SessionManager | None = None,
         memory_service: MemoryService | None = None,
+        discovery_service: ContextDiscoveryService | None = None,
         history_limit: int = 5,
     ) -> None:
         if history_limit < 1:
@@ -24,6 +26,9 @@ class ContextEngine:
         self._context_provider = context_provider or ContextProvider()
         self._session_manager = session_manager or SessionManager()
         self._memory_service = memory_service
+        self._discovery_service = (
+            discovery_service or ContextDiscoveryService()
+        )
         self._history_limit = history_limit
 
     def build(self, *, session_id: str) -> ContextSnapshot:
@@ -33,6 +38,11 @@ class ContextEngine:
             raise ValueError("O identificador da sessão não pode estar vazio.")
 
         environment = self._context_provider.get_context()
+
+        environment_snapshot = self._discovery_service.discover(
+            str(environment.working_directory)
+        )
+
         executions = self._recent_executions(environment.project_name)
 
         return ContextSnapshot(
@@ -43,6 +53,7 @@ class ContextEngine:
             last_commands=tuple(record.command for record in executions),
             last_errors=self._extract_errors(executions),
             previous_request=self._previous_request(),
+            environment=environment_snapshot,
         )
 
     def _recent_executions(
@@ -57,6 +68,7 @@ class ContextEngine:
             "recent_executions",
             None,
         )
+
         if not callable(recent_executions):
             return ()
 
@@ -86,6 +98,7 @@ class ContextEngine:
                 continue
 
             detail = record.stderr.strip() or record.message.strip()
+
             if detail:
                 errors.append(f"{record.command}: {detail}")
 
