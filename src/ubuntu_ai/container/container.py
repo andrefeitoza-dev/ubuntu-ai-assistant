@@ -7,6 +7,9 @@ from ubuntu_ai.agent_loop import AgentLoopConfig, AgentLoopController
 from ubuntu_ai.ai.ollama_provider import OllamaProvider
 from ubuntu_ai.ai.provider import AIProvider
 from ubuntu_ai.ai.registry import AIProviderRegistry
+from ubuntu_ai.application.runtime import ApplicationRuntime
+from ubuntu_ai.autonomy.factory import build_autonomous_runtime
+from ubuntu_ai.autonomy.runtime import AutonomousRuntime
 from ubuntu_ai.benchmark import BenchmarkRecorder, BenchmarkService
 from ubuntu_ai.context.engine import ContextEngine
 from ubuntu_ai.conversation.engine import ConversationEngine
@@ -18,6 +21,8 @@ from ubuntu_ai.diagnostics.ai_diagnostics import AIDiagnosticsService
 from ubuntu_ai.execution_intelligence.discovery import DiscoveryEngine
 from ubuntu_ai.execution_intelligence.engine import ExecutionIntelligence
 from ubuntu_ai.execution_intelligence.preflight import PreflightEngine
+from ubuntu_ai.hardening.health import ApplicationHealthService
+from ubuntu_ai.hardening.telemetry import RuntimeTelemetry
 from ubuntu_ai.executor.preview import PreviewBuilder
 from ubuntu_ai.intent.engine import IntentEngine
 from ubuntu_ai.intent.repository import InMemoryIntentRepository, IntentRepository
@@ -30,6 +35,7 @@ from ubuntu_ai.learning.engine import LearningEngine
 from ubuntu_ai.learning.repository import LearningRepository
 from ubuntu_ai.learning.service import LearningService
 from ubuntu_ai.learning.sqlite_repository import SQLiteLearningRepository
+from ubuntu_ai.logging import LoggingRuntimeConfig, LoggingService
 from ubuntu_ai.memory.repository import MemoryRepository
 from ubuntu_ai.memory.service import MemoryService
 from ubuntu_ai.memory.sqlite_repository import SQLiteMemoryRepository
@@ -39,7 +45,11 @@ from ubuntu_ai.planner.planner import Planner
 from ubuntu_ai.planner.rule_planner import RulePlanner
 from ubuntu_ai.plugins import PluginManager, PluginPolicy, PluginRegistry
 from ubuntu_ai.reflection.engine import ReflectionEngine
+from ubuntu_ai.remote.engine import RemoteExecutionEngine
+from ubuntu_ai.remote.factory import build_remote_engine
 from ubuntu_ai.renderer.preview_renderer import PreviewRenderer
+from ubuntu_ai.runtime_integration.factory import build_multi_agent_runtime
+from ubuntu_ai.runtime_integration.runtime import MultiAgentRuntime
 from ubuntu_ai.semantic import (
     RAGContextBuilder,
     SemanticKnowledgeService,
@@ -512,6 +522,76 @@ class Container:
             ),
         )
 
+    def multi_agent_runtime(self) -> MultiAgentRuntime:
+        """Retorna o runtime multiagente composto pelos serviços atuais."""
+
+        return self._singleton(
+            "multi_agent_runtime",
+            lambda: build_multi_agent_runtime(
+                planner=self.planner(),
+                context_engine=self.context_engine(),
+            ),
+        )
+
+    def autonomous_runtime(self) -> AutonomousRuntime:
+        """Retorna o runtime autônomo controlado da aplicação."""
+
+        return self._singleton(
+            "autonomous_runtime",
+            lambda: build_autonomous_runtime(self.multi_agent_runtime()),
+        )
+
+    def remote_execution_engine(self) -> RemoteExecutionEngine:
+        """Retorna a engine única de execução local e remota."""
+
+        return self._singleton(
+            "remote_execution_engine",
+            build_remote_engine,
+        )
+
+    def runtime_telemetry(self) -> RuntimeTelemetry:
+        """Retorna o coletor leve de telemetria da aplicação."""
+
+        return self._singleton("runtime_telemetry", RuntimeTelemetry)
+
+    def application_health_service(self) -> ApplicationHealthService:
+        """Retorna o agregador de probes de prontidão."""
+
+        return self._singleton(
+            "application_health_service",
+            ApplicationHealthService,
+        )
+
+    def logging_service(self) -> LoggingService:
+        """Retorna o serviço de logging configurado pelo AppConfig."""
+
+        config = self.config()
+        return self._singleton(
+            "logging_service",
+            lambda: LoggingService(
+                LoggingRuntimeConfig(
+                    directory=config.log_dir,
+                    level="INFO",
+                    console_enabled=False,
+                )
+            ),
+        )
+
+    def application_runtime(self) -> ApplicationRuntime:
+        """Retorna a fachada canônica da aplicação para a versão 1.0."""
+
+        return self._singleton(
+            "application_runtime",
+            lambda: ApplicationRuntime(
+                controller=self.agent_loop_controller(),
+                multi_agent=self.multi_agent_runtime(),
+                autonomous=self.autonomous_runtime(),
+                remote=self.remote_execution_engine(),
+                telemetry=self.runtime_telemetry(),
+                health_service=self.application_health_service(),
+                logging_service=self.logging_service(),
+            ),
+        )
 
     def terminal_app(self) -> TerminalApp:
         """Retorna a interface interativa de terminal."""

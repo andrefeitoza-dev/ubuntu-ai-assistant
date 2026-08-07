@@ -4,7 +4,7 @@ from ubuntu_ai.context.models import ContextSnapshot
 
 
 class PlanningPromptBuilder:
-    """Monta o prompt do planejador com contrato JSON e contexto disponível."""
+    """Monta o prompt do planejador com contexto rico do ambiente."""
 
     def build(
         self,
@@ -14,55 +14,70 @@ class PlanningPromptBuilder:
         knowledge_context: str | None = None,
         learning_context: str | None = None,
         intent_context: str | None = None,
+        planning_advice: str | None = None,
+        decision_context: str | None = None,
     ) -> str:
-        context_section = (
-            f"Contexto disponível:\n{context.to_prompt()}\n"
-            if context is not None
-            else ""
-        )
-        knowledge_section = (
-            f"Conhecimento local relevante:\n{knowledge_context}\n"
-            if knowledge_context
-            else ""
-        )
-        intent_section = (
-            f"Intenção estruturada:\n{intent_context}\n"
-            if intent_context
-            else ""
-        )
-        learning_section = (
-            f"Aprendizado de execuções anteriores:\n{learning_context}\n"
-            if learning_context
-            else ""
-        )
-        conversation_section = ""
-        if context is not None and context.conversation_history:
-            conversation_section = (
-                "Histórico recente da conversa:\n"
-                + "\n".join(context.conversation_history)
-                + "\n"
-            )
+        sections: list[str] = [
+            "Você é o planejador do Ubuntu AI Assistant.",
+            "Sua função é produzir planos seguros, determinísticos e objetivos.",
+        ]
 
-        return (
-            "Crie um plano seguro para Ubuntu em JSON válido.\n"
-            f"{context_section}"
-            f"{conversation_section}"
-            f"{knowledge_section}"
-            f"{intent_section}"
-            f"{learning_section}"
-            "Use exatamente esta estrutura:\n"
-            "{\n"
-            '  "goal": "objetivo",\n'
-            '  "estimated_seconds": 120,\n'
-            '  "risk": "low|medium|high|critical",\n'
-            '  "steps": [\n'
-            "    {\n"
-            '      "title": "etapa",\n'
-            '      "description": "descrição",\n'
-            '      "command": ["comando", "argumento"]\n'
-            "    }\n"
-            "  ]\n"
-            "}\n"
-            "Não inclua Markdown nem explicações fora do JSON.\n"
-            f"Solicitação atual: {request}"
+        if context is not None:
+            sections.extend(["=== CONTEXTO ===", context.to_prompt()])
+            if context.conversation_history:
+                sections.append("Histórico recente da conversa:")
+                sections.extend(context.conversation_history)
+
+        if knowledge_context:
+            sections.extend(["Conhecimento local relevante:", knowledge_context])
+        if intent_context:
+            sections.extend(["Intenção estruturada:", intent_context])
+        if learning_context:
+            sections.extend(["Aprendizado de execuções anteriores:", learning_context])
+        if planning_advice:
+            sections.extend(["Recomendações de planejamento:", planning_advice])
+        if decision_context:
+            sections.extend(["Decisão operacional:", decision_context])
+
+        sections.append("=== REGRAS ===")
+        sections.extend(
+            [
+                "- Utilize o contexto detectado para adaptar o plano.",
+                "- Preserve o ambiente existente.",
+                "- Evite comandos destrutivos.",
+                "- Não invente arquivos ou diretórios.",
+                "- Gere etapas pequenas e verificáveis.",
+                (
+                    "- Considere Docker, Git, Python, Ollama "
+                    "e Virtualenv quando disponíveis."
+                ),
+            ]
         )
+
+        sections.append("Use exatamente esta estrutura:")
+        sections.append(
+            """
+{
+  "goal": "objetivo",
+  "estimated_seconds": 120,
+  "risk": "low|medium|high|critical",
+  "steps": [
+    {
+      "title": "etapa",
+      "description": "descrição",
+      "command": ["comando", "argumento"]
+    }
+  ]
+}
+""".strip()
+        )
+
+        sections.extend(
+            [
+                "Não utilize Markdown.",
+                "Não escreva explicações.",
+                "Retorne apenas JSON válido.",
+                f"Solicitação atual: {request}",
+            ]
+        )
+        return "\n\n".join(sections)

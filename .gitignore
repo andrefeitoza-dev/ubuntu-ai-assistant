@@ -36,3 +36,8 @@ site/
 *.sqlite
 *.sqlite3
 # Documentation build
+# Local migration / sprint backups
+.epic*-backup/
+.rc*-backup/
+.sprint*-backup/
+.c1-backup/
