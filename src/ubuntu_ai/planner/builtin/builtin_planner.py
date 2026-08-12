@@ -1,10 +1,45 @@
 from __future__ import annotations
 
+import unicodedata
+
 from ubuntu_ai.domain.plan import Plan, PlanStep
 from ubuntu_ai.planner.builtin.registry import (
     BUILTIN_COMMANDS,
     BuiltinCommand,
 )
+
+
+_STOP_WORDS = {
+    "o",
+    "a",
+    "os",
+    "as",
+    "um",
+    "uma",
+    "de",
+    "do",
+    "da",
+    "dos",
+    "das",
+    "para",
+    "por",
+    "com",
+    "no",
+    "na",
+    "nos",
+    "nas",
+    "me",
+    "meu",
+    "minha",
+    "mostrar",
+    "mostre",
+    "mostrar-me",
+    "ver",
+    "veja",
+    "quero",
+    "por",
+    "favor",
+}
 
 
 class BuiltinPlanner:
@@ -25,13 +60,17 @@ class BuiltinPlanner:
 
         return self._build_plan(command)
 
-    def _match(self, normalized_request: str) -> BuiltinCommand | None:
+    def _match(
+        self,
+        normalized_request: str,
+    ) -> BuiltinCommand | None:
+
         for command in BUILTIN_COMMANDS:
-            if any(
-                keyword in normalized_request
-                for keyword in command.keywords
-            ):
-                return command
+            for keyword in command.keywords:
+                normalized_keyword = self._normalize(keyword)
+
+                if normalized_keyword in normalized_request:
+                    return command
 
         return None
 
@@ -53,6 +92,20 @@ class BuiltinPlanner:
 
         return plan
 
-    @staticmethod
-    def _normalize(value: str) -> str:
-        return " ".join(value.strip().lower().split())
+    @classmethod
+    def _normalize(cls, value: str) -> str:
+
+        value = (
+            unicodedata.normalize("NFKD", value)
+            .encode("ascii", "ignore")
+            .decode()
+            .lower()
+        )
+
+        words = [
+            word
+            for word in value.split()
+            if word not in _STOP_WORDS
+        ]
+
+        return " ".join(words)

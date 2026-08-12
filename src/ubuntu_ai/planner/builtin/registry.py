@@ -19,63 +19,239 @@ class BuiltinCommand:
 
 
 BUILTIN_COMMANDS: tuple[BuiltinCommand, ...] = (
+    #
+    # DIRETÓRIO
+    #
     BuiltinCommand(
         goal="Mostrar diretório atual",
         title="Mostrar diretório atual",
         description="Exibe o diretório de trabalho atual.",
         command=("pwd",),
         keywords=(
+            "pwd",
+            "diretório",
+            "diretorio",
             "diretório atual",
             "diretorio atual",
-            "meu diretório",
-            "meu diretorio",
+            "diretório de trabalho",
+            "diretorio de trabalho",
+            "working directory",
             "onde estou",
-            "pwd",
+            "qual pasta",
+            "pasta atual",
+            "mostrar diretório",
+            "mostrar diretorio",
+            "mostre o diretório",
+            "mostre o diretorio",
+            "current directory",
         ),
     ),
+
+    #
+    # DISCO
+    #
     BuiltinCommand(
         goal="Mostrar uso de disco",
         title="Verificar uso de disco",
-        description="Exibe o uso dos sistemas de arquivos em formato legível.",
+        description="Exibe o uso dos sistemas de arquivos.",
         command=("df", "-h"),
         keywords=(
-            "uso de disco",
+            "df",
+            "df -h",
+            "disco",
+            "ssd",
+            "hd",
+            "armazenamento",
+            "armazenamento local",
+            "espaço",
+            "espaco",
             "espaço em disco",
             "espaco em disco",
             "espaço livre",
             "espaco livre",
+            "mostrar disco",
+            "mostre o disco",
+            "veja o disco",
+            "ver disco",
+            "quanto espaço tenho",
+            "quanto espaco tenho",
+            "quanto espaço livre tenho",
+            "quanto espaco livre tenho",
+            "disk",
             "disk usage",
-            "df -h",
+            "storage",
+            "uso de disco",
         ),
     ),
+
+    #
+    # MEMÓRIA
+    #
     BuiltinCommand(
         goal="Mostrar uso de memória",
         title="Verificar memória",
-        description="Exibe memória total, utilizada e disponível.",
+        description="Exibe memória RAM.",
         command=("free", "-h"),
         keywords=(
+            "free",
+            "free -h",
+            "ram",
             "memória",
             "memoria",
+            "memory",
             "memória ram",
             "memoria ram",
             "uso de memória",
             "uso de memoria",
-            "ram",
-            "memory",
-            "free -h",
+            "consumo de memória",
+            "consumo de memoria",
+            "memória usada",
+            "memoria usada",
+            "memória livre",
+            "memoria livre",
+            "quanta memória",
+            "quanta memoria",
+            "quanto de memória",
+            "quanto de memoria",
+            "quanto de ram",
         ),
     ),
+
+    #
+    # ARQUIVOS
+    #
     BuiltinCommand(
         goal="Listar arquivos",
         title="Listar arquivos",
-        description="Lista os arquivos do diretório atual.",
+        description="Lista arquivos do diretório atual.",
         command=("ls",),
         keywords=(
-            "liste os arquivos",
+            "ls",
+            "arquivo",
+            "arquivos",
             "listar arquivos",
-            "mostre os arquivos",
+            "liste os arquivos",
             "mostrar arquivos",
-            "arquivos desta pasta",
+            "mostre os arquivos",
+            "listar pasta",
+            "conteúdo da pasta",
+            "conteudo da pasta",
+            "listar diretório",
+            "listar diretorio",
+        ),
+    ),
+
+    #
+    # REDE
+    #
+    BuiltinCommand(
+        goal="Mostrar interfaces",
+        title="Interfaces de rede",
+        description="Mostra as interfaces de rede.",
+        command=("ip", "-br", "addr"),
+        keywords=(
+            "rede",
+            "network",
+            "ip",
+            "ip addr",
+            "meu ip",
+            "mostrar ip",
+            "interface",
+            "interfaces",
+            "interfaces de rede",
+            "ethernet",
+            "wifi",
+            "wi-fi",
+        ),
+    ),
+
+    #
+    # CPU
+    #
+    BuiltinCommand(
+        goal="Mostrar CPU",
+        title="Informações da CPU",
+        description="Mostra informações resumidas da CPU.",
+        command=("lscpu",),
+        keywords=(
+            "cpu",
+            "processador",
+            "informações da cpu",
+            "informacoes da cpu",
+            "mostrar cpu",
+            "lscpu",
+        ),
+    ),
+
+    #
+    # HOSTNAME
+    #
+    BuiltinCommand(
+        goal="Mostrar hostname",
+        title="Hostname",
+        description="Mostra o hostname do computador.",
+        command=("hostname",),
+        keywords=(
+            "hostname",
+            "nome do computador",
+            "nome da máquina",
+            "nome da maquina",
+            "identificação",
+            "identificacao",
+        ),
+    ),
+
+    #
+    # KERNEL
+    #
+    BuiltinCommand(
+        goal="Mostrar kernel",
+        title="Kernel Linux",
+        description="Mostra a versão do kernel.",
+        command=("uname", "-r"),
+        keywords=(
+            "kernel",
+            "versão do kernel",
+            "versao do kernel",
+            "uname",
+            "linux kernel",
+        ),
+    ),
+
+    #
+    # UPTIME
+    #
+    BuiltinCommand(
+        goal="Mostrar uptime",
+        title="Tempo ligado",
+        description="Mostra há quanto tempo o sistema está ligado.",
+        command=("uptime",),
+        keywords=(
+            "uptime",
+            "tempo ligado",
+            "há quanto tempo ligado",
+            "ha quanto tempo ligado",
+            "tempo de atividade",
+        ),
+    ),
+
+    #
+    # USUÁRIO
+    #
+    BuiltinCommand(
+        goal="Mostrar usuário",
+        title="Usuário atual",
+        description="Mostra o usuário logado.",
+        command=("whoami",),
+        keywords=(
+            "whoami",
+            "usuário",
+            "usuario",
+            "usuário atual",
+            "usuario atual",
+            "quem sou eu",
+            "quem está logado",
+            "quem esta logado",
         ),
     ),
 )

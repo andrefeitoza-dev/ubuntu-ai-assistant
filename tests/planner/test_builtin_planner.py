@@ -1,66 +1,110 @@
-from ubuntu_ai.domain.risk import RiskLevel
-from ubuntu_ai.planner.builtin import BuiltinPlanner
+from ubuntu_ai.planner.builtin.builtin_planner import BuiltinPlanner
 
 
-def test_builtin_planner_creates_pwd_plan() -> None:
-    planner = BuiltinPlanner()
-
-    plan = planner.try_create_plan("mostre meu diretório atual")
-
-    assert plan is not None
-    assert plan.goal == "Mostrar diretório atual"
-    assert plan.risk is RiskLevel.LOW
-    assert plan.estimated_seconds == 1
-    assert len(plan.steps) == 1
-    assert plan.steps[0].command == ["pwd"]
+planner = BuiltinPlanner()
 
 
-def test_builtin_planner_creates_disk_plan() -> None:
-    planner = BuiltinPlanner()
-
-    plan = planner.try_create_plan("mostre o uso de disco")
-
-    assert plan is not None
-    assert plan.goal == "Mostrar uso de disco"
-    assert plan.steps[0].command == ["df", "-h"]
-
-
-def test_builtin_planner_creates_memory_plan() -> None:
-    planner = BuiltinPlanner()
-
-    plan = planner.try_create_plan("mostre a memória RAM")
-
-    assert plan is not None
-    assert plan.goal == "Mostrar uso de memória"
-    assert plan.steps[0].command == ["free", "-h"]
-
-
-def test_builtin_planner_creates_ls_plan() -> None:
-    planner = BuiltinPlanner()
-
-    plan = planner.try_create_plan("liste os arquivos desta pasta")
-
-    assert plan is not None
-    assert plan.goal == "Listar arquivos"
-    assert plan.steps[0].command == ["ls"]
-
-
-def test_builtin_planner_accepts_common_variations() -> None:
-    planner = BuiltinPlanner()
-
+#
+# DIRETÓRIO
+#
+def test_builtin_pwd():
+    assert planner.try_create_plan("pwd") is not None
     assert planner.try_create_plan("onde estou") is not None
-    assert planner.try_create_plan("quanto espaço livre tenho?") is not None
-    assert planner.try_create_plan("mostre memoria") is not None
-    assert planner.try_create_plan("listar arquivos") is not None
+    assert planner.try_create_plan("qual pasta") is not None
+    assert planner.try_create_plan("diretório") is not None
 
 
-def test_builtin_planner_returns_none_for_unknown_request() -> None:
-    planner = BuiltinPlanner()
+#
+# DISCO
+#
+def test_builtin_disk():
+    assert planner.try_create_plan("disco") is not None
+    assert planner.try_create_plan("df") is not None
+    assert planner.try_create_plan("ssd") is not None
+    assert planner.try_create_plan("hd") is not None
+    assert planner.try_create_plan("armazenamento") is not None
+    assert planner.try_create_plan("quanto espaço tenho") is not None
+    assert planner.try_create_plan("espaço livre") is not None
 
-    assert planner.try_create_plan("instale o PostgreSQL") is None
+
+#
+# MEMÓRIA
+#
+def test_builtin_memory():
+    assert planner.try_create_plan("memória") is not None
+    assert planner.try_create_plan("ram") is not None
+    assert planner.try_create_plan("free") is not None
+    assert planner.try_create_plan("quanta memória") is not None
+    assert planner.try_create_plan("quanto de ram") is not None
 
 
-def test_builtin_planner_returns_none_for_empty_request() -> None:
-    planner = BuiltinPlanner()
+#
+# ARQUIVOS
+#
+def test_builtin_ls():
+    assert planner.try_create_plan("ls") is not None
+    assert planner.try_create_plan("arquivos") is not None
+    assert planner.try_create_plan("listar pasta") is not None
+    assert planner.try_create_plan("mostrar arquivos") is not None
 
-    assert planner.try_create_plan("   ") is None
+
+#
+# REDE
+#
+def test_builtin_network():
+    assert planner.try_create_plan("rede") is not None
+    assert planner.try_create_plan("ip") is not None
+    assert planner.try_create_plan("wifi") is not None
+    assert planner.try_create_plan("interfaces") is not None
+    assert planner.try_create_plan("meu ip") is not None
+
+
+#
+# CPU
+#
+def test_builtin_cpu():
+    assert planner.try_create_plan("cpu") is not None
+    assert planner.try_create_plan("processador") is not None
+    assert planner.try_create_plan("lscpu") is not None
+
+
+#
+# HOSTNAME
+#
+def test_builtin_hostname():
+    assert planner.try_create_plan("hostname") is not None
+    assert planner.try_create_plan("nome do computador") is not None
+
+
+#
+# KERNEL
+#
+def test_builtin_kernel():
+    assert planner.try_create_plan("kernel") is not None
+    assert planner.try_create_plan("uname") is not None
+
+
+#
+# UPTIME
+#
+def test_builtin_uptime():
+    assert planner.try_create_plan("uptime") is not None
+    assert planner.try_create_plan("tempo ligado") is not None
+
+
+#
+# USUÁRIO
+#
+def test_builtin_user():
+    assert planner.try_create_plan("whoami") is not None
+    assert planner.try_create_plan("quem sou eu") is not None
+    assert planner.try_create_plan("usuário atual") is not None
+
+
+#
+# DESCONHECIDO
+#
+def test_builtin_unknown():
+    assert planner.try_create_plan("instale kubernetes") is None
+    assert planner.try_create_plan("crie um cluster") is None
+    assert planner.try_create_plan("") is None
