@@ -57,30 +57,48 @@ class TerminalRenderer:
             "[cyan]:plugins[/cyan] plugins  "
             "[cyan]:quit[/cyan] sair"
         )
+
         if compact:
             self.console.print(commands)
             return
-        self.console.print(Panel(commands, title="Comandos", border_style="cyan"))
+
+        self.console.print(
+            Panel(
+                commands,
+                title="Comandos",
+                border_style="cyan",
+            )
+        )
 
     def intent(self, intent: Intent) -> None:
         """Exibe a interpretação estruturada da solicitação."""
 
         view = IntentPresenter().present(intent)
-        table = Table(title="Intenção detectada", show_header=False)
+
+        table = Table(
+            title="Intenção detectada",
+            show_header=False,
+        )
         table.add_column("Campo", style="bold cyan")
         table.add_column("Valor")
+
         table.add_row("Categoria", view.category)
         table.add_row("Objetivo", view.goal)
         table.add_row("Confiança", view.confidence_percent)
         table.add_row("Entidades", view.entities)
         table.add_row("Confirmação", view.requires_confirmation)
+
         self.console.print(table)
 
     def plan(self, snapshot: LoopSnapshot) -> None:
         pending = snapshot.pending_plan
+
         if pending is None:
-            self.console.print("[yellow]Nenhum plano pendente.[/yellow]")
+            self.console.print(
+                "[yellow]Nenhum plano pendente.[/yellow]"
+            )
             return
+
         self.console.print(
             Panel(
                 pending.message,
@@ -90,84 +108,206 @@ class TerminalRenderer:
         )
 
     def status(self, snapshot: LoopSnapshot) -> None:
-        table = Table(title="Estado do Agent Loop", show_header=False)
+        table = Table(
+            title="Estado do Agent Loop",
+            show_header=False,
+        )
         table.add_column("Campo", style="bold")
         table.add_column("Valor")
+
         table.add_row("Objetivo", snapshot.goal or "—")
-        table.add_row("Estado", _STATE_LABELS[snapshot.state])
-        table.add_row("Iteração", str(snapshot.iteration))
-        table.add_row("Execuções", str(len(snapshot.records)))
+        table.add_row(
+            "Estado",
+            _STATE_LABELS[snapshot.state],
+        )
+        table.add_row(
+            "Iteração",
+            str(snapshot.iteration),
+        )
+        table.add_row(
+            "Execuções",
+            str(len(snapshot.records)),
+        )
         table.add_row(
             "Motivo de parada",
-            snapshot.stop_reason.value if snapshot.stop_reason else "—",
+            (
+                snapshot.stop_reason.value
+                if snapshot.stop_reason
+                else "—"
+            ),
         )
+
         self.console.print(table)
 
-    def results(self, results: tuple[ExecutionResult, ...]) -> None:
+    def results(
+        self,
+        results: tuple[ExecutionResult, ...],
+    ) -> None:
+        """Exibe resumo e conteúdo real retornado pelos comandos."""
+
         if not results:
-            self.console.print("[yellow]A execução não retornou resultados.[/yellow]")
+            self.console.print(
+                "[yellow]"
+                "A execução não retornou resultados."
+                "[/yellow]"
+            )
             return
+
         table = Table(title="Resultados da execução")
         table.add_column("Status")
         table.add_column("Comando")
         table.add_column("Mensagem")
         table.add_column("Tempo", justify="right")
+
         for result in results:
             style = _STATUS_STYLES[result.status]
+
             duration = (
-                f"{result.duration:.2f}s" if result.duration is not None else "—"
+                f"{result.duration:.2f}s"
+                if result.duration is not None
+                else "—"
             )
+
             table.add_row(
-                Text(result.status.value, style=style),
+                Text(
+                    result.status.value,
+                    style=style,
+                ),
                 result.command or "—",
                 result.message,
                 duration,
             )
+
         self.console.print(table)
 
-    def history(self, records: tuple[ExecutionRecord, ...]) -> None:
+        for result in results:
+            self._render_result_details(result)
+
+    def _render_result_details(
+        self,
+        result: ExecutionResult,
+    ) -> None:
+        """Renderiza stdout e stderr preservando a saída original."""
+
+        command = result.command or "comando"
+
+        if result.stdout.strip():
+            self.console.print(
+                Panel(
+                    Text(result.stdout.rstrip()),
+                    title=f"Saída — {command}",
+                    border_style=_STATUS_STYLES[result.status],
+                    subtitle=self._result_metadata(result),
+                )
+            )
+
+        if result.stderr.strip():
+            self.console.print(
+                Panel(
+                    Text(result.stderr.rstrip()),
+                    title=f"Erro — {command}",
+                    border_style="red",
+                    subtitle=self._result_metadata(result),
+                )
+            )
+
+    @staticmethod
+    def _result_metadata(
+        result: ExecutionResult,
+    ) -> str:
+        parts: list[str] = []
+
+        if result.return_code is not None:
+            parts.append(
+                f"exit={result.return_code}"
+            )
+
+        if result.duration is not None:
+            parts.append(
+                f"{result.duration:.2f}s"
+            )
+
+        return " | ".join(parts)
+
+    def history(
+        self,
+        records: tuple[ExecutionRecord, ...],
+    ) -> None:
         if not records:
-            self.console.print("[yellow]Nenhuma execução persistida.[/yellow]")
+            self.console.print(
+                "[yellow]"
+                "Nenhuma execução persistida."
+                "[/yellow]"
+            )
             return
+
         table = Table(title="Histórico recente")
         table.add_column("Data")
         table.add_column("Status")
         table.add_column("Projeto")
         table.add_column("Comando")
+
         for record in records:
             table.add_row(
-                record.created_at.astimezone().strftime("%Y-%m-%d %H:%M:%S"),
+                record.created_at.astimezone().strftime(
+                    "%Y-%m-%d %H:%M:%S"
+                ),
                 record.status,
                 record.project_name or "—",
                 record.command,
             )
+
         self.console.print(table)
 
-    def plugins(self, plugins: tuple[LoadedPlugin, ...]) -> None:
+    def plugins(
+        self,
+        plugins: tuple[LoadedPlugin, ...],
+    ) -> None:
         if not plugins:
-            self.console.print("[yellow]Nenhum plugin carregado.[/yellow]")
+            self.console.print(
+                "[yellow]"
+                "Nenhum plugin carregado."
+                "[/yellow]"
+            )
             return
+
         table = Table(title="Plugins carregados")
         table.add_column("Nome")
         table.add_column("Versão")
         table.add_column("API")
+
         for plugin in plugins:
             table.add_row(
                 plugin.manifest.name,
                 plugin.manifest.version,
                 str(plugin.manifest.api_version),
             )
+
         self.console.print(table)
-    def benchmark(self, report: BenchmarkReport) -> None:
+
+    def benchmark(
+        self,
+        report: BenchmarkReport,
+    ) -> None:
         """Exibe um resumo do benchmark da última execução."""
 
         if report.operations == 0:
-            self.console.print("[yellow]Nenhum benchmark disponível.[/yellow]")
+            self.console.print(
+                "[yellow]"
+                "Nenhum benchmark disponível."
+                "[/yellow]"
+            )
             return
 
         table = Table(title="Desempenho")
-        table.add_column("Operação", style="bold cyan")
-        table.add_column("Tempo", justify="right")
+        table.add_column(
+            "Operação",
+            style="bold cyan",
+        )
+        table.add_column(
+            "Tempo",
+            justify="right",
+        )
 
         for record in report.records:
             table.add_row(
@@ -188,18 +328,34 @@ class TerminalRenderer:
         )
 
         self.console.print(table)
-    def completion(self, snapshot: LoopSnapshot) -> None:
+
+    def completion(
+        self,
+        snapshot: LoopSnapshot,
+    ) -> None:
         style = {
             LoopState.COMPLETED: "green",
             LoopState.BLOCKED: "yellow",
             LoopState.FAILED: "red",
             LoopState.CANCELLED: "dim",
-        }.get(snapshot.state, "blue")
-        message = snapshot.events[-1].message if snapshot.events else _STATE_LABELS[snapshot.state]
+        }.get(
+            snapshot.state,
+            "blue",
+        )
+
+        message = (
+            snapshot.events[-1].message
+            if snapshot.events
+            else _STATE_LABELS[snapshot.state]
+        )
+
         self.console.print(
             Panel(
                 message,
-                title=f"Ciclo {_STATE_LABELS[snapshot.state]}",
+                title=(
+                    f"Ciclo "
+                    f"{_STATE_LABELS[snapshot.state]}"
+                ),
                 border_style=style,
             )
         )
