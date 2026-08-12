@@ -46,3 +46,17 @@ Todas as mudanças relevantes deste projeto são registradas neste arquivo.
 ### Added
 
 - Primeira candidata à release com auditoria arquitetural e hardening.
+
+Ubuntu AI Assistant v1.1
+Objetivo
+
+Melhorar significativamente a experiência do usuário, reduzindo o tempo de resposta para comandos simples e apresentando respostas mais úteis.
+
+Escopo
+Fast Path Engine
+Response Formatter
+stdout automático
+ubuntu-ai inicia a TUI por padrão
+ubuntu-ai examples
+Instalação profissional
+Empacotamento (uv tool, .deb)
