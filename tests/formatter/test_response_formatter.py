@@ -4,7 +4,7 @@ from ubuntu_ai.formatter import (
 )
 
 
-def test_pwd_formatter():
+def test_pwd_formatter() -> None:
     formatter = ResponseFormatter()
 
     text = formatter.format(
@@ -18,7 +18,7 @@ def test_pwd_formatter():
     assert "/home/andre" in text
 
 
-def test_df_formatter():
+def test_df_formatter() -> None:
     formatter = ResponseFormatter()
 
     text = formatter.format(
@@ -31,7 +31,7 @@ def test_df_formatter():
     assert "Uso de Disco" in text
 
 
-def test_free_formatter():
+def test_free_formatter() -> None:
     formatter = ResponseFormatter()
 
     text = formatter.format(
@@ -44,7 +44,7 @@ def test_free_formatter():
     assert "Memória RAM" in text
 
 
-def test_ls_formatter():
+def test_ls_formatter() -> None:
     formatter = ResponseFormatter()
 
     text = formatter.format(
@@ -57,7 +57,7 @@ def test_ls_formatter():
     assert "Arquivos" in text
 
 
-def test_unknown_command_returns_stdout():
+def test_unknown_command_returns_stdout() -> None:
     formatter = ResponseFormatter()
 
     text = formatter.format(
