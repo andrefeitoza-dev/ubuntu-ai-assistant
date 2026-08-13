@@ -40,7 +40,7 @@ class TerminalApp:
 
         self._renderer.banner()
         while True:
-            raw_value = self._input("\n[bold cyan]Objetivo>[/bold cyan] ").strip()
+            raw_value = self._input("\n[bold cyan]ubuntu-ai >[/bold cyan] ").strip()
             if not raw_value:
                 continue
             if self._handle_command(raw_value):

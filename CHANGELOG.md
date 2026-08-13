@@ -60,3 +60,22 @@ ubuntu-ai inicia a TUI por padrão
 ubuntu-ai examples
 Instalação profissional
 Empacotamento (uv tool, .deb)
+
+## Sprint 9 - Builtin Intelligence
+
+### Added
+- Semantic normalization
+- Builtin metrics
+- Network commands
+- CPU commands
+- Kernel commands
+- Hostname commands
+- User commands
+
+### Improved
+- Expanded builtin vocabulary
+- Natural language matching
+- Alias coverage
+
+### Tests
+- 32 tests passing
