@@ -76,9 +76,6 @@ def test_sdk_raises_error_when_runtime_returns_no_pipeline_result() -> None:
 
     with pytest.raises(
         RuntimeError,
-        match=(
-            "O Agent Runtime não retornou um resultado "
-            "de planejamento"
-        ),
+        match=("O Agent Runtime não retornou um resultado de planejamento"),
     ):
         assistant.plan("Instale Docker")

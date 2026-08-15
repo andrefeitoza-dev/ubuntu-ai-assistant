@@ -87,11 +87,7 @@ def test_runtime_records_interaction_and_context_in_session() -> None:
 
     assert session_manager.session.history == [
         "Usuário: Analise este projeto",
-        (
-            "Contexto: diretório=/tmp/ubuntu-ai; "
-            "projeto=ubuntu-ai-assistant; "
-            "sistema=Linux"
-        ),
+        ("Contexto: diretório=/tmp/ubuntu-ai; projeto=ubuntu-ai-assistant; sistema=Linux"),
         "Agente: Preview seguro para: Analise este projeto",
     ]
 

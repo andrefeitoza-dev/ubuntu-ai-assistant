@@ -19,9 +19,7 @@ class ContextProvider:
         working_directory = Path.cwd()
 
         project_name = (
-            working_directory.name
-            if (working_directory / "pyproject.toml").exists()
-            else None
+            working_directory.name if (working_directory / "pyproject.toml").exists() else None
         )
 
         return AgentContext(

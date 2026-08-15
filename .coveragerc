@@ -1,0 +1,23 @@
+[run]
+branch = True
+source = src/ubuntu_ai
+omit =
+    */__init__.py
+    */__main__.py
+
+[report]
+show_missing = True
+skip_covered = False
+precision = 2
+fail_under = 80
+exclude_lines =
+    pragma: no cover
+    if TYPE_CHECKING:
+    raise NotImplementedError
+    if __name__ == .__main__.:
+
+[html]
+directory = htmlcov
+
+[xml]
+output = coverage.xml

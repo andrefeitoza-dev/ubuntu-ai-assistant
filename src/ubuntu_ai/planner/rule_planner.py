@@ -20,6 +20,7 @@ class RulePlanner:
             goal="Instalar e configurar o Docker",
             estimated_seconds=240,
             risk=RiskLevel.HIGH,
+            planner="rule",
         )
 
         plan.add_step(
@@ -33,10 +34,7 @@ class RulePlanner:
         plan.add_step(
             PlanStep(
                 title="Instalar Docker",
-                description=(
-                    "Instala o pacote Docker disponível nos "
-                    "repositórios do Ubuntu."
-                ),
+                description=("Instala o pacote Docker disponível nos repositórios do Ubuntu."),
                 command=[
                     "sudo",
                     "apt",
@@ -64,9 +62,7 @@ class RulePlanner:
         plan.add_step(
             PlanStep(
                 title="Verificar instalação",
-                description=(
-                    "Confirma que o Docker foi instalado corretamente."
-                ),
+                description=("Confirma que o Docker foi instalado corretamente."),
                 command=["docker", "--version"],
             )
         )

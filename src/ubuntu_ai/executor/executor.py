@@ -19,9 +19,7 @@ class Executor:
             result = shell_tool.execute(command=step.command)
 
             if not isinstance(result, CommandResult):
-                raise TypeError(
-                    "A ferramenta shell deve retornar um CommandResult."
-                )
+                raise TypeError("A ferramenta shell deve retornar um CommandResult.")
 
             results.append(result)
 

@@ -1,90 +1,74 @@
-# Ubuntu AI Assistant Roadmap
+# Ubuntu AI Assistant — Roadmap
 
-## Foundation
+## Concluído
 
-- [x] Estrutura do projeto
-- [x] CLI
-- [x] Doctor
-- [x] SystemService
-- [x] ShellService
-- [x] OllamaService
+### Fase 1 — Fundação
 
----
+- estrutura, CLI, Doctor e serviços de sistema;
+- integração inicial com Ollama;
+- qualidade, build e testes.
 
-## Core
+### Fase 2 — Core e planejamento
 
-- [x] Intent Analyzer
-- [x] Planner
-- [x] Explainer
-- [x] Core Engine
+- domínio de planos e riscos;
+- Rule Planner e AI Planner;
+- preview, renderização e pipeline.
 
----
+### Fase 3 — Execução segura
 
-## Execution
+- confirmação;
+- política de execução;
+- executor controlado;
+- relatórios e ciclo de vida.
 
-- [x] Executor
-- [x] Tool Registry
-- [x] Shell Tool
-- [ ] Dry Run
-- [ ] Execution Preview
-- [ ] Execution Report
+### Fase 4 — Contexto e memória
 
----
+- memória persistente;
+- contexto e conversa;
+- conhecimento local;
+- aprendizado histórico.
 
-## Memory
+### Fase 5 — Capacidades de agente
 
-- [ ] Context Manager
-- [ ] SQLite Storage
+- seleção de ferramentas;
+- execution intelligence e preflight;
+- skills;
+- reflexão;
+- recuperação semântica local;
+- Plugin SDK;
+- Agent Loop.
 
----
+### Fase 6 — Produto no terminal
 
-## Remote
+- TUI interativa;
+- diagnóstico do runtime de IA;
+- confiabilidade do Ollama;
+- estabilização da skill shell;
+- estabilização da persistência;
+- fluxo completo validado.
 
-- [ ] SSH Executor
+## Release Candidate v0.6.0
 
----
+- [x] RC1.1 — Auditoria arquitetural;
+- [ ] RC1.2 — Hardening de release e versão;
+- [ ] RC1.3 — Cenários de aceitação;
+- [ ] RC1.4 — Documentação e distribuição;
+- [ ] Tag `v0.6.0-rc.1`.
 
-## Integrations
+## Fase 7 — Operação autônoma
 
-- [ ] VS Code
-- [ ] Antigravity
+- replanejamento inteligente baseado em falha;
+- execução e logs em streaming;
+- retomada de tarefas;
+- observabilidade estruturada;
+- tarefas longas e cancelamento seguro;
+- execução remota via SSH.
 
----
+## Fase 8 — Distribuição e ecossistema
 
-## Release
-
-- [ ] Ubuntu AI Assistant 1.0
-
-## Execution
-
-- [x] Executor
-- [x] Tool Registry
-- [x] Shell Tool
-- [x] Execution Preview
-- [x] Preview Renderer
-- [ ] Execution Pipeline
-- [ ] Confirmation
-- [ ] Execution Report
-
-- [x] Execution Pipeline
-
-## Milestone 3 — Execution Foundation
-
-- [x] Executor
-- [x] Tool Registry
-- [x] Shell Tool
-- [x] Integração Executor e Tool Registry
-- [x] Execution Preview
-- [x] Preview Renderer
-- [x] Execution Pipeline
-
-Status: concluída na versão v0.5.0.
-
-## Engineering Excellence
-
-- Dependency Injection
-- SDK
-- Container
-- Architecture Reviews
-- CI/CD
-- Release Process
+- interface web opcional;
+- integração VS Code;
+- catálogo e política de plugins;
+- perfis de agente;
+- documentação pública e contribuição externa;
+- release 1.0.

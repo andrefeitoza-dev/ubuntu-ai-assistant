@@ -1,0 +1,514 @@
+.
+├── APPLY-M5.2.md
+├── APPLY-M5.3.md
+├── APPLY-M5.4.md
+├── APPLY-M5.5.md
+├── APPLY-M5.6.md
+├── APPLY-M5.7.md
+├── APPLY-M6.0.3.md
+├── APPLY-M6.0.md
+├── APPLY.md
+├── CHANGELOG.md
+├── configs
+├── CONTRIBUTING.md
+├── .coveragerc
+├── docs
+│   ├── adr
+│   │   ├── ADR-001-core-architecture.md
+│   │   └── ADR-002-rc1-stabilization-strategy.md
+│   ├── architecture.md
+│   ├── architecture-review-0.6.md
+│   ├── architecture-review-1.0.md
+│   ├── checkpoint.md
+│   ├── milestones
+│   │   ├── M4.1-memory-engine.md
+│   │   ├── M4.2-context-engine.md
+│   │   ├── M4.3.1-knowledge-repository.md
+│   │   ├── M4.3-conversation-engine.md
+│   │   ├── M4.4-knowledge-engine.md
+│   │   ├── M4.5-learning-engine.md
+│   │   ├── M5.1-tool-selection-engine.md
+│   │   ├── M5.2-execution-intelligence.md
+│   │   ├── M5.3-skill-system.md
+│   │   ├── M5.4-self-reflection.md
+│   │   ├── M5.5-semantic-knowledge-local-rag.md
+│   │   ├── M5.6-plugin-sdk.md
+│   │   ├── M5.7-agent-loop.md
+│   │   ├── M6.0.1-ai-runtime-diagnostics.md
+│   │   ├── M6.0.2-ai-runtime-reliability.md
+│   │   ├── M6.0.3-shell-skill-stabilization.md
+│   │   ├── M6.0.4-persistence-stabilization.md
+│   │   └── M6.0-terminal-ui.md
+│   ├── product-architecture.md
+│   ├── project-context.md
+│   ├── rc1
+│   │   └── RC1.1-architectural-audit.md
+│   ├── releases
+│   │   └── RC1.2-release-hardening.md
+│   ├── roadmap.md
+│   └── sprints
+│       ├── AR-03-controlled-executor.md
+│       └── S5.0-architectural-consolidation.md
+├── .github
+│   ├── dependabot.yml
+│   ├── ISSUE_TEMPLATE
+│   │   ├── bug_report.md
+│   │   └── feature_request.md
+│   ├── PULL_REQUEST_TEMPLATE.md
+│   └── workflows
+│       ├── ci.yml
+│       ├── codeql.yml
+│       └── release.yml
+├── .gitignore
+├── INSTALL-M5.1.md
+├── LICENSE
+├── mkdocs.yml
+├── .pre-commit-config.yaml
+├── projeto.txt
+├── pyproject.toml
+├── README.md
+├── scripts
+│   └── architecture_audit.py
+├── SECURITY.md
+├── site
+│   ├── 404.html
+│   ├── adr
+│   │   └── ADR-001-core-architecture
+│   │       └── index.html
+│   ├── architecture
+│   │   └── index.html
+│   ├── architecture-review-0.6
+│   │   └── index.html
+│   ├── architecture-review-1.0
+│   │   └── index.html
+│   ├── assets
+│   │   ├── images
+│   │   │   └── favicon.png
+│   │   ├── javascripts
+│   │   │   ├── bundle.d7400e89.min.js
+│   │   │   ├── bundle.d7400e89.min.js.map
+│   │   │   ├── lunr
+│   │   │   │   ├── min
+│   │   │   │   │   ├── lunr.ar.min.js
+│   │   │   │   │   ├── lunr.da.min.js
+│   │   │   │   │   ├── lunr.de.min.js
+│   │   │   │   │   ├── lunr.du.min.js
+│   │   │   │   │   ├── lunr.el.min.js
+│   │   │   │   │   ├── lunr.es.min.js
+│   │   │   │   │   ├── lunr.fi.min.js
+│   │   │   │   │   ├── lunr.fr.min.js
+│   │   │   │   │   ├── lunr.he.min.js
+│   │   │   │   │   ├── lunr.hi.min.js
+│   │   │   │   │   ├── lunr.hu.min.js
+│   │   │   │   │   ├── lunr.hy.min.js
+│   │   │   │   │   ├── lunr.it.min.js
+│   │   │   │   │   ├── lunr.ja.min.js
+│   │   │   │   │   ├── lunr.jp.min.js
+│   │   │   │   │   ├── lunr.kn.min.js
+│   │   │   │   │   ├── lunr.ko.min.js
+│   │   │   │   │   ├── lunr.multi.min.js
+│   │   │   │   │   ├── lunr.nl.min.js
+│   │   │   │   │   ├── lunr.no.min.js
+│   │   │   │   │   ├── lunr.pt.min.js
+│   │   │   │   │   ├── lunr.ro.min.js
+│   │   │   │   │   ├── lunr.ru.min.js
+│   │   │   │   │   ├── lunr.sa.min.js
+│   │   │   │   │   ├── lunr.stemmer.support.min.js
+│   │   │   │   │   ├── lunr.sv.min.js
+│   │   │   │   │   ├── lunr.ta.min.js
+│   │   │   │   │   ├── lunr.te.min.js
+│   │   │   │   │   ├── lunr.th.min.js
+│   │   │   │   │   ├── lunr.tr.min.js
+│   │   │   │   │   ├── lunr.vi.min.js
+│   │   │   │   │   └── lunr.zh.min.js
+│   │   │   │   ├── tinyseg.js
+│   │   │   │   └── wordcut.js
+│   │   │   └── workers
+│   │   │       ├── search.2c215733.min.js
+│   │   │       └── search.2c215733.min.js.map
+│   │   └── stylesheets
+│   │       ├── main.ec1eaa64.min.css
+│   │       ├── main.ec1eaa64.min.css.map
+│   │       ├── palette.ab4e12ef.min.css
+│   │       └── palette.ab4e12ef.min.css.map
+│   ├── checkpoint
+│   │   └── index.html
+│   ├── milestones
+│   │   ├── M4.1-memory-engine
+│   │   │   └── index.html
+│   │   ├── M4.2-context-engine
+│   │   │   └── index.html
+│   │   ├── M4.3.1-knowledge-repository
+│   │   │   └── index.html
+│   │   ├── M4.3-conversation-engine
+│   │   │   └── index.html
+│   │   └── M4.4-knowledge-engine
+│   │       └── index.html
+│   ├── mkdocs.yml
+│   ├── product-architecture
+│   │   └── index.html
+│   ├── project-context
+│   │   └── index.html
+│   ├── roadmap
+│   │   └── index.html
+│   ├── search
+│   │   └── search_index.json
+│   ├── sitemap.xml
+│   ├── sitemap.xml.gz
+│   └── sprints
+│       └── AR-03-controlled-executor
+│           └── index.html
+├── src
+│   └── ubuntu_ai
+│       ├── agent
+│       │   ├── context.py
+│       │   ├── engine.py
+│       │   ├── __init__.py
+│       │   ├── lifecycle.py
+│       │   ├── models.py
+│       │   ├── runtime.py
+│       │   └── session.py
+│       ├── agent_loop
+│       │   ├── controller.py
+│       │   ├── __init__.py
+│       │   ├── models.py
+│       │   ├── replanner.py
+│       │   └── watchdog.py
+│       ├── ai
+│       │   ├── __init__.py
+│       │   ├── models.py
+│       │   ├── ollama_provider.py
+│       │   ├── prompt_builder.py
+│       │   ├── provider.py
+│       │   └── registry.py
+│       ├── cli
+│       │   ├── app.py
+│       │   ├── CHANGELOG.md
+│       │   ├── context.py
+│       │   ├── diagnose_ai.py
+│       │   ├── doctor.py
+│       │   ├── errors.py
+│       │   ├── __init__.py
+│       │   ├── knowledge.py
+│       │   ├── plan.py
+│       │   ├── tui.py
+│       │   └── version.py
+│       ├── confirmation
+│       │   ├── engine.py
+│       │   ├── __init__.py
+│       │   ├── models.py
+│       │   └── states.py
+│       ├── container
+│       │   ├── bootstrap.py
+│       │   ├── container.py
+│       │   ├── __init__.py
+│       │   └── lifetimes.py
+│       ├── context
+│       │   ├── engine.py
+│       │   ├── __init__.py
+│       │   └── models.py
+│       ├── conversation
+│       │   ├── engine.py
+│       │   ├── __init__.py
+│       │   ├── models.py
+│       │   ├── repository.py
+│       │   ├── service.py
+│       │   └── sqlite_repository.py
+│       ├── core
+│       │   ├── config.py
+│       │   ├── engine.py
+│       │   ├── __init__.py
+│       │   └── intent.py
+│       ├── diagnostics
+│       │   ├── ai_diagnostics.py
+│       │   ├── __init__.py
+│       │   ├── models.py
+│       │   └── timers.py
+│       ├── domain
+│       │   ├── __init__.py
+│       │   ├── plan.py
+│       │   └── risk.py
+│       ├── execution
+│       │   ├── controlled_executor.py
+│       │   ├── default_policy.py
+│       │   ├── execution_report.py
+│       │   ├── __init__.py
+│       │   ├── models.py
+│       │   ├── policy.py
+│       │   └── system_executor.py
+│       ├── execution_intelligence
+│       │   ├── discovery.py
+│       │   ├── engine.py
+│       │   ├── __init__.py
+│       │   ├── models.py
+│       │   └── preflight.py
+│       ├── executor
+│       │   ├── controlled_executor.py
+│       │   ├── executor.py
+│       │   ├── __init__.py
+│       │   ├── models.py
+│       │   └── preview.py
+│       ├── explainer
+│       │   ├── explainer.py
+│       │   └── __init__.py
+│       ├── __init__.py
+│       ├── knowledge
+│       │   ├── chunker.py
+│       │   ├── database.py
+│       │   ├── engine.py
+│       │   ├── exceptions.py
+│       │   ├── extractor.py
+│       │   ├── __init__.py
+│       │   ├── models.py
+│       │   ├── repository.py
+│       │   ├── service.py
+│       │   └── sqlite_repository.py
+│       ├── learning
+│       │   ├── database.py
+│       │   ├── engine.py
+│       │   ├── __init__.py
+│       │   ├── models.py
+│       │   ├── repository.py
+│       │   ├── service.py
+│       │   └── sqlite_repository.py
+│       ├── main.py
+│       ├── memory
+│       │   ├── database.py
+│       │   ├── __init__.py
+│       │   ├── models.py
+│       │   ├── repository.py
+│       │   ├── service.py
+│       │   └── sqlite_repository.py
+│       ├── pipeline
+│       │   ├── execution_pipeline.py
+│       │   ├── __init__.py
+│       │   └── models.py
+│       ├── planner
+│       │   ├── ai_planner.py
+│       │   ├── __init__.py
+│       │   ├── planner.py
+│       │   └── rule_planner.py
+│       ├── plugins
+│       │   ├── api.py
+│       │   ├── exceptions.py
+│       │   ├── __init__.py
+│       │   ├── loader.py
+│       │   ├── manager.py
+│       │   ├── manifest.py
+│       │   ├── registry.py
+│       │   └── sandbox.py
+│       ├── reflection
+│       │   ├── analyzer.py
+│       │   ├── engine.py
+│       │   ├── __init__.py
+│       │   ├── models.py
+│       │   └── service.py
+│       ├── renderer
+│       │   ├── command_formatter.py
+│       │   ├── __init__.py
+│       │   └── preview_renderer.py
+│       ├── sdk.py
+│       ├── semantic
+│       │   ├── embedder.py
+│       │   ├── __init__.py
+│       │   ├── models.py
+│       │   ├── repository.py
+│       │   ├── service.py
+│       │   └── sqlite_repository.py
+│       ├── services
+│       │   ├── __init__.py
+│       │   ├── ollama.py
+│       │   ├── shell.py
+│       │   └── system.py
+│       ├── skills
+│       │   ├── base.py
+│       │   ├── builtin
+│       │   │   ├── core.py
+│       │   │   ├── defaults.py
+│       │   │   └── __init__.py
+│       │   ├── __init__.py
+│       │   ├── manager.py
+│       │   └── registry.py
+│       ├── tools
+│       │   ├── base.py
+│       │   ├── capability.py
+│       │   ├── capability_registry.py
+│       │   ├── default_capabilities.py
+│       │   ├── __init__.py
+│       │   ├── registry.py
+│       │   ├── selection.py
+│       │   └── shell_tool.py
+│       ├── tui
+│       │   ├── app.py
+│       │   ├── __init__.py
+│       │   ├── models.py
+│       │   └── renderer.py
+│       ├── utils
+│       │   └── __init__.py
+│       └── version.py
+├── tests
+│   ├── agent
+│   │   ├── __init__.py
+│   │   ├── test_context.py
+│   │   ├── test_engine.py
+│   │   ├── test_lifecycle.py
+│   │   ├── test_models.py
+│   │   ├── test_runtime_confirmation.py
+│   │   ├── test_runtime_confirm.py
+│   │   ├── test_runtime_context.py
+│   │   ├── test_runtime_conversation.py
+│   │   ├── test_runtime_execution.py
+│   │   ├── test_runtime_learning.py
+│   │   ├── test_runtime_lifecycle.py
+│   │   ├── test_runtime_memory.py
+│   │   ├── test_runtime_planner.py
+│   │   ├── test_runtime.py
+│   │   └── test_session.py
+│   ├── agent_loop
+│   │   ├── __init__.py
+│   │   ├── test_container.py
+│   │   ├── test_controller.py
+│   │   ├── test_replanner.py
+│   │   └── test_watchdog.py
+│   ├── ai
+│   │   ├── __init__.py
+│   │   ├── test_ollama_provider.py
+│   │   ├── test_prompt_builder.py
+│   │   ├── test_provider.py
+│   │   └── test_registry.py
+│   ├── cli
+│   │   ├── __init__.py
+│   │   ├── test_diagnose_ai.py
+│   │   ├── test_error_handling.py
+│   │   ├── test_plan.py
+│   │   └── test_version.py
+│   ├── confirmation
+│   │   ├── __init__.py
+│   │   ├── test_engine.py
+│   │   └── test_states.py
+│   ├── container
+│   │   ├── test_ai_provider.py
+│   │   ├── test_container.py
+│   │   ├── test_execution_intelligence.py
+│   │   ├── test_lifetimes.py
+│   │   ├── test_reflection.py
+│   │   ├── test_skills.py
+│   │   └── test_tool_selection.py
+│   ├── context
+│   │   ├── __init__.py
+│   │   ├── test_engine.py
+│   │   └── test_models.py
+│   ├── conversation
+│   │   ├── __init__.py
+│   │   ├── test_models.py
+│   │   ├── test_service.py
+│   │   └── test_sqlite_repository.py
+│   ├── core
+│   │   ├── __init__.py
+│   │   ├── test_config.py
+│   │   └── test_engine.py
+│   ├── diagnostics
+│   │   ├── __init__.py
+│   │   └── test_ai_diagnostics.py
+│   ├── domain
+│   │   ├── __init__.py
+│   │   └── test_plan.py
+│   ├── execution
+│   │   ├── test_controlled_executor_plan.py
+│   │   ├── test_controlled_executor.py
+│   │   ├── test_default_policy.py
+│   │   ├── test_execution_report.py
+│   │   └── test_system_executor.py
+│   ├── execution_intelligence
+│   │   ├── test_discovery.py
+│   │   ├── test_engine.py
+│   │   └── test_preflight.py
+│   ├── executor
+│   │   ├── __init__.py
+│   │   ├── test_controlled_executor.py
+│   │   ├── test_executor.py
+│   │   └── test_preview.py
+│   ├── explainer
+│   │   ├── __init__.py
+│   │   └── test_explainer.py
+│   ├── __init__.py
+│   ├── knowledge
+│   │   ├── fakes.py
+│   │   ├── __init__.py
+│   │   ├── test_chunker.py
+│   │   ├── test_cli.py
+│   │   ├── test_container.py
+│   │   ├── test_engine.py
+│   │   ├── test_extractor.py
+│   │   ├── test_models.py
+│   │   ├── test_planner_integration.py
+│   │   ├── test_repository_contract.py
+│   │   ├── test_service.py
+│   │   └── test_sqlite_repository.py
+│   ├── learning
+│   │   ├── __init__.py
+│   │   ├── test_container.py
+│   │   ├── test_models.py
+│   │   ├── test_planner_integration.py
+│   │   ├── test_service.py
+│   │   └── test_sqlite_repository.py
+│   ├── memory
+│   │   ├── __init__.py
+│   │   ├── test_models.py
+│   │   ├── test_service.py
+│   │   └── test_sqlite_repository.py
+│   ├── pipeline
+│   │   ├── __init__.py
+│   │   ├── test_confirmation_flow.py
+│   │   └── test_execution_pipeline.py
+│   ├── planner
+│   │   ├── __init__.py
+│   │   ├── test_ai_planner.py
+│   │   ├── test_planner.py
+│   │   ├── test_rule_planner.py
+│   │   └── test_tool_selection_integration.py
+│   ├── plugins
+│   │   ├── __init__.py
+│   │   ├── test_container.py
+│   │   ├── test_manager.py
+│   │   ├── test_manifest.py
+│   │   └── test_policy.py
+│   ├── reflection
+│   │   ├── test_analyzer.py
+│   │   └── test_service.py
+│   ├── renderer
+│   │   ├── __init__.py
+│   │   ├── test_command_formatter.py
+│   │   └── test_preview_renderer.py
+│   ├── semantic
+│   │   ├── __init__.py
+│   │   ├── test_container.py
+│   │   ├── test_embedder.py
+│   │   ├── test_rag_context.py
+│   │   └── test_service.py
+│   ├── services
+│   │   ├── __init__.py
+│   │   ├── test_ollama_service.py
+│   │   └── test_shell_service.py
+│   ├── skills
+│   │   ├── test_builtin_skill.py
+│   │   ├── test_manager.py
+│   │   └── test_registry.py
+│   ├── test_sdk.py
+│   ├── tools
+│   │   ├── __init__.py
+│   │   ├── test_capability_registry.py
+│   │   ├── test_registry.py
+│   │   ├── test_selection.py
+│   │   └── test_shell_tool.py
+│   └── tui
+│       ├── __init__.py
+│       ├── test_app.py
+│       ├── test_commands.py
+│       ├── test_container.py
+│       └── test_renderer.py
+├── ubuntu-ai-current.tar.gz
+├── ubuntu-ai-current.zip
+└── uv.lock
+
+99 directories, 413 files

@@ -17,9 +17,7 @@ class ShellTool(Tool):
         command = kwargs.get("command")
         timeout = kwargs.get("timeout", 30)
 
-        if not isinstance(command, list) or not all(
-            isinstance(item, str) for item in command
-        ):
+        if not isinstance(command, list) or not all(isinstance(item, str) for item in command):
             raise ValueError("O parâmetro 'command' deve ser uma lista de strings.")
 
         if not isinstance(timeout, int) or timeout <= 0:

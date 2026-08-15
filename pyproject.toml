@@ -4,16 +4,31 @@ build-backend = "hatchling.build"
 
 [project]
 name = "ubuntu-ai-assistant"
-version = "0.1.0"
-description = "AI Assistant for Ubuntu Administration"
+version = "1.0.0"
+description = "Framework local para agentes inteligentes e administração segura do Ubuntu"
 readme = "README.md"
 requires-python = ">=3.12"
 license = { text = "MIT" }
-
 authors = [
     { name = "Andre Anderson Feitoza" }
 ]
-
+keywords = [
+    "ubuntu",
+    "linux",
+    "ai-agent",
+    "ollama",
+    "automation",
+    "cli",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Console",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: POSIX :: Linux",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: System :: Systems Administration",
+]
 dependencies = [
     "typer>=0.16.0",
     "rich>=14.0.0",
@@ -30,6 +45,7 @@ dev = [
 
 [project.scripts]
 ubuntu-ai = "ubuntu_ai.cli.app:app"
+ubuntu-ai-gui = "ubuntu_ai.gui.app:main"
 
 [tool.ruff]
 line-length = 100
@@ -39,7 +55,17 @@ target-version = "py312"
 select = ["E", "F", "I", "UP"]
 
 [tool.pytest.ini_options]
-pythonpath = ["src"] 
+pythonpath = ["src"]
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/ubuntu_ai"]
+
+[dependency-groups]
+dev = [
+    "mkdocs>=1.6.1",
+    "mkdocs-material>=9.7.7",
+    "mkdocstrings>=1.0.6",
+    "mkdocstrings-python>=2.0.5",
+    "pre-commit>=4.6.1",
+    "pytest-cov>=7.1.0",
+]

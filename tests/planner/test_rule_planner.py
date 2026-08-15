@@ -16,8 +16,6 @@ def test_rule_planner_creates_docker_plan() -> None:
 def test_rule_planner_returns_none_for_unknown_request() -> None:
     planner = RulePlanner()
 
-    plan = planner.try_create_plan(
-        "Configure um servidor de e-mail"
-    )
+    plan = planner.try_create_plan("Configure um servidor de e-mail")
 
     assert plan is None

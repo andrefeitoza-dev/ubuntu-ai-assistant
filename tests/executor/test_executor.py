@@ -20,9 +20,7 @@ class FakeShellTool(Tool):
         self.executed_commands.append(command)
 
         index = len(self.executed_commands) - 1
-        return_code = self._return_codes[
-            min(index, len(self._return_codes) - 1)
-        ]
+        return_code = self._return_codes[min(index, len(self._return_codes) - 1)]
 
         return CommandResult(
             command=" ".join(command),
