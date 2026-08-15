@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import threading
 import tkinter as tk
+from pathlib import Path
 
 from ubuntu_ai.agent_loop.models import LoopSnapshot, LoopState
 from ubuntu_ai.gui.backend import GUIBackend
@@ -46,9 +47,22 @@ class UbuntuAIApp:
         self.root.geometry("1040x760")
         self.root.minsize(780, 580)
         self.root.configure(bg=BACKGROUND)
+        self._set_window_icon()
 
         self._build_interface()
         self._show_welcome()
+
+    def _set_window_icon(self) -> None:
+        icon_candidates = (
+            Path.home() / ".local/share/icons/hicolor/512x512/apps/ubuntu-ai-assistant.png",
+            Path(__file__).resolve().parents[3] / "assets/icons/ubuntu-ai-assistant.png",
+        )
+
+        for icon_path in icon_candidates:
+            if icon_path.is_file():
+                self._window_icon = tk.PhotoImage(file=icon_path)
+                self.root.iconphoto(True, self._window_icon)
+                return
 
     # ------------------------------------------------------------------
     # Layout
@@ -65,6 +79,18 @@ class UbuntuAIApp:
 
         brand = tk.Frame(header, bg=BACKGROUND)
         brand.pack(side=tk.LEFT)
+
+        if hasattr(self, "_window_icon"):
+            self._header_icon = self._window_icon.subsample(16, 16)
+            tk.Label(
+                brand,
+                image=self._header_icon,
+                bg=BACKGROUND,
+                borderwidth=0,
+            ).pack(
+                side=tk.LEFT,
+                padx=(0, 10),
+            )
 
         tk.Label(
             brand,
@@ -123,9 +149,7 @@ class UbuntuAIApp:
 
         self.messages.bind(
             "<Configure>",
-            lambda _event: self.canvas.configure(
-                scrollregion=self.canvas.bbox("all")
-            ),
+            lambda _event: self.canvas.configure(scrollregion=self.canvas.bbox("all")),
         )
 
         self.canvas_window = self.canvas.create_window(
@@ -156,16 +180,19 @@ class UbuntuAIApp:
 
         # Composer ------------------------------------------------------
 
-        composer_outer = tk.Frame(
+        self.composer_outer = tk.Frame(
             self.root,
             bg=BACKGROUND,
             padx=28,
             pady=12,
         )
-        composer_outer.pack(fill=tk.X)
+        self.composer_outer.pack(
+            fill=tk.X,
+            pady=(0, 190),
+        )
 
         self.composer = tk.Frame(
-            composer_outer,
+            self.composer_outer,
             bg=SURFACE_ALT,
             padx=18,
             pady=10,
@@ -224,23 +251,31 @@ class UbuntuAIApp:
         self.request_entry.focus_set()
 
     def _show_welcome(self) -> None:
-        welcome = tk.Frame(
+        self.welcome = tk.Frame(
             self.messages,
             bg=BACKGROUND,
         )
-        welcome.pack(
+        self.welcome.pack(
             fill=tk.X,
-            pady=(85, 36),
+            pady=(55, 24),
         )
 
+        if hasattr(self, "_window_icon"):
+            self._welcome_icon = self._window_icon.subsample(4, 4)
+            tk.Label(
+                self.welcome,
+                image=self._welcome_icon,
+                bg=BACKGROUND,
+                borderwidth=0,
+            ).pack(pady=(0, 20))
+
         tk.Label(
-            welcome,
+            self.welcome,
             text="Como posso ajudar?",
             bg=BACKGROUND,
             fg=TEXT,
             font=("Sans", 30, "bold"),
         ).pack()
-
 
     # ------------------------------------------------------------------
     # Request
@@ -256,6 +291,11 @@ class UbuntuAIApp:
             return
 
         self.request_entry.delete(0, tk.END)
+
+        if self.welcome.winfo_exists():
+            self.welcome.destroy()
+            self.composer_outer.pack_configure(pady=(0, 24))
+
         self._add_user_message(request)
         self._set_busy(True, "Analisando")
 
@@ -488,9 +528,7 @@ class UbuntuAIApp:
             )
 
             if command:
-                command_text = self._command_text(
-                    command
-                )
+                command_text = self._command_text(command)
 
                 command_box = tk.Label(
                     card,
@@ -605,17 +643,12 @@ class UbuntuAIApp:
             record = snapshot.records[-1]
 
             for result in record.execution_results:
-                self._add_execution_result(
-                    result
-                )
+                self._add_execution_result(result)
 
         if snapshot.requires_confirmation:
             pending = snapshot.pending_plan
 
-            if (
-                pending is not None
-                and pending.pipeline_result is not None
-            ):
+            if pending is not None and pending.pipeline_result is not None:
                 plan = pending.pipeline_result.plan
 
                 if plan is not None:
@@ -704,17 +737,9 @@ class UbuntuAIApp:
 
         tk.Label(
             card,
-            text=(
-                "✓ Execução concluída"
-                if successful
-                else "⚠ Execução não concluída"
-            ),
+            text=("✓ Execução concluída" if successful else "⚠ Execução não concluída"),
             bg=SURFACE,
-            fg=(
-                SUCCESS
-                if successful
-                else ERROR
-            ),
+            fg=(SUCCESS if successful else ERROR),
             font=("Sans", 12, "bold"),
         ).pack(anchor="w")
 
@@ -770,9 +795,7 @@ class UbuntuAIApp:
                 font=("Monospace", 9),
                 height=min(
                     max(
-                        len(
-                            str(output).splitlines()
-                        ),
+                        len(str(output).splitlines()),
                         3,
                     ),
                     14,
@@ -797,16 +820,9 @@ class UbuntuAIApp:
         if return_code is not None:
             tk.Label(
                 card,
-                text=(
-                    "Concluído · "
-                    f"código de saída {return_code}"
-                ),
+                text=(f"Concluído · código de saída {return_code}"),
                 bg=SURFACE,
-                fg=(
-                    SUCCESS
-                    if return_code == 0
-                    else ERROR
-                ),
+                fg=(SUCCESS if return_code == 0 else ERROR),
                 font=("Sans", 8),
             ).pack(
                 anchor="e",
@@ -823,9 +839,7 @@ class UbuntuAIApp:
         if self._busy:
             return
 
-        self._close_active_actions(
-            "Plano cancelado"
-        )
+        self._close_active_actions("Plano cancelado")
 
         try:
             snapshot = self._backend.cancel()
@@ -875,10 +889,7 @@ class UbuntuAIApp:
     ) -> None:
         actions = self._active_actions
 
-        if (
-            actions is None
-            or not actions.winfo_exists()
-        ):
+        if actions is None or not actions.winfo_exists():
             self._active_actions = None
             return
 
@@ -934,10 +945,7 @@ class UbuntuAIApp:
             command,
             (list, tuple),
         ):
-            return " ".join(
-                str(item)
-                for item in command
-            )
+            return " ".join(str(item) for item in command)
 
         return str(command)
 
@@ -946,16 +954,11 @@ class UbuntuAIApp:
         snapshot: LoopSnapshot,
     ) -> str:
         messages = {
-            LoopState.COMPLETED:
-                "✓ Operação concluída com sucesso.",
-            LoopState.BLOCKED:
-                "A operação foi bloqueada pela política de segurança.",
-            LoopState.FAILED:
-                "Não foi possível concluir a operação.",
-            LoopState.CANCELLED:
-                "Operação cancelada.",
-            LoopState.WAITING_CONFIRMATION:
-                "O plano aguarda sua confirmação.",
+            LoopState.COMPLETED: "✓ Operação concluída com sucesso.",
+            LoopState.BLOCKED: "A operação foi bloqueada pela política de segurança.",
+            LoopState.FAILED: "Não foi possível concluir a operação.",
+            LoopState.CANCELLED: "Operação cancelada.",
+            LoopState.WAITING_CONFIRMATION: "O plano aguarda sua confirmação.",
         }
 
         return messages.get(
@@ -1007,9 +1010,7 @@ class UbuntuAIApp:
     def _scroll_bottom(self) -> None:
         self.root.after(
             30,
-            lambda: self.canvas.yview_moveto(
-                1.0
-            ),
+            lambda: self.canvas.yview_moveto(1.0),
         )
 
     def _on_enter(
