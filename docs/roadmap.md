@@ -113,7 +113,7 @@ depender do terminal ou do VS Code.
 ### G3 — Estabilização da aplicação desktop
 
 - [x] versionar o instalador do launcher;
-- [ ] empacotar corretamente os assets da GUI;
+- [x] empacotar corretamente os assets da GUI;
 - [ ] adicionar testes específicos da interface;
 - [ ] validar associação da janela com o Dock;
 - [ ] tratar ausência ou corrupção do ícone;

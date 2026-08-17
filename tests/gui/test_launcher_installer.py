@@ -70,3 +70,18 @@ def test_uninstall_removes_only_launcher_files(
 
     assert all(not path.exists() for path in paths)
     assert untouched.read_text(encoding="utf-8") == "keep"
+
+
+def test_gui_icon_is_packaged_and_valid_png() -> None:
+    icon = (
+        Path(__file__).resolve().parents[2]
+        / "src"
+        / "ubuntu_ai"
+        / "gui"
+        / "assets"
+        / "ubuntu-ai-assistant.png"
+    )
+
+    assert icon.is_file()
+    assert icon.read_bytes().startswith(b"\x89PNG\r\n\x1a\n")
+    assert install_launcher.ICON_SOURCE == icon

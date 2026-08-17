@@ -12,7 +12,7 @@ from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 APP_ID = "ubuntu-ai-assistant"
-ICON_SOURCE = PROJECT_ROOT / "assets" / "icons" / f"{APP_ID}.png"
+ICON_SOURCE = PROJECT_ROOT / "src" / "ubuntu_ai" / "gui" / "assets" / f"{APP_ID}.png"
 
 
 def user_paths(home: Path) -> tuple[Path, Path, Path]:

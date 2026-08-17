@@ -55,7 +55,7 @@ class UbuntuAIApp:
     def _set_window_icon(self) -> None:
         icon_candidates = (
             Path.home() / ".local/share/icons/hicolor/512x512/apps/ubuntu-ai-assistant.png",
-            Path(__file__).resolve().parents[3] / "assets/icons/ubuntu-ai-assistant.png",
+            Path(__file__).resolve().parent / "assets" / "ubuntu-ai-assistant.png",
         )
 
         for icon_path in icon_candidates:
