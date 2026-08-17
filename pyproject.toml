@@ -46,6 +46,7 @@ dev = [
 [project.scripts]
 ubuntu-ai = "ubuntu_ai.cli.app:app"
 ubuntu-ai-gui = "ubuntu_ai.gui.app:main"
+ubuntu-ai-install-launcher = "ubuntu_ai.gui.launcher_installer:main"
 
 [tool.ruff]
 line-length = 100

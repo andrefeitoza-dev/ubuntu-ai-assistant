@@ -123,7 +123,7 @@ depender do terminal ou do VS Code.
 ### G4 — Preparação da release v1.2.0
 
 - [x] validar os fluxos `LOW`, `HIGH` e `CRITICAL`;
-- [ ] testar instalação e desinstalação em ambiente limpo;
+- [x] testar instalação e desinstalação em ambiente limpo;
 - [ ] atualizar README, arquitetura e checkpoint;
 - [ ] preparar notas da release `v1.2.0`;
 - [ ] atualizar a versão do pacote para `1.2.0`;
