@@ -39,6 +39,7 @@ class UbuntuAIApp:
     def __init__(self) -> None:
         self._backend = GUIBackend()
         self._busy = False
+        self._operation_generation = 0
         self._active_actions: tk.Frame | None = None
         self._active_plan_card: tk.Frame | None = None
 
@@ -50,6 +51,7 @@ class UbuntuAIApp:
         self._set_window_icon()
 
         self._build_interface()
+        self._bind_accessibility_shortcuts()
         self._show_welcome()
 
     @staticmethod
@@ -252,6 +254,7 @@ class UbuntuAIApp:
             padx=20,
             pady=9,
             cursor="hand2",
+            takefocus=True,
             font=("Sans", 10, "bold"),
         )
         self.send_button.pack(
@@ -308,30 +311,56 @@ class UbuntuAIApp:
             self.composer_outer.pack_configure(pady=(0, 24))
 
         self._add_user_message(request)
-        self._set_busy(True, "Analisando")
+        operation = self._begin_operation("Analisando")
 
         threading.Thread(
             target=self._start_request,
-            args=(request,),
+            args=(request, operation),
             daemon=True,
         ).start()
 
-    def _start_request(self, request: str) -> None:
+    def _start_request(
+        self,
+        request: str,
+        operation: int,
+    ) -> None:
         try:
             snapshot = self._backend.start(request)
         except Exception as exc:
             self.root.after(
                 0,
-                self._show_error,
+                self._deliver_error,
+                operation,
                 str(exc),
             )
             return
 
         self.root.after(
             0,
-            self._show_snapshot,
+            self._deliver_snapshot,
+            operation,
             snapshot,
         )
+
+    def _deliver_snapshot(
+        self,
+        operation: int,
+        snapshot: LoopSnapshot,
+    ) -> None:
+        if operation != self._operation_generation:
+            return
+
+        self._show_snapshot(snapshot)
+
+    def _deliver_error(
+        self,
+        operation: int,
+        message: str,
+    ) -> None:
+        if operation != self._operation_generation:
+            return
+
+        self._show_error(message)
 
     def _show_snapshot(self, snapshot: LoopSnapshot) -> None:
         # Planos LOW podem ser executados automaticamente pelo controller.
@@ -582,6 +611,7 @@ class UbuntuAIApp:
                 padx=20,
                 pady=9,
                 cursor="hand2",
+                takefocus=True,
                 font=("Sans", 10),
             )
             cancel_button.pack(
@@ -602,6 +632,7 @@ class UbuntuAIApp:
                 padx=20,
                 pady=9,
                 cursor="hand2",
+                takefocus=True,
                 font=("Sans", 10, "bold"),
             )
             confirm_button.pack(side=tk.RIGHT)
@@ -617,32 +648,45 @@ class UbuntuAIApp:
             return
 
         self._remove_active_plan_card()
-        self._set_busy(
-            True,
-            "Executando",
-        )
+        operation = self._begin_operation("Executando")
 
         threading.Thread(
             target=self._confirm_request,
+            args=(operation,),
             daemon=True,
         ).start()
 
-    def _confirm_request(self) -> None:
+    def _confirm_request(
+        self,
+        operation: int,
+    ) -> None:
         try:
             snapshot = self._backend.confirm()
         except Exception as exc:
             self.root.after(
                 0,
-                self._show_error,
+                self._deliver_error,
+                operation,
                 str(exc),
             )
             return
 
         self.root.after(
             0,
-            self._show_execution,
+            self._deliver_execution,
+            operation,
             snapshot,
         )
+
+    def _deliver_execution(
+        self,
+        operation: int,
+        snapshot: LoopSnapshot,
+    ) -> None:
+        if operation != self._operation_generation:
+            return
+
+        self._show_execution(snapshot)
 
     def _show_execution(
         self,
@@ -846,6 +890,18 @@ class UbuntuAIApp:
     # Cancel / errors
     # ------------------------------------------------------------------
 
+    def cancel_current_operation(self) -> None:
+        if not self._busy:
+            return
+
+        self._operation_generation += 1
+        self._set_busy(False)
+        self._add_system_message(
+            "Espera interrompida. Um processamento já iniciado pode "
+            "terminar em segundo plano, mas seu resultado será ignorado.",
+            color=WARNING,
+        )
+
     def cancel(self) -> None:
         if self._busy:
             return
@@ -869,8 +925,9 @@ class UbuntuAIApp:
     ) -> None:
         self._set_busy(False)
 
+        friendly_message = self._friendly_error(message)
         self._add_system_message(
-            f"Erro: {message}",
+            f"Não foi possível concluir a solicitação.\n{friendly_message}",
             color=ERROR,
         )
 
@@ -878,6 +935,36 @@ class UbuntuAIApp:
             text="●  Erro",
             fg=ERROR,
         )
+
+    @staticmethod
+    def _friendly_error(message: str) -> str:
+        normalized = message.strip().lower()
+
+        if not normalized:
+            return "O backend não informou detalhes. Tente novamente."
+
+        if "ollama" in normalized or "connection refused" in normalized:
+            return "Não foi possível conectar ao Ollama. Verifique se o serviço está em execução."
+
+        if "timeout" in normalized or "timed out" in normalized:
+            return (
+                "A operação excedeu o tempo esperado. "
+                "Você pode tentar novamente com uma solicitação mais direta."
+            )
+
+        if "model" in normalized and ("not found" in normalized or "não encontrado" in normalized):
+            return (
+                "O modelo de IA configurado não foi encontrado. "
+                "Confira os modelos disponíveis no Ollama."
+            )
+
+        if "permission denied" in normalized or "permissão negada" in normalized:
+            return (
+                "O Ubuntu negou permissão para essa operação. "
+                "Revise o plano e as permissões necessárias."
+            )
+
+        return message.strip()
 
     # ------------------------------------------------------------------
     # Helpers
@@ -917,6 +1004,14 @@ class UbuntuAIApp:
 
         self._active_actions = None
 
+    def _begin_operation(
+        self,
+        label: str,
+    ) -> int:
+        self._operation_generation += 1
+        self._set_busy(True, label)
+        return self._operation_generation
+
     def _set_busy(
         self,
         busy: bool,
@@ -930,7 +1025,10 @@ class UbuntuAIApp:
                 fg=WARNING,
             )
             self.send_button.configure(
-                state=tk.DISABLED,
+                text="Interromper",
+                command=self.cancel_current_operation,
+                state=tk.NORMAL,
+                bg=WARNING,
             )
             self.request_entry.configure(
                 state=tk.DISABLED,
@@ -941,7 +1039,10 @@ class UbuntuAIApp:
                 fg=SUCCESS,
             )
             self.send_button.configure(
+                text="Enviar",
+                command=self.submit,
                 state=tk.NORMAL,
+                bg=ACCENT,
             )
             self.request_entry.configure(
                 state=tk.NORMAL,
@@ -1023,6 +1124,31 @@ class UbuntuAIApp:
             30,
             lambda: self.canvas.yview_moveto(1.0),
         )
+
+    def _bind_accessibility_shortcuts(self) -> None:
+        self.root.bind("<Escape>", self._on_escape)
+        self.root.bind("<Control-l>", self._focus_request)
+        self.root.bind("<Control-L>", self._focus_request)
+
+    def _on_escape(
+        self,
+        _event: tk.Event | None = None,
+    ) -> str:
+        if self._busy:
+            self.cancel_current_operation()
+        else:
+            self.request_entry.focus_set()
+
+        return "break"
+
+    def _focus_request(
+        self,
+        _event: tk.Event | None = None,
+    ) -> str:
+        if not self._busy:
+            self.request_entry.focus_set()
+
+        return "break"
 
     def _on_enter(
         self,

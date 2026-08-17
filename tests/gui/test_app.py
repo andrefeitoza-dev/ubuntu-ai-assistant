@@ -70,3 +70,63 @@ def test_window_icon_tolerates_missing_candidates(tmp_path: Path) -> None:
 
     assert application._window_icon is None
     assert application.root.calls == []
+
+
+def test_friendly_error_explains_ollama_failure() -> None:
+    message = gui_app.UbuntuAIApp._friendly_error("Ollama connection refused")
+
+    assert "conectar ao Ollama" in message
+    assert "serviço" in message
+
+
+def test_friendly_error_explains_timeout() -> None:
+    message = gui_app.UbuntuAIApp._friendly_error("request timed out")
+
+    assert "tempo esperado" in message
+
+
+def test_stale_snapshot_is_ignored() -> None:
+    application = gui_app.UbuntuAIApp.__new__(gui_app.UbuntuAIApp)
+    application._operation_generation = 2
+    delivered: list[object] = []
+    application._show_snapshot = delivered.append
+
+    application._deliver_snapshot(1, SimpleNamespace())
+
+    assert delivered == []
+
+
+def test_current_snapshot_is_delivered() -> None:
+    application = gui_app.UbuntuAIApp.__new__(gui_app.UbuntuAIApp)
+    application._operation_generation = 2
+    delivered: list[object] = []
+    application._show_snapshot = delivered.append
+    snapshot = SimpleNamespace()
+
+    application._deliver_snapshot(2, snapshot)
+
+    assert delivered == [snapshot]
+
+
+def test_cancel_current_operation_invalidates_result(monkeypatch) -> None:
+    application = gui_app.UbuntuAIApp.__new__(gui_app.UbuntuAIApp)
+    application._busy = True
+    application._operation_generation = 3
+    messages: list[str] = []
+
+    monkeypatch.setattr(
+        application,
+        "_set_busy",
+        lambda busy: setattr(application, "_busy", busy),
+    )
+    monkeypatch.setattr(
+        application,
+        "_add_system_message",
+        lambda message, **_kwargs: messages.append(message),
+    )
+
+    application.cancel_current_operation()
+
+    assert application._busy is False
+    assert application._operation_generation == 4
+    assert "resultado será ignorado" in messages[0]

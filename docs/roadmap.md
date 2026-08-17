@@ -117,11 +117,17 @@ depender do terminal ou do VS Code.
 - [x] adicionar testes específicos da interface;
 - [x] validar associação da janela com o Dock;
 - [x] tratar ausência ou corrupção do ícone;
-- [ ] melhorar mensagens de falha do backend;
-- [ ] adicionar cancelamento visual de tarefas;
-- [ ] revisar acessibilidade, foco e navegação por teclado;
+- [x] melhorar mensagens de falha do backend;
+- [x] adicionar cancelamento visual de tarefas;
+- [x] revisar acessibilidade, foco e navegação por teclado;
+### G4 — Preparação da release v1.2.0
+
+- [ ] validar os fluxos `LOW`, `HIGH` e `CRITICAL`;
+- [ ] testar instalação e desinstalação em ambiente limpo;
+- [ ] atualizar README, arquitetura e checkpoint;
 - [ ] preparar notas da release `v1.2.0`;
-- [ ] atualizar versão do pacote somente na etapa de release.
+- [ ] atualizar a versão do pacote para `1.2.0`;
+- [ ] executar auditoria final e criar a tag da release.
 
 ### Critério de conclusão da v1.2
 
