@@ -22,7 +22,7 @@ segurança operacional.
 - Testes automatizados: `482 passed`
 - Qualidade estática: Ruff aprovado
 
-> A versão `1.2.0` está preparada; falta a auditoria final e a tag.
+> A versão `1.2.0` foi auditada e concluída.
 
 ## Visão geral das versões
 
@@ -30,7 +30,7 @@ segurança operacional.
 |---|---|---|
 | `v1.0` | Fundação, segurança e runtime do agente | Concluída |
 | `v1.1` | Respostas rápidas, planners e evolução de UX | Concluída |
-| `v1.2` | Aplicativo desktop e experiência gráfica | Auditoria final |
+| `v1.2` | Aplicativo desktop e experiência gráfica | Concluída |
 | `v1.3` | Administração remota segura | Planejada |
 | `v1.4` | Automação e agentes especializados | Planejada |
 | `v1.5` | Distribuição e integrações | Planejada |
@@ -126,7 +126,7 @@ depender do terminal ou do VS Code.
 - [x] atualizar README, arquitetura e checkpoint;
 - [x] preparar notas da release `v1.2.0`;
 - [x] atualizar a versão do pacote para `1.2.0`;
-- [ ] executar auditoria final e criar a tag da release.
+- [x] executar auditoria final e criar a tag da release.
 
 ### Critério de conclusão da v1.2
 

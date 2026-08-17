@@ -6,9 +6,9 @@
 
 - Versão: `1.2.0`
 - Branch: `develop/v1.2`
-- Fase: G4 — preparação final da release
+- Release `v1.2.0`: concluída
 - G1, G2 e G3: concluídas
-- G4: auditoria final pendente
+- G4: concluída
 
 ## Funcionalidades validadas
 
@@ -36,7 +36,7 @@ confirmação e podem ser cancelados sem chamar o executor.
 
 ## Próxima tarefa
 
-Executar auditoria final, validar build e working tree e criar a tag `v1.2.0`.
+Iniciar a próxima evolução: tornar o assistente mais inteligente e rápido.
 
 ## Próxima evolução
 
