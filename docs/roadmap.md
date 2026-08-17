@@ -15,15 +15,14 @@ segurança operacional.
 
 - Linha de desenvolvimento: `v1.2`
 - Branch: `develop/v1.2`
-- Versão publicada no pacote: `1.0.0`
+- Versão do pacote: `1.2.0`
 - Interface terminal: concluída
 - Interface gráfica G1 e G2: concluídas
 - Launcher desktop: funcional
 - Testes automatizados: `482 passed`
 - Qualidade estática: Ruff aprovado
 
-> A versão do pacote permanecerá em `1.0.0` até a preparação formal da release
-> `v1.2.0`.
+> A versão `1.2.0` está preparada; falta a auditoria final e a tag.
 
 ## Visão geral das versões
 
@@ -31,7 +30,7 @@ segurança operacional.
 |---|---|---|
 | `v1.0` | Fundação, segurança e runtime do agente | Concluída |
 | `v1.1` | Respostas rápidas, planners e evolução de UX | Concluída |
-| `v1.2` | Aplicativo desktop e experiência gráfica | Em desenvolvimento |
+| `v1.2` | Aplicativo desktop e experiência gráfica | Auditoria final |
 | `v1.3` | Administração remota segura | Planejada |
 | `v1.4` | Automação e agentes especializados | Planejada |
 | `v1.5` | Distribuição e integrações | Planejada |
@@ -124,9 +123,9 @@ depender do terminal ou do VS Code.
 
 - [x] validar os fluxos `LOW`, `HIGH` e `CRITICAL`;
 - [x] testar instalação e desinstalação em ambiente limpo;
-- [ ] atualizar README, arquitetura e checkpoint;
-- [ ] preparar notas da release `v1.2.0`;
-- [ ] atualizar a versão do pacote para `1.2.0`;
+- [x] atualizar README, arquitetura e checkpoint;
+- [x] preparar notas da release `v1.2.0`;
+- [x] atualizar a versão do pacote para `1.2.0`;
 - [ ] executar auditoria final e criar a tag da release.
 
 ### Critério de conclusão da v1.2

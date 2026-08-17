@@ -2,6 +2,27 @@
 
 Todas as mudanças relevantes deste projeto são registradas neste arquivo.
 
+## [1.2.0] - 2026-08-16
+
+### Added
+
+- GUI Tkinter, launcher, ícone e integração com o Dock.
+- Instalador `ubuntu-ai-install-launcher`.
+- Assets e instalador incluídos no wheel.
+- Autoexecução exclusiva para `LOW`.
+- Interrupção cooperativa e atalhos de teclado.
+- Matrizes de risco e instalação limpa isolada.
+
+### Changed
+
+- Mensagens de falha da GUI aprimoradas.
+- Documentação e arquitetura atualizadas.
+
+### Validation
+
+- Riscos `LOW`, `MEDIUM`, `HIGH` e `CRITICAL` validados.
+- Mais de 500 testes automatizados aprovados.
+
 ## [0.6.0] - 2026-08-05
 
 ### Added

@@ -4,8 +4,13 @@ Framework local e extensível para construir agentes inteligentes voltados à ad
 
 O Ubuntu AI transforma solicitações em linguagem natural em planos auditáveis, apresenta um preview, aplica políticas de risco, solicita confirmação quando necessário e executa comandos de forma controlada.
 
-## Recursos da v0.6.0
+## Recursos da v1.2.0
 
+- GUI moderna em Tkinter com launcher e ícone próprios;
+- execução automática exclusiva para risco `LOW`;
+- confirmação para `MEDIUM`, `HIGH` e `CRITICAL`;
+- interrupção cooperativa e atalhos de teclado;
+- instalador `ubuntu-ai-install-launcher`;
 - planejamento determinístico e por IA local com Ollama;
 - preview em modo seguro antes da execução;
 - confirmação humana e políticas de execução;
@@ -17,7 +22,7 @@ O Ubuntu AI transforma solicitações em linguagem natural em planos auditáveis
 - TUI com Rich, spinner e resumo de benchmark;
 - logging rotativo, diagnóstico de IA e benchmark;
 - SDK Python para integração com outras aplicações;
-- suíte com mais de 300 testes automatizados.
+- suíte com mais de 500 testes automatizados.
 
 ## Requisitos
 
@@ -37,6 +42,7 @@ Depois de baixar ou clonar o projeto:
 
 ```bash
 pipx install .
+ubuntu-ai-install-launcher
 ubuntu-ai version
 ubuntu-ai doctor
 ```
@@ -58,6 +64,7 @@ ubuntu-ai diagnose-ai
 ubuntu-ai benchmark
 ubuntu-ai plan "mostrar o diretório atual"
 ubuntu-ai tui
+ubuntu-ai-gui
 ```
 
 Na TUI:
@@ -97,7 +104,7 @@ print(result.rendered_preview)
 
 ## Estado do projeto
 
-A versão `0.6.0` consolida a fundação do framework. A próxima fase evoluirá o runtime inteligente, o replanejamento e as APIs públicas para agentes Linux.
+A versão `1.2.0` consolida o assistente como aplicação desktop. A próxima evolução priorizará respostas mais inteligentes e rápidas, Fast Path adaptativo e aprendizado de variações de linguagem.
 
 ## Licença
 

@@ -1,7 +1,7 @@
 # Ubuntu AI Assistant Architecture
 
-**Versão:** 1.1  
-**Status:** Em desenvolvimento  
+**Versão:** 1.2.0
+**Status:** Em desenvolvimento
 **Arquitetura:** Clean Architecture + SOLID + Strategy + Dependency Injection
 
 ---
@@ -339,43 +339,28 @@ Exemplos futuros:
 
 # Roadmap Arquitetural
 
-## v1.0
+## v1.0 — Fundação
 
-- CLI
-- TUI
-- AI Planner
-- Rule Planner
-- Remote Execution
-- Autonomous Loop
+CLI, TUI, runtime, planners, confirmação, execução controlada, memória,
+contexto e Agent Loop.
 
----
+## v1.1 — Inteligência rápida
 
-## v1.1
+Builtin Planner, Fast Path, Response Formatter, vocabulário e melhorias de UX.
 
-- Builtin Planner
-- Response Formatter
-- Fast Response
-- UX Improvements
-- Professional Installation
+## v1.2 — Aplicação desktop
 
----
+GUI Tkinter, launcher nativo, assets no wheel, instalador reproduzível,
+autoexecução exclusiva para `LOW`, confirmação para riscos sensíveis,
+interrupção cooperativa, acessibilidade e instalação limpa.
 
-## v2.0
+## Próximas versões
 
-- GUI Desktop
-- RAG Local
-- Code Search
-- Semantic Memory
-- Plugin System
-- Multi-Agent Collaboration
-- Remote Infrastructure Management
-
----
+Fast Path adaptativo, aprendizado de frases, administração remota, agentes
+especializados, observabilidade, automação e distribuição ampliada.
 
 # Conclusão
 
-A arquitetura do Ubuntu AI Assistant foi concebida para permitir evolução contínua sem comprometer os princípios de modularidade, manutenção e extensibilidade.
-
-A introdução do BuiltinPlanner na versão 1.1 reduz significativamente a latência para operações determinísticas, preservando o AIPlanner para tarefas que realmente exigem inteligência artificial.
-
-Essa separação mantém a arquitetura limpa, melhora a experiência do usuário e prepara a plataforma para as próximas versões do projeto.
+A versão 1.2.0 transforma o framework em uma aplicação desktop utilizável sem
+remover as políticas de segurança. CLI, TUI e GUI compartilham o mesmo runtime,
+Agent Loop e classificação de riscos.

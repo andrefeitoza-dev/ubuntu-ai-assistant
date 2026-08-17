@@ -5,7 +5,7 @@ import tomllib
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-EXPECTED_VERSION = "0.6.0"
+EXPECTED_VERSION = "1.2.0"
 
 
 def main() -> None:
@@ -19,15 +19,13 @@ def main() -> None:
     if package_version != EXPECTED_VERSION:
         raise SystemExit(f"pyproject.toml usa {package_version}, esperado {EXPECTED_VERSION}.")
     if match.group(1) != EXPECTED_VERSION:
-        raise SystemExit(
-            f"version.py usa {match.group(1)}, esperado {EXPECTED_VERSION}."
-        )
+        raise SystemExit(f"version.py usa {match.group(1)}, esperado {EXPECTED_VERSION}.")
 
     required = [
         ROOT / "README.md",
         ROOT / "CHANGELOG.md",
         ROOT / "LICENSE",
-        ROOT / "docs/releases/v0.6.0.md",
+        ROOT / "docs/releases/v1.2.0.md",
     ]
     missing = [str(path.relative_to(ROOT)) for path in required if not path.exists()]
     if missing:
