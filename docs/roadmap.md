@@ -122,7 +122,7 @@ depender do terminal ou do VS Code.
 - [x] revisar acessibilidade, foco e navegação por teclado;
 ### G4 — Preparação da release v1.2.0
 
-- [ ] validar os fluxos `LOW`, `HIGH` e `CRITICAL`;
+- [x] validar os fluxos `LOW`, `HIGH` e `CRITICAL`;
 - [ ] testar instalação e desinstalação em ambiente limpo;
 - [ ] atualizar README, arquitetura e checkpoint;
 - [ ] preparar notas da release `v1.2.0`;
