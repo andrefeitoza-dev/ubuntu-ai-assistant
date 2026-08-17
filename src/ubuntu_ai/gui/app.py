@@ -52,17 +52,28 @@ class UbuntuAIApp:
         self._build_interface()
         self._show_welcome()
 
-    def _set_window_icon(self) -> None:
-        icon_candidates = (
+    @staticmethod
+    def _icon_candidates() -> tuple[Path, ...]:
+        return (
             Path.home() / ".local/share/icons/hicolor/512x512/apps/ubuntu-ai-assistant.png",
             Path(__file__).resolve().parent / "assets" / "ubuntu-ai-assistant.png",
         )
 
-        for icon_path in icon_candidates:
-            if icon_path.is_file():
-                self._window_icon = tk.PhotoImage(file=icon_path)
-                self.root.iconphoto(True, self._window_icon)
-                return
+    def _set_window_icon(self) -> None:
+        self._window_icon: tk.PhotoImage | None = None
+
+        for icon_path in self._icon_candidates():
+            if not icon_path.is_file():
+                continue
+
+            try:
+                window_icon = tk.PhotoImage(file=icon_path)
+            except (tk.TclError, OSError):
+                continue
+
+            self._window_icon = window_icon
+            self.root.iconphoto(True, window_icon)
+            return
 
     # ------------------------------------------------------------------
     # Layout
@@ -80,7 +91,7 @@ class UbuntuAIApp:
         brand = tk.Frame(header, bg=BACKGROUND)
         brand.pack(side=tk.LEFT)
 
-        if hasattr(self, "_window_icon"):
+        if self._window_icon is not None:
             self._header_icon = self._window_icon.subsample(16, 16)
             tk.Label(
                 brand,
@@ -260,7 +271,7 @@ class UbuntuAIApp:
             pady=(55, 24),
         )
 
-        if hasattr(self, "_window_icon"):
+        if self._window_icon is not None:
             self._welcome_icon = self._window_icon.subsample(4, 4)
             tk.Label(
                 self.welcome,

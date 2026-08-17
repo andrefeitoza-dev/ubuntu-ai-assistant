@@ -114,9 +114,9 @@ depender do terminal ou do VS Code.
 
 - [x] versionar o instalador do launcher;
 - [x] empacotar corretamente os assets da GUI;
-- [ ] adicionar testes específicos da interface;
-- [ ] validar associação da janela com o Dock;
-- [ ] tratar ausência ou corrupção do ícone;
+- [x] adicionar testes específicos da interface;
+- [x] validar associação da janela com o Dock;
+- [x] tratar ausência ou corrupção do ícone;
 - [ ] melhorar mensagens de falha do backend;
 - [ ] adicionar cancelamento visual de tarefas;
 - [ ] revisar acessibilidade, foco e navegação por teclado;
