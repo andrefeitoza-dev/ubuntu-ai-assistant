@@ -112,6 +112,10 @@ def test_cancel_current_operation_invalidates_result(monkeypatch) -> None:
     application = gui_app.UbuntuAIApp.__new__(gui_app.UbuntuAIApp)
     application._busy = True
     application._operation_generation = 3
+    cancel_calls: list[bool] = []
+    application._backend = SimpleNamespace(
+        cancel=lambda: cancel_calls.append(True),
+    )
     messages: list[str] = []
 
     monkeypatch.setattr(
@@ -129,4 +133,5 @@ def test_cancel_current_operation_invalidates_result(monkeypatch) -> None:
 
     assert application._busy is False
     assert application._operation_generation == 4
-    assert "resultado será ignorado" in messages[0]
+    assert cancel_calls == [True]
+    assert "já pode enviar" in messages[0]

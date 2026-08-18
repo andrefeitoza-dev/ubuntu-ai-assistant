@@ -39,6 +39,7 @@ class AgentLoopController:
         self._records: list[IterationRecord] = []
         self._events: list[LoopEvent] = []
         self._stop_reason: StopReason | None = None
+        self._cycle_generation = 0
 
     def start(self, goal: str) -> LoopSnapshot:
         clean_goal = goal.strip()
@@ -53,6 +54,8 @@ class AgentLoopController:
         }:
             raise RuntimeError("Já existe um ciclo de agente em andamento.")
 
+        self._cycle_generation += 1
+        generation = self._cycle_generation
         self._goal = clean_goal
         self._state = LoopState.IDLE
         self._iteration = 0
@@ -62,7 +65,7 @@ class AgentLoopController:
         self._events.clear()
         self._stop_reason = None
         self._watchdog.reset()
-        return self._plan(clean_goal)
+        return self._plan(clean_goal, generation)
 
     def confirm(self) -> LoopSnapshot:
         if self._state is not LoopState.WAITING_CONFIRMATION:
@@ -120,7 +123,7 @@ class AgentLoopController:
             iteration=self._iteration,
             results=results,
         )
-        return self._plan(request)
+        return self._plan(request, self._cycle_generation)
 
     def cancel(self) -> LoopSnapshot:
         if self._state not in {
@@ -148,7 +151,7 @@ class AgentLoopController:
             stop_reason=self._stop_reason,
         )
 
-    def _plan(self, request: str) -> LoopSnapshot:
+    def _plan(self, request: str, generation: int) -> LoopSnapshot:
         if self._iteration >= self._config.max_iterations:
             return self._stop(
                 LoopState.FAILED,
@@ -160,11 +163,17 @@ class AgentLoopController:
         try:
             plan = self._runtime.run(AgentTask(request=request))
         except Exception as exc:
+            if generation != self._cycle_generation or self._state is LoopState.CANCELLED:
+                return self.snapshot()
             return self._stop(
                 LoopState.FAILED,
                 StopReason.PLANNING_ERROR,
                 f"Falha durante o planejamento: {exc}",
             )
+
+        if generation != self._cycle_generation or self._state is LoopState.CANCELLED:
+            return self.snapshot()
+
         self._pending_plan = plan
         self._pending_request = request
 

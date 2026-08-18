@@ -211,3 +211,47 @@ def test_high_risk_plan_still_requires_confirmation() -> None:
     assert snapshot.state is LoopState.WAITING_CONFIRMATION
     assert snapshot.requires_confirmation
     assert runtime.confirm_calls == 0
+
+
+def test_cancelled_planning_cannot_overwrite_a_new_cycle() -> None:
+    import threading
+
+    class DelayedRuntime:
+        def __init__(self) -> None:
+            self.started = threading.Event()
+            self.release = threading.Event()
+
+        def run(self, task: AgentTask) -> AgentResult:
+            if task.request == "solicitação antiga":
+                self.started.set()
+                self.release.wait(timeout=2)
+            return AgentResult(success=True, message=f"plan: {task.request}")
+
+        def confirm(self) -> tuple[ExecutionResult, ...]:
+            return ()
+
+    runtime = DelayedRuntime()
+    controller = AgentLoopController(runtime=runtime)  # type: ignore[arg-type]
+
+    old_thread = threading.Thread(
+        target=controller.start,
+        args=("solicitação antiga",),
+    )
+    old_thread.start()
+    assert runtime.started.wait(timeout=1)
+
+    cancelled = controller.cancel()
+    assert cancelled.state is LoopState.CANCELLED
+
+    current = controller.start("solicitação nova")
+    assert current.state is LoopState.WAITING_CONFIRMATION
+    assert current.pending_plan is not None
+    assert current.pending_plan.message == "plan: solicitação nova"
+
+    runtime.release.set()
+    old_thread.join(timeout=1)
+
+    final = controller.snapshot()
+    assert final.state is LoopState.WAITING_CONFIRMATION
+    assert final.pending_plan is not None
+    assert final.pending_plan.message == "plan: solicitação nova"

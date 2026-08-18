@@ -5,6 +5,7 @@ import tkinter as tk
 from pathlib import Path
 
 from ubuntu_ai.agent_loop.models import LoopSnapshot, LoopState
+from ubuntu_ai.fast_path import LocalResponder
 from ubuntu_ai.gui.backend import GUIBackend
 
 # ---------------------------------------------------------------------------
@@ -38,6 +39,7 @@ class UbuntuAIApp:
 
     def __init__(self) -> None:
         self._backend = GUIBackend()
+        self._local_responder = LocalResponder()
         self._busy = False
         self._operation_generation = 0
         self._active_actions: tk.Frame | None = None
@@ -311,6 +313,16 @@ class UbuntuAIApp:
             self.composer_outer.pack_configure(pady=(0, 24))
 
         self._add_user_message(request)
+
+        local_response = self._local_responder.respond(request)
+        if local_response is not None:
+            self._add_system_message(
+                f"{local_response.text}\n\nResposta local instantânea.",
+                color=TEXT,
+            )
+            self.request_entry.focus_set()
+            return
+
         operation = self._begin_operation("Analisando")
 
         threading.Thread(
@@ -895,10 +907,15 @@ class UbuntuAIApp:
             return
 
         self._operation_generation += 1
+
+        try:
+            self._backend.cancel()
+        except RuntimeError:
+            pass
+
         self._set_busy(False)
         self._add_system_message(
-            "Espera interrompida. Um processamento já iniciado pode "
-            "terminar em segundo plano, mas seu resultado será ignorado.",
+            "Operação cancelada. Você já pode enviar uma nova solicitação.",
             color=WARNING,
         )
 
