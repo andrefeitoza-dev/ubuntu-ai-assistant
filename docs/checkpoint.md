@@ -1,14 +1,13 @@
 # Ubuntu AI Assistant — Development Checkpoint
 
-> Última atualização: 2026-08-16
+> Última atualização: 2026-08-18
 
 ## Estado atual
 
-- Versão: `1.2.0`
-- Branch: `develop/v1.2`
+- Versão-base: `1.2.0`
+- Branch: `develop/v1.3`
 - Release `v1.2.0`: concluída
-- G1, G2 e G3: concluídas
-- G4: concluída
+- Fase atual: v1.3 — inteligência, conversa e desempenho
 
 ## Funcionalidades validadas
 
@@ -22,6 +21,11 @@
 - mensagens amigáveis e interrupção cooperativa;
 - atalhos `Esc` e `Ctrl+L`;
 - CLI, TUI, GUI e SDK preservados.
+- respostas locais instantâneas;
+- cancelamento protegido contra resultados antigos;
+- roteamento entre resposta local, ação auditável e conversa;
+- conversa geral pelo Ollama sem criar planos executáveis;
+- histórico recente incorporado às respostas conversacionais.
 
 ## Segurança
 
@@ -36,9 +40,5 @@ confirmação e podem ser cancelados sem chamar o executor.
 
 ## Próxima tarefa
 
-Iniciar a próxima evolução: tornar o assistente mais inteligente e rápido.
-
-## Próxima evolução
-
-Tornar o assistente mais inteligente e rápido com sinônimos, similaridade de
-intenções, aprendizado aprovado, Fast Path adaptativo e menor uso do Ollama.
+Validar o roteador conversacional na GUI real e avançar para sinônimos,
+similaridade de intenções, aprendizado aprovado e métricas de latência.

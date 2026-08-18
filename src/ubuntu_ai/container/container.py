@@ -27,6 +27,7 @@ from ubuntu_ai.hardening.telemetry import RuntimeTelemetry
 from ubuntu_ai.intent.engine import IntentEngine
 from ubuntu_ai.intent.repository import InMemoryIntentRepository, IntentRepository
 from ubuntu_ai.intent.service import IntentService
+from ubuntu_ai.interaction import ChatService, InteractionRouter
 from ubuntu_ai.knowledge.engine import KnowledgeEngine
 from ubuntu_ai.knowledge.repository import KnowledgeRepository
 from ubuntu_ai.knowledge.service import KnowledgeService
@@ -107,6 +108,38 @@ class Container:
                 num_predict=config.ollama_num_predict,
                 temperature=config.ollama_temperature,
                 keep_alive=config.ollama_keep_alive,
+            ),
+        )
+
+    def chat_ollama_service(self) -> OllamaService:
+        """Retorna um cliente Ollama textual e otimizado para conversa."""
+
+        config = self.config()
+        return self._singleton(
+            "chat_ollama_service",
+            lambda: OllamaService(
+                base_url=config.ollama_base_url,
+                timeout=config.request_timeout,
+                num_predict=min(config.ollama_num_predict, 192),
+                temperature=max(config.ollama_temperature, 0.2),
+                keep_alive=config.ollama_keep_alive,
+            ),
+        )
+
+    def interaction_router(self) -> InteractionRouter:
+        """Retorna o roteador único de conversa e ações."""
+
+        return self._singleton("interaction_router", InteractionRouter)
+
+    def chat_service(self) -> ChatService:
+        """Retorna o serviço conversacional local."""
+
+        return self._singleton(
+            "chat_service",
+            lambda: ChatService(
+                service=self.chat_ollama_service(),
+                model=self.config().ollama_model,
+                conversation_engine=self.conversation_engine(),
             ),
         )
 

@@ -5,6 +5,7 @@ from pathlib import Path
 from types import SimpleNamespace
 
 from ubuntu_ai.gui import app as gui_app
+from ubuntu_ai.interaction import ChatResponse
 
 
 class FakeRoot:
@@ -135,3 +136,44 @@ def test_cancel_current_operation_invalidates_result(monkeypatch) -> None:
     assert application._operation_generation == 4
     assert cancel_calls == [True]
     assert "já pode enviar" in messages[0]
+
+
+def test_chat_response_is_delivered(monkeypatch) -> None:
+    application = gui_app.UbuntuAIApp.__new__(gui_app.UbuntuAIApp)
+    application._operation_generation = 4
+    application._busy = True
+    messages: list[str] = []
+
+    monkeypatch.setattr(application, "_set_busy", lambda busy: setattr(application, "_busy", busy))
+    monkeypatch.setattr(
+        application,
+        "_add_system_message",
+        lambda message, **_kwargs: messages.append(message),
+    )
+
+    application._deliver_chat(
+        4,
+        ChatResponse(content="Linux é um sistema operacional.", model="qwen2.5:3b"),
+    )
+
+    assert application._busy is False
+    assert "Linux é um sistema" in messages[0]
+    assert "Rota IA local" in messages[0]
+
+
+def test_stale_chat_response_is_ignored(monkeypatch) -> None:
+    application = gui_app.UbuntuAIApp.__new__(gui_app.UbuntuAIApp)
+    application._operation_generation = 5
+    messages: list[str] = []
+    monkeypatch.setattr(
+        application,
+        "_add_system_message",
+        lambda message, **_kwargs: messages.append(message),
+    )
+
+    application._deliver_chat(
+        4,
+        ChatResponse(content="Resposta antiga", model="qwen2.5:3b"),
+    )
+
+    assert messages == []

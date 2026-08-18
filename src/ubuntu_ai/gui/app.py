@@ -5,8 +5,8 @@ import tkinter as tk
 from pathlib import Path
 
 from ubuntu_ai.agent_loop.models import LoopSnapshot, LoopState
-from ubuntu_ai.fast_path import LocalResponder
 from ubuntu_ai.gui.backend import GUIBackend
+from ubuntu_ai.interaction import ChatResponse, InteractionRoute
 
 # ---------------------------------------------------------------------------
 # Theme
@@ -39,7 +39,6 @@ class UbuntuAIApp:
 
     def __init__(self) -> None:
         self._backend = GUIBackend()
-        self._local_responder = LocalResponder()
         self._busy = False
         self._operation_generation = 0
         self._active_actions: tk.Frame | None = None
@@ -314,13 +313,22 @@ class UbuntuAIApp:
 
         self._add_user_message(request)
 
-        local_response = self._local_responder.respond(request)
-        if local_response is not None:
+        decision = self._backend.route(request)
+        if decision.route is InteractionRoute.LOCAL:
             self._add_system_message(
-                f"{local_response.text}\n\nResposta local instantânea.",
+                f"{decision.response}\n\nRota local · resposta instantânea.",
                 color=TEXT,
             )
             self.request_entry.focus_set()
+            return
+
+        if decision.route is InteractionRoute.CHAT:
+            operation = self._begin_operation("Respondendo")
+            threading.Thread(
+                target=self._start_chat,
+                args=(request, operation),
+                daemon=True,
+            ).start()
             return
 
         operation = self._begin_operation("Analisando")
@@ -352,6 +360,33 @@ class UbuntuAIApp:
             self._deliver_snapshot,
             operation,
             snapshot,
+        )
+
+    def _start_chat(
+        self,
+        request: str,
+        operation: int,
+    ) -> None:
+        try:
+            response = self._backend.chat(request)
+        except Exception as exc:
+            self.root.after(0, self._deliver_error, operation, str(exc))
+            return
+
+        self.root.after(0, self._deliver_chat, operation, response)
+
+    def _deliver_chat(
+        self,
+        operation: int,
+        response: ChatResponse,
+    ) -> None:
+        if operation != self._operation_generation:
+            return
+
+        self._set_busy(False)
+        self._add_system_message(
+            f"{response.content}\n\nRota IA local · {response.model}",
+            color=TEXT,
         )
 
     def _deliver_snapshot(

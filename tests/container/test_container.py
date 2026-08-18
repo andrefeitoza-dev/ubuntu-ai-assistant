@@ -1,6 +1,7 @@
 from ubuntu_ai.agent.runtime import AgentRuntime
 from ubuntu_ai.container import Container
 from ubuntu_ai.core.config import AppConfig
+from ubuntu_ai.interaction import ChatService, InteractionRouter
 from ubuntu_ai.pipeline.execution_pipeline import ExecutionPipeline
 from ubuntu_ai.planner.ai_planner import AIPlanner
 from ubuntu_ai.planner.planner import Planner
@@ -66,6 +67,17 @@ def test_ollama_service_uses_application_config() -> None:
 
     assert service.base_url == config.ollama_base_url
     assert service.timeout == config.request_timeout
+
+
+def test_container_composes_interaction_services_as_singletons() -> None:
+    container = Container()
+
+    assert isinstance(container.interaction_router(), InteractionRouter)
+    assert container.interaction_router() is container.interaction_router()
+    assert isinstance(container.chat_service(), ChatService)
+    assert container.chat_service() is container.chat_service()
+    assert container.chat_ollama_service() is container.chat_ollama_service()
+    assert container.chat_ollama_service() is not container.ollama_service()
 
 
 def test_planner_is_transient() -> None:

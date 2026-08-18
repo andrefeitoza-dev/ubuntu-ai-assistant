@@ -13,13 +13,13 @@ segurança operacional.
 
 ## Estado atual
 
-- Linha de desenvolvimento: `v1.2`
-- Branch: `develop/v1.2`
+- Linha de desenvolvimento: `v1.3`
+- Branch: `develop/v1.3`
 - Versão do pacote: `1.2.0`
 - Interface terminal: concluída
 - Interface gráfica G1 e G2: concluídas
 - Launcher desktop: funcional
-- Testes automatizados: `482 passed`
+- Testes automatizados: `530 passed`
 - Qualidade estática: Ruff aprovado
 
 > A versão `1.2.0` foi auditada e concluída.
@@ -31,9 +31,10 @@ segurança operacional.
 | `v1.0` | Fundação, segurança e runtime do agente | Concluída |
 | `v1.1` | Respostas rápidas, planners e evolução de UX | Concluída |
 | `v1.2` | Aplicativo desktop e experiência gráfica | Concluída |
-| `v1.3` | Administração remota segura | Planejada |
-| `v1.4` | Automação e agentes especializados | Planejada |
-| `v1.5` | Distribuição e integrações | Planejada |
+| `v1.3` | Inteligência, conversa e desempenho | Em desenvolvimento |
+| `v1.4` | Administração remota segura | Planejada |
+| `v1.5` | Automação e agentes especializados | Planejada |
+| `v1.6` | Distribuição e integrações | Planejada |
 | `v2.0` | Plataforma inteligente multiagente | Visão futura |
 
 ---
@@ -136,7 +137,46 @@ uma instalação limpa.
 
 ---
 
-## v1.3 — Administração remota segura
+## v1.3 — Inteligência, conversa e desempenho
+
+### Objetivo
+
+Tornar o aplicativo um assistente de IA completo para a apresentação do TCC,
+sem transformar perguntas gerais em comandos e sem usar o Ollama quando uma
+resposta determinística segura for suficiente.
+
+### F1 — Roteamento e conversa
+
+- [x] respostas locais instantâneas para consultas determinísticas;
+- [x] cancelamento coerente entre GUI e Agent Loop;
+- [x] proteção contra resultados antigos após cancelamento;
+- [x] separação entre pergunta conversacional e ação no sistema;
+- [x] canal Ollama textual independente do planejador JSON;
+- [x] memória recente nas conversas gerais;
+- [x] identificação da rota usada na GUI;
+- [x] limite de resposta reduzido para computadores CPU-only.
+
+### F2 — Fast Path adaptativo
+
+- [ ] ampliar vocabulário seguro e sinônimos;
+- [ ] reconhecer frases semelhantes por intenção;
+- [ ] priorizar correspondências específicas sobre termos genéricos;
+- [ ] usar histórico bem-sucedido como recomendação;
+- [ ] exigir aprovação antes de promover novos atalhos executáveis;
+- [ ] manter ações sensíveis fora do aprendizado automático.
+
+### F3 — Desempenho e apresentação do TCC
+
+- [ ] medir latência por rota `local`, `action` e `chat`;
+- [ ] mostrar a estratégia selecionada de forma discreta;
+- [ ] preparar cenários reproduzíveis de demonstração;
+- [ ] validar operação em hardware CPU-only com 8 GB de RAM;
+- [ ] documentar arquitetura, segurança e resultados;
+- [ ] executar auditoria e preparar a release de apresentação.
+
+---
+
+## v1.4 — Administração remota segura
 
 ### Planejado
 
@@ -153,7 +193,7 @@ uma instalação limpa.
 
 ---
 
-## v1.4 — Automação e agentes especializados
+## v1.5 — Automação e agentes especializados
 
 ### Planejado
 
@@ -169,7 +209,7 @@ uma instalação limpa.
 
 ---
 
-## v1.5 — Distribuição e integrações
+## v1.6 — Distribuição e integrações
 
 ### Planejado
 
@@ -206,12 +246,11 @@ uma instalação limpa.
 
 ## Próximos passos imediatos
 
-1. concluir a personalização e persistência do launcher;
-2. versionar o instalador e os assets;
-3. adicionar testes da GUI e do carregamento do ícone;
-4. validar o fluxo `LOW`, `HIGH` e `CRITICAL` pela GUI;
-5. atualizar README, arquitetura e checkpoint;
-6. preparar a release `v1.2.0`.
+1. validar conversa geral e roteamento na GUI real;
+2. ampliar o Fast Path com correspondências específicas;
+3. integrar recomendações do aprendizado sem autoexecutar novos comandos;
+4. medir a redução do uso do Ollama e a latência percebida;
+5. preparar os cenários e evidências da apresentação do TCC.
 
 ## Princípios permanentes
 
