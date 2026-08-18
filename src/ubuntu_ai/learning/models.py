@@ -56,6 +56,18 @@ class LearningPattern:
             return 0.0
         return max(0.0, min(1.0, weighted_success / weighted_total))
 
+    @property
+    def approved_for_reuse(self) -> bool:
+        """Exige sucesso e aprovação explícita sem histórico negativo."""
+
+        return (
+            self.success_count > 0
+            and self.positive_feedback > 0
+            and self.failure_count == 0
+            and self.blocked_count == 0
+            and self.negative_feedback == 0
+        )
+
     def with_outcome(self, outcome: LearningOutcome) -> LearningPattern:
         changes = {"updated_at": datetime.now(UTC)}
         if outcome is LearningOutcome.SUCCESS:

@@ -7,6 +7,7 @@ from dataclasses import dataclass
 from enum import StrEnum
 
 from ubuntu_ai.fast_path import LocalResponder
+from ubuntu_ai.learning.service import LearningService
 from ubuntu_ai.planner.builtin import BuiltinPlanner
 
 
@@ -125,9 +126,11 @@ class InteractionRouter:
         self,
         local_responder: LocalResponder | None = None,
         builtin_planner: BuiltinPlanner | None = None,
+        learning_service: LearningService | None = None,
     ) -> None:
         self._local_responder = local_responder or LocalResponder()
         self._builtin_planner = builtin_planner or BuiltinPlanner()
+        self._learning_service = learning_service
 
     def route(self, request: str) -> InteractionDecision:
         normalized = self._normalize(request)
@@ -150,6 +153,11 @@ class InteractionRouter:
 
         if words & self._ACTION_VERBS and words & self._SYSTEM_TERMS:
             return InteractionDecision(InteractionRoute.ACTION)
+
+        if self._learning_service is not None:
+            approved = self._learning_service.approved_recommendations(request, limit=1)
+            if approved:
+                return InteractionDecision(InteractionRoute.ACTION)
 
         return InteractionDecision(InteractionRoute.CHAT)
 

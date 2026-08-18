@@ -74,6 +74,28 @@ class LearningService:
             limit=limit,
         )
 
+    def approved_recommendations(
+        self,
+        request: str,
+        *,
+        project_name: str | None = None,
+        limit: int = 5,
+        minimum_score: float = 0.72,
+    ) -> tuple[LearningRecommendation, ...]:
+        """Retorna apenas padrões bem-sucedidos e aprovados explicitamente."""
+
+        if not 0.0 <= minimum_score <= 1.0:
+            raise ValueError("A pontuação mínima deve estar entre 0.0 e 1.0.")
+        return tuple(
+            recommendation
+            for recommendation in self.recommend(
+                request,
+                project_name=project_name,
+                limit=max(limit * 4, 20),
+            )
+            if recommendation.pattern.approved_for_reuse and recommendation.score >= minimum_score
+        )[:limit]
+
     def context_for_intent(
         self,
         intent: Intent,

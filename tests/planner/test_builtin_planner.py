@@ -107,3 +107,29 @@ def test_builtin_unknown():
     assert planner.try_create_plan("instale kubernetes") is None
     assert planner.try_create_plan("crie um cluster") is None
     assert planner.try_create_plan("") is None
+
+
+def test_builtin_prioritizes_specific_phrase() -> None:
+    plan = planner.try_create_plan("mostre a arquitetura das pastas")
+
+    assert plan is not None
+    assert plan.steps[0].command == ["find", ".", "-maxdepth", "2", "-print"]
+
+
+def test_builtin_recognizes_safe_typo_by_similarity() -> None:
+    plan = planner.try_create_plan("mostre os prosessos")
+
+    assert plan is not None
+    assert plan.steps[0].command[0] == "ps"
+
+
+def test_builtin_does_not_match_keyword_inside_another_word() -> None:
+    assert planner.try_create_plan("explique pipeline") is None
+
+
+def test_builtin_exposes_match_confidence() -> None:
+    match = planner.find_match("quanta memoria esta disponivel")
+
+    assert match is not None
+    assert match.command.goal == "Mostrar uso de memória"
+    assert match.confidence >= 0.78

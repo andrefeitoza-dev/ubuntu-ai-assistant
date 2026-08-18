@@ -129,7 +129,10 @@ class Container:
     def interaction_router(self) -> InteractionRouter:
         """Retorna o roteador único de conversa e ações."""
 
-        return self._singleton("interaction_router", InteractionRouter)
+        return self._singleton(
+            "interaction_router",
+            lambda: InteractionRouter(learning_service=self.learning_service()),
+        )
 
     def chat_service(self) -> ChatService:
         """Retorna o serviço conversacional local."""

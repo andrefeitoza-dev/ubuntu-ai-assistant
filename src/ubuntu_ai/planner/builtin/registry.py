@@ -112,6 +112,11 @@ BUILTIN_COMMANDS: tuple[BuiltinCommand, ...] = (
             "quanto de memória",
             "quanto de memoria",
             "quanto de ram",
+            "memória disponível",
+            "memoria disponivel",
+            "quanto resta de memória",
+            "quanto resta de memoria",
+            "veja a ram",
         ),
     ),
     #
@@ -135,6 +140,46 @@ BUILTIN_COMMANDS: tuple[BuiltinCommand, ...] = (
             "conteudo da pasta",
             "listar diretório",
             "listar diretorio",
+            "itens da pasta",
+            "mostre o conteúdo",
+            "mostre o conteudo",
+        ),
+    ),
+    #
+    # ÁRVORE DE DIRETÓRIOS
+    #
+    BuiltinCommand(
+        goal="Mostrar estrutura de diretórios",
+        title="Estrutura de diretórios",
+        description="Exibe a estrutura do diretório atual em até dois níveis.",
+        command=("find", ".", "-maxdepth", "2", "-print"),
+        keywords=(
+            "estrutura de pastas",
+            "estrutura dos diretórios",
+            "estrutura dos diretorios",
+            "árvore de diretórios",
+            "arvore de diretorios",
+            "arquitetura das pastas",
+            "hierarquia de pastas",
+        ),
+    ),
+    #
+    # PROCESSOS
+    #
+    BuiltinCommand(
+        goal="Mostrar processos ativos",
+        title="Processos ativos",
+        description="Lista processos com uso de CPU e memória.",
+        command=("ps", "-eo", "pid,comm,%cpu,%mem", "--sort=-%cpu"),
+        keywords=(
+            "processos",
+            "listar processos",
+            "mostre os processos",
+            "processos ativos",
+            "processos rodando",
+            "tarefas em execução",
+            "tarefas em execucao",
+            "uso de cpu por processo",
         ),
     ),
     #

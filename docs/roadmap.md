@@ -158,12 +158,12 @@ resposta determinística segura for suficiente.
 
 ### F2 — Fast Path adaptativo
 
-- [ ] ampliar vocabulário seguro e sinônimos;
-- [ ] reconhecer frases semelhantes por intenção;
-- [ ] priorizar correspondências específicas sobre termos genéricos;
-- [ ] usar histórico bem-sucedido como recomendação;
-- [ ] exigir aprovação antes de promover novos atalhos executáveis;
-- [ ] manter ações sensíveis fora do aprendizado automático.
+- [x] ampliar vocabulário seguro e sinônimos;
+- [x] reconhecer frases semelhantes por intenção;
+- [x] priorizar correspondências específicas sobre termos genéricos;
+- [x] usar histórico bem-sucedido como recomendação;
+- [x] exigir aprovação antes de promover novos atalhos executáveis;
+- [x] manter ações sensíveis fora do aprendizado automático.
 
 ### F3 — Desempenho e apresentação do TCC
 
