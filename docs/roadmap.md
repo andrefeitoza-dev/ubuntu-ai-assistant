@@ -283,18 +283,48 @@ agentes especializados com limites operacionais explícitos.
 
 ## v1.6 — Distribuição e integrações
 
-### Planejado
+### Objetivo
 
-- pacote instalável para Ubuntu;
-- atualização e desinstalação controladas;
-- integração com VS Code;
-- catálogo de plugins;
-- perfis de agente;
-- importação e exportação de configurações;
-- documentação pública;
-- guia de contribuição;
-- pipeline de release;
-- distribuição assinada.
+Transformar o Ubuntu AI Assistant em um produto distribuível, atualizável,
+extensível e documentado, preservando segurança, compatibilidade e
+reprodutibilidade.
+
+### D1 — Instalação e ciclo de vida
+
+- [ ] consolidar instalação pelo wheel e por ferramenta isolada;
+- [ ] implementar atualização controlada com validação de versão;
+- [ ] implementar desinstalação completa e segura;
+- [ ] preservar configurações e dados durante atualizações;
+- [ ] validar launcher, ícone e comandos após instalação;
+- [ ] testar instalação, atualização e remoção em ambiente limpo.
+
+### D2 — Configurações, perfis e plugins
+
+- [ ] importar e exportar configurações sem incluir segredos;
+- [ ] criar perfis de agentes com limites e políticas explícitas;
+- [ ] formalizar catálogo local de plugins;
+- [ ] validar versão, manifesto e compatibilidade dos plugins;
+- [ ] impedir carregamento de plugins inválidos ou não confiáveis;
+- [ ] documentar estabilidade e depreciação da API pública.
+
+### D3 — Integração e documentação pública
+
+- [ ] integrar comandos e tarefas seguras ao VS Code;
+- [ ] manter a integração opcional e desacoplada da aplicação;
+- [ ] publicar documentação de instalação, uso e solução de problemas;
+- [ ] atualizar guia de contribuição e desenvolvimento;
+- [ ] documentar plugins, perfis e configurações;
+- [ ] preparar exemplos reproduzíveis para usuários e contribuidores.
+
+### D4 — Pipeline e release v1.6.0
+
+- [ ] automatizar qualidade, testes, arquitetura e build;
+- [ ] validar integridade e conteúdo dos artefatos;
+- [ ] gerar checksums verificáveis da distribuição;
+- [ ] preparar assinatura sem armazenar chaves no repositório;
+- [ ] executar instalação, atualização e desinstalação limpas;
+- [ ] atualizar documentação e evidências da release;
+- [ ] preparar e criar a tag `v1.6.0`.
 
 ---
 
