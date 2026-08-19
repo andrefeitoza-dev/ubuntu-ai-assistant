@@ -3,6 +3,7 @@ from __future__ import annotations
 import threading
 import tkinter as tk
 from pathlib import Path
+from time import perf_counter
 
 from ubuntu_ai.agent_loop.models import LoopSnapshot, LoopState
 from ubuntu_ai.gui.backend import GUIBackend
@@ -41,6 +42,7 @@ class UbuntuAIApp:
         self._backend = GUIBackend()
         self._busy = False
         self._operation_generation = 0
+        self._operation_started_at: dict[int, float] = {}
         self._active_actions: tk.Frame | None = None
         self._active_plan_card: tk.Frame | None = None
 
@@ -316,7 +318,7 @@ class UbuntuAIApp:
         decision = self._backend.route(request)
         if decision.route is InteractionRoute.LOCAL:
             self._add_system_message(
-                f"{decision.response}\n\nRota local · resposta instantânea.",
+                f"{decision.response}\n\nRota local · {self._format_duration(decision.duration)}",
                 color=TEXT,
             )
             self.request_entry.focus_set()
@@ -332,6 +334,7 @@ class UbuntuAIApp:
             return
 
         operation = self._begin_operation("Analisando")
+        self._operation_started_at[operation] = perf_counter()
 
         threading.Thread(
             target=self._start_request,
@@ -385,7 +388,8 @@ class UbuntuAIApp:
 
         self._set_busy(False)
         self._add_system_message(
-            f"{response.content}\n\nRota IA local · {response.model}",
+            f"{response.content}\n\nRota IA local · {response.model} · "
+            f"{self._format_duration(response.duration)}",
             color=TEXT,
         )
 
@@ -396,6 +400,13 @@ class UbuntuAIApp:
     ) -> None:
         if operation != self._operation_generation:
             return
+
+        started = getattr(self, "_operation_started_at", {}).pop(operation, None)
+        if started is not None:
+            self._add_system_message(
+                f"Rota ação segura · {self._format_duration(perf_counter() - started)}",
+                color=TEXT_MUTED,
+            )
 
         self._show_snapshot(snapshot)
 
@@ -942,6 +953,7 @@ class UbuntuAIApp:
             return
 
         self._operation_generation += 1
+        getattr(self, "_operation_started_at", {}).clear()
 
         try:
             self._backend.cancel()
@@ -1063,6 +1075,14 @@ class UbuntuAIApp:
         self._operation_generation += 1
         self._set_busy(True, label)
         return self._operation_generation
+
+    @staticmethod
+    def _format_duration(duration: float) -> str:
+        if duration < 0.001:
+            return f"{duration * 1_000_000:.0f} µs"
+        if duration < 1.0:
+            return f"{duration * 1000:.1f} ms"
+        return f"{duration:.2f} s"
 
     def _set_busy(
         self,

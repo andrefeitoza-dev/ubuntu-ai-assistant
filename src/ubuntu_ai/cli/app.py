@@ -1,6 +1,7 @@
 import typer
 
 from ubuntu_ai.cli.benchmark import benchmark
+from ubuntu_ai.cli.benchmark_routes import benchmark_routes
 from ubuntu_ai.cli.context import CLIContext
 from ubuntu_ai.cli.diagnose_ai import diagnose_ai
 from ubuntu_ai.cli.doctor import doctor
@@ -42,6 +43,7 @@ app.command(name="doctor")(doctor)
 app.command(name="health")(health)
 app.command(name="intent")(intent)
 app.command(name="benchmark")(benchmark)
+app.command(name="benchmark-routes")(benchmark_routes)
 app.command(name="plan")(plan)
 app.command(name="run")(run)
 app.command(name="shell")(shell)

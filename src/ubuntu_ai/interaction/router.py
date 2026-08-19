@@ -5,7 +5,9 @@ import shlex
 import unicodedata
 from dataclasses import dataclass
 from enum import StrEnum
+from time import perf_counter
 
+from ubuntu_ai.benchmark import BenchmarkService
 from ubuntu_ai.fast_path import LocalResponder
 from ubuntu_ai.learning.service import LearningService
 from ubuntu_ai.planner.builtin import BuiltinPlanner
@@ -21,6 +23,7 @@ class InteractionRoute(StrEnum):
 class InteractionDecision:
     route: InteractionRoute
     response: str | None = None
+    duration: float = 0.0
 
 
 class InteractionRouter:
@@ -75,6 +78,8 @@ class InteractionRouter:
         "arquivos",
         "armazenamento",
         "branch",
+        "computador",
+        "configuracao",
         "cpu",
         "diretorio",
         "disco",
@@ -85,6 +90,7 @@ class InteractionRouter:
         "ip",
         "kernel",
         "memoria",
+        "maquina",
         "nginx",
         "pacote",
         "pasta",
@@ -127,12 +133,25 @@ class InteractionRouter:
         local_responder: LocalResponder | None = None,
         builtin_planner: BuiltinPlanner | None = None,
         learning_service: LearningService | None = None,
+        benchmark_service: BenchmarkService | None = None,
     ) -> None:
         self._local_responder = local_responder or LocalResponder()
         self._builtin_planner = builtin_planner or BuiltinPlanner()
         self._learning_service = learning_service
+        self._benchmark_service = benchmark_service
 
     def route(self, request: str) -> InteractionDecision:
+        started_at = perf_counter()
+        decision = self._decide(request)
+        duration = perf_counter() - started_at
+        if self._benchmark_service is not None:
+            self._benchmark_service.record(
+                f"interaction.route.{decision.route.value}",
+                duration,
+            )
+        return InteractionDecision(decision.route, decision.response, duration)
+
+    def _decide(self, request: str) -> InteractionDecision:
         normalized = self._normalize(request)
         if not normalized:
             raise ValueError("Digite uma solicitação.")

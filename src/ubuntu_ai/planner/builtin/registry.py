@@ -223,6 +223,29 @@ BUILTIN_COMMANDS: tuple[BuiltinCommand, ...] = (
         ),
     ),
     #
+    # CONFIGURAÇÃO DO COMPUTADOR
+    #
+    BuiltinCommand(
+        goal="Mostrar configuração do computador",
+        title="Configuração do computador",
+        description="Exibe sistema operacional, kernel, arquitetura e identificação da máquina.",
+        command=("hostnamectl",),
+        keywords=(
+            "configuração do computador",
+            "configuracao do computador",
+            "configuração desse computador",
+            "configuracao desse computador",
+            "configuração da máquina",
+            "configuracao da maquina",
+            "informações do computador",
+            "informacoes do computador",
+            "detalhes da máquina",
+            "detalhes da maquina",
+            "resumo do sistema",
+            "mostre meu computador",
+        ),
+    ),
+    #
     # HOSTNAME
     #
     BuiltinCommand(

@@ -1,3 +1,4 @@
+from ubuntu_ai.benchmark import BenchmarkService
 from ubuntu_ai.interaction import ChatService
 
 
@@ -59,3 +60,19 @@ def test_chat_without_conversation_engine() -> None:
     )
 
     assert service.ask("Olá").content == "Resposta natural."
+
+
+def test_chat_records_generation_latency() -> None:
+    benchmark = BenchmarkService()
+    service = ChatService(
+        service=FakeOllamaService(),  # type: ignore[arg-type]
+        model="qwen2.5:3b",
+        benchmark_service=benchmark,
+    )
+
+    response = service.ask("Olá")
+
+    assert response.duration >= 0
+    record = benchmark.report().records[0]
+    assert record.operation == "interaction.chat"
+    assert record.success is True

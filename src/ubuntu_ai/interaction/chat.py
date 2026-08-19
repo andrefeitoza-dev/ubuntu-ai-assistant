@@ -1,8 +1,10 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from time import perf_counter
 from uuid import uuid4
 
+from ubuntu_ai.benchmark import BenchmarkService
 from ubuntu_ai.conversation.engine import ConversationEngine
 from ubuntu_ai.services.ollama import OllamaService
 
@@ -12,6 +14,7 @@ class ChatResponse:
     content: str
     model: str
     route: str = "chat"
+    duration: float = 0.0
 
 
 class ChatService:
@@ -25,6 +28,7 @@ class ChatService:
         conversation_engine: ConversationEngine | None = None,
         session_id: str | None = None,
         history_limit: int = 6,
+        benchmark_service: BenchmarkService | None = None,
     ) -> None:
         normalized_model = model.strip()
         if not normalized_model:
@@ -36,6 +40,7 @@ class ChatService:
         self._conversation_engine = conversation_engine
         self._session_id = session_id or f"gui-chat-{uuid4()}"
         self._history_limit = history_limit
+        self._benchmark_service = benchmark_service
 
     def ask(self, request: str) -> ChatResponse:
         normalized = request.strip()
@@ -44,7 +49,20 @@ class ChatService:
 
         history = self._history()
         prompt = self._build_prompt(normalized, history)
-        content = self._service.generate(prompt=prompt, model=self._model)
+        started_at = perf_counter()
+        try:
+            content = self._service.generate(prompt=prompt, model=self._model)
+        except Exception:
+            if self._benchmark_service is not None:
+                self._benchmark_service.record(
+                    "interaction.chat",
+                    perf_counter() - started_at,
+                    success=False,
+                )
+            raise
+        duration = perf_counter() - started_at
+        if self._benchmark_service is not None:
+            self._benchmark_service.record("interaction.chat", duration)
 
         if self._conversation_engine is not None:
             self._conversation_engine.remember_user(
@@ -56,7 +74,7 @@ class ChatService:
                 content=content,
             )
 
-        return ChatResponse(content=content, model=self._model)
+        return ChatResponse(content=content, model=self._model, duration=duration)
 
     def _history(self) -> tuple[str, ...]:
         if self._conversation_engine is None:

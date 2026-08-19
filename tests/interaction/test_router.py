@@ -1,5 +1,6 @@
 import pytest
 
+from ubuntu_ai.benchmark import BenchmarkService
 from ubuntu_ai.interaction import InteractionRoute, InteractionRouter
 
 
@@ -24,6 +25,7 @@ def router() -> InteractionRouter:
         ("que dia é hoje?", InteractionRoute.LOCAL),
         ("qual a memória?", InteractionRoute.ACTION),
         ("mostre os processos", InteractionRoute.ACTION),
+        ("mostre a configuração desse computador", InteractionRoute.ACTION),
         ("instale o Docker", InteractionRoute.ACTION),
         ("sudo apt update", InteractionRoute.ACTION),
         ("o que é memória RAM?", InteractionRoute.CHAT),
@@ -66,3 +68,15 @@ def test_unapproved_learning_does_not_promote_unknown_phrase() -> None:
     )
 
     assert router.route("exibir os itens deste local").route is InteractionRoute.CHAT
+
+
+def test_router_records_selected_route_latency() -> None:
+    benchmark = BenchmarkService()
+    router = InteractionRouter(benchmark_service=benchmark)
+
+    decision = router.route("que dia é hoje?")
+
+    assert decision.duration >= 0
+    record = benchmark.report().records[0]
+    assert record.operation == "interaction.route.local"
+    assert record.success is True

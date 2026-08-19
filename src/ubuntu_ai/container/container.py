@@ -131,7 +131,10 @@ class Container:
 
         return self._singleton(
             "interaction_router",
-            lambda: InteractionRouter(learning_service=self.learning_service()),
+            lambda: InteractionRouter(
+                learning_service=self.learning_service(),
+                benchmark_service=self.benchmark_service(),
+            ),
         )
 
     def chat_service(self) -> ChatService:
@@ -143,6 +146,7 @@ class Container:
                 service=self.chat_ollama_service(),
                 model=self.config().ollama_model,
                 conversation_engine=self.conversation_engine(),
+                benchmark_service=self.benchmark_service(),
             ),
         )
 

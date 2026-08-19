@@ -167,11 +167,11 @@ resposta determinística segura for suficiente.
 
 ### F3 — Desempenho e apresentação do TCC
 
-- [ ] medir latência por rota `local`, `action` e `chat`;
-- [ ] mostrar a estratégia selecionada de forma discreta;
-- [ ] preparar cenários reproduzíveis de demonstração;
-- [ ] validar operação em hardware CPU-only com 8 GB de RAM;
-- [ ] documentar arquitetura, segurança e resultados;
+- [x] medir latência por rota `local`, `action` e `chat`;
+- [x] mostrar a estratégia selecionada de forma discreta;
+- [x] preparar cenários reproduzíveis de demonstração;
+- [x] validar operação em hardware CPU-only com 8 GB de RAM;
+- [x] documentar arquitetura, segurança e resultados;
 - [ ] executar auditoria e preparar a release de apresentação.
 
 ---

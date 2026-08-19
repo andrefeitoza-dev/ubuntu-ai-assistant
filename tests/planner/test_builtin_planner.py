@@ -133,3 +133,10 @@ def test_builtin_exposes_match_confidence() -> None:
     assert match is not None
     assert match.command.goal == "Mostrar uso de memória"
     assert match.confidence >= 0.78
+
+
+def test_builtin_computer_configuration_uses_real_local_data() -> None:
+    plan = planner.try_create_plan("mostre a configuração desse computador")
+
+    assert plan is not None
+    assert plan.steps[0].command == ["hostnamectl"]
