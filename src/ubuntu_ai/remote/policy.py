@@ -44,11 +44,20 @@ class RemoteExecutionPolicy:
         "lscpu",
         "nproc",
         "ps",
-        "systemctl",
         "true",
         "uname",
         "uptime",
         "whoami",
+    }
+    _MODERATE = {"mkdir", "touch"}
+    _SYSTEMCTL_READ_ONLY = {
+        "--failed",
+        "is-active",
+        "is-enabled",
+        "list-unit-files",
+        "list-units",
+        "show",
+        "status",
     }
 
     def evaluate(
@@ -82,6 +91,35 @@ class RemoteExecutionPolicy:
                 requires_confirmation=True,
                 reason=(f"Comando potencialmente destrutivo em {host.name}."),
                 risk=RiskLevel.CRITICAL,
+            )
+
+        if host.kind is RemoteHostKind.SSH and executable == "systemctl":
+            arguments = tuple(argument.lower() for argument in command.argv[1:])
+            operation = (
+                "--failed"
+                if "--failed" in arguments
+                else next((argument for argument in arguments if not argument.startswith("-")), "")
+            )
+            if operation not in self._SYSTEMCTL_READ_ONLY:
+                return RemotePolicyDecision(
+                    allowed=True,
+                    requires_confirmation=True,
+                    reason=f"Alteração de serviço exige confirmação para {host.name}.",
+                    risk=RiskLevel.HIGH,
+                )
+            return RemotePolicyDecision(
+                allowed=True,
+                requires_confirmation=False,
+                reason="Consulta remota de serviço permitida.",
+                risk=RiskLevel.LOW,
+            )
+
+        if host.kind is RemoteHostKind.SSH and executable in self._MODERATE:
+            return RemotePolicyDecision(
+                allowed=True,
+                requires_confirmation=True,
+                reason=f"Alteração remota reversível exige confirmação para {host.name}.",
+                risk=RiskLevel.MEDIUM,
             )
 
         if host.kind is RemoteHostKind.SSH and executable not in self._READ_ONLY:

@@ -63,9 +63,42 @@ def test_remote_read_only_command_is_low_risk() -> None:
 def test_unknown_remote_action_is_high_risk_and_requires_confirmation() -> None:
     decision = RemoteExecutionPolicy().evaluate(
         ssh_host(),
-        RemoteCommand(("touch", "/tmp/example")),
+        RemoteCommand(("apt", "install", "example")),
     )
 
     assert decision.allowed
     assert decision.requires_confirmation
     assert decision.risk is RiskLevel.HIGH
+
+
+def test_reversible_remote_action_is_medium_risk() -> None:
+    decision = RemoteExecutionPolicy().evaluate(
+        RemoteHost(name="server", kind=RemoteHostKind.SSH, hostname="server.local"),
+        RemoteCommand(("mkdir", "/tmp/example")),
+    )
+
+    assert decision.allowed
+    assert decision.requires_confirmation
+    assert decision.risk is RiskLevel.MEDIUM
+
+
+@pytest.mark.parametrize("operation", ("status", "show", "is-active", "--failed"))
+def test_systemctl_read_operations_are_low_risk(operation: str) -> None:
+    decision = RemoteExecutionPolicy().evaluate(
+        RemoteHost(name="server", kind=RemoteHostKind.SSH, hostname="server.local"),
+        RemoteCommand(("systemctl", operation, "ssh")),
+    )
+
+    assert decision.risk is RiskLevel.LOW
+    assert not decision.requires_confirmation
+
+
+@pytest.mark.parametrize("operation", ("start", "stop", "restart", "enable", "disable"))
+def test_systemctl_mutations_are_high_risk(operation: str) -> None:
+    decision = RemoteExecutionPolicy().evaluate(
+        RemoteHost(name="server", kind=RemoteHostKind.SSH, hostname="server.local"),
+        RemoteCommand(("systemctl", operation, "ssh")),
+    )
+
+    assert decision.risk is RiskLevel.HIGH
+    assert decision.requires_confirmation

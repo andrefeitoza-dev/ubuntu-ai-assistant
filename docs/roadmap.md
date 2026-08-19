@@ -231,10 +231,10 @@ auditoria separada por host.
 
 ### R4 — Integração e release v1.4.0
 
-- [ ] preparar ambiente SSH isolado;
-- [ ] validar conexão, identidade, timeout e falhas;
-- [ ] validar políticas `LOW`, `MEDIUM`, `HIGH` e `CRITICAL`;
-- [ ] atualizar documentação e evidências;
+- [x] preparar ambiente SSH isolado;
+- [x] validar conexão, identidade, timeout e falhas;
+- [x] validar políticas `LOW`, `MEDIUM`, `HIGH` e `CRITICAL`;
+- [x] atualizar documentação e evidências;
 - [ ] executar auditoria, build e instalação limpa;
 - [ ] preparar e criar a tag `v1.4.0`.
 
