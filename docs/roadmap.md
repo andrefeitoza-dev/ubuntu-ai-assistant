@@ -276,8 +276,8 @@ agentes especializados com limites operacionais explícitos.
 - [x] emitir eventos e métricas estruturadas;
 - [x] integrar progresso, automações e agentes à GUI;
 - [x] validar tarefas longas, retomada e agentes especializados;
-- [ ] executar auditoria, build e instalação limpa;
-- [ ] preparar e criar a tag `v1.5.0`.
+- [x] executar auditoria, build e instalação limpa;
+- [x] preparar e criar a tag `v1.5.0`.
 
 ---
 

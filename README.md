@@ -4,7 +4,7 @@ Framework local e extensível para construir agentes inteligentes voltados à ad
 
 O Ubuntu AI transforma solicitações em linguagem natural em planos auditáveis, apresenta um preview, aplica políticas de risco, solicita confirmação quando necessário e executa comandos de forma controlada.
 
-## Recursos da v1.4.0
+## Recursos da v1.5.0
 
 - GUI desktop moderna em Tkinter;
 - launcher, ícone e integração com o Dock do Ubuntu;
@@ -29,6 +29,12 @@ O Ubuntu AI transforma solicitações em linguagem natural em planos auditáveis
 - diagnóstico remoto de sistema, CPU, memória, disco, rede e serviços;
 - seleção explícita e visível do computador de destino;
 - timeout, cancelamento e auditoria separados por host;
+
+- tarefas longas com progresso, pausa e cancelamento;
+- persistência de checkpoints e retomada segura;
+- agendamento protegido por classificação de risco;
+- agentes especializados em sistema, rede, armazenamento e serviços;
+- observabilidade estruturada e progresso na GUI;
 
 ## Requisitos
 

@@ -1,6 +1,6 @@
 # Ubuntu AI Assistant Architecture
 
-**Versão:** 1.4.0
+**Versão:** 1.5.0
 **Status:** Estável — v1.2.0
 **Arquitetura:** Clean Architecture + SOLID + Strategy + Dependency Injection
 
@@ -387,6 +387,19 @@ não autorizadas permanecem bloqueados.
 
 A GUI mantém o computador selecionado visível e impede operações quando o
 destino remoto não está definido.
+
+## v1.5 — Automação e agentes especializados
+
+A camada de autonomia gerencia tarefas longas, progresso, cancelamento,
+checkpoints, retomada e agendamento. Estados e transições são observáveis e
+persistidos com permissões restritas.
+
+Agentes de sistema, rede, armazenamento e serviços produzem planos dentro de
+escopos explícitos. A política central continua responsável pela confirmação e
+pelo bloqueio de riscos críticos.
+
+A telemetria registra somente identificadores, estados, progresso e mensagens
+controladas, sem armazenar payloads, comandos ou credenciais.
 
 # Conclusão
 

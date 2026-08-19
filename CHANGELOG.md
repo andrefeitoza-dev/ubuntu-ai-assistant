@@ -2,6 +2,29 @@
 
 Todas as mudanças relevantes deste projeto são registradas neste arquivo.
 
+## [1.5.0] - 2026-08-19
+
+### Added
+
+- Tarefas longas com progresso observável.
+- Checkpoints, retomada e agendamento seguro.
+- Histórico persistente de automações.
+- Agentes especializados de sistema, rede, armazenamento e serviços.
+- Eventos, métricas e indicador de automações na GUI.
+
+### Security
+
+- Recuperação sempre retorna ao estado pendente.
+- Agendamentos sensíveis exigem confirmação.
+- Ações críticas não podem ser agendadas ou delegadas.
+- Limites de ações, tentativas e duração por agente.
+- Elevação automática permanece bloqueada.
+
+### Validation
+
+- Concorrência, persistência, retomada e agendamento validados.
+- Isolamento, limites e políticas dos agentes validados.
+
 ## [1.4.0] - 2026-08-19
 
 ### Added

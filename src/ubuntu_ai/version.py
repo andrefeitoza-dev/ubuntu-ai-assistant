@@ -1,7 +1,7 @@
 from importlib.metadata import PackageNotFoundError, version
 
 PACKAGE_NAME = "ubuntu-ai-assistant"
-FALLBACK_VERSION = "1.4.0"
+FALLBACK_VERSION = "1.5.0"
 
 
 def get_version() -> str:

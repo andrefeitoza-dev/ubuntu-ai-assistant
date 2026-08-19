@@ -4,40 +4,35 @@
 
 ## Estado atual
 
-- Versão: `1.4.0`
-- Branch: `develop/v1.4`
-- Release `v1.3.0`: concluída e publicada
-- R1, R2 e R3 da v1.4: concluídos
-- R4: auditoria e release final
+- Versão: `1.5.0`
+- Branch: `develop/v1.5`
+- Releases `v1.3.0` e `v1.4.0`: concluídas e publicadas
+- A1, A2 e A3: concluídos
+- A4: auditoria e release final
 
-## Funcionalidades validadas
+## Capacidades da v1.5
 
-- respostas locais rápidas e conversa pelo Ollama;
-- contexto inteligente do computador local;
-- ações desktop e pesquisas locais seguras;
-- administração remota por SSH;
-- inventário persistente de hosts autorizados;
-- autenticação por chave e validação de `known_hosts`;
-- diagnóstico remoto;
-- seleção explícita do destino na GUI;
-- timeout e cancelamento remoto;
-- matriz de risco remoto completa;
-- auditoria e histórico separados por host.
+- tarefas longas observáveis;
+- progresso incremental;
+- pausa, retomada, cancelamento e timeout;
+- checkpoints SQLite com permissões restritas;
+- recuperação segura após interrupção;
+- agendamento local protegido por risco;
+- histórico de automações;
+- agentes especializados;
+- limites por agente e ambiente;
+- replanejamento seguro;
+- eventos e métricas estruturadas;
+- progresso de automações na GUI.
 
-## Segurança remota
+## Evidências
 
-O assistente não utiliza senha SSH interativa, não tenta elevar privilégios
-automaticamente e não executa comandos por shells intermediários. O destino
-permanece visível, e alterações exigem confirmação proporcional ao risco.
-
-## Evidências da v1.4
-
-- `docs/releases/v1.4-r1-foundation-validation.md`
-- `docs/releases/v1.4-r2-context-execution-validation.md`
-- `docs/releases/v1.4-r3-gui-audit-validation.md`
-- `docs/releases/v1.4-ssh-integration-validation.md`
-- `docs/releases/v1.4.0.md`
+- `docs/releases/v1.5-a1-long-tasks-validation.md`
+- `docs/releases/v1.5-a2-persistence-scheduling-validation.md`
+- `docs/releases/v1.5-a3-specialized-agents-validation.md`
+- `docs/releases/v1.5-a4-observability-validation.md`
+- `docs/releases/v1.5.0.md`
 
 ## Próxima evolução
 
-A v1.5 será dedicada a automação, tarefas longas e agentes especializados.
+A v1.6 será dedicada à distribuição, atualizações e integrações.
