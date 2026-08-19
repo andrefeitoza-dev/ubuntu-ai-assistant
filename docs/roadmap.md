@@ -194,18 +194,49 @@ resposta determinística segura for suficiente.
 
 ## v1.4 — Administração remota segura
 
-### Planejado
+### Objetivo
 
-- cadastro de hosts Ubuntu remotos;
-- conexão SSH com validação de identidade;
-- diagnóstico remoto;
-- planejamento com contexto do host selecionado;
-- execução remota usando a mesma política de risco;
-- confirmação explícita para ações remotas;
-- logs separados por host;
-- timeout, cancelamento e recuperação de conexão;
-- inventário básico dos servidores;
-- testes de integração com ambiente SSH isolado.
+Administrar computadores Ubuntu autorizados por SSH, preservando identificação
+explícita do destino, autenticação segura, confirmação proporcional ao risco e
+auditoria separada por host.
+
+### R1 — Fundação SSH segura
+
+- [x] validar nomes, endereços, usuários, portas e argumentos;
+- [x] persistir inventário de hosts com permissão `0600`;
+- [x] aceitar somente caminhos absolutos para chaves e `known_hosts`;
+- [x] exigir verificação da identidade do servidor;
+- [x] desabilitar autenticação interativa por senha;
+- [x] limitar timeouts de conexão e execução;
+- [x] bloquear elevação automática e shells intermediários;
+- [x] validar a fundação com testes automatizados.
+
+### R2 — Contexto e execução remota
+
+- [ ] cadastrar, listar, editar e remover hosts autorizados;
+- [ ] testar conectividade e apresentar diagnóstico amigável;
+- [ ] consultar sistema, CPU, memória, disco, rede e serviços;
+- [ ] aplicar classificação de risco aos comandos remotos;
+- [ ] implementar confirmação, cancelamento e timeout;
+- [ ] separar contexto local e contexto remoto.
+
+### R3 — GUI e auditoria
+
+- [ ] selecionar explicitamente o computador de destino;
+- [ ] manter o destino visível durante toda a operação;
+- [ ] impedir execução quando o destino estiver indefinido;
+- [ ] apresentar conexão, diagnóstico, resultado e falhas na GUI;
+- [ ] manter histórico e logs separados por host;
+- [ ] proteger contra execução acidental no computador errado.
+
+### R4 — Integração e release v1.4.0
+
+- [ ] preparar ambiente SSH isolado;
+- [ ] validar conexão, identidade, timeout e falhas;
+- [ ] validar políticas `LOW`, `MEDIUM`, `HIGH` e `CRITICAL`;
+- [ ] atualizar documentação e evidências;
+- [ ] executar auditoria, build e instalação limpa;
+- [ ] preparar e criar a tag `v1.4.0`.
 
 ---
 

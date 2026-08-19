@@ -29,15 +29,29 @@ class SSHExecutor:
 
         remote_command = shlex.join(command.argv)
 
+        ssh_argv = [
+            "ssh",
+            "-o",
+            "BatchMode=yes",
+            "-o",
+            "PasswordAuthentication=no",
+            "-o",
+            "KbdInteractiveAuthentication=no",
+            "-o",
+            "StrictHostKeyChecking=yes",
+            "-o",
+            f"ConnectTimeout={int(host.connect_timeout)}",
+            "-p",
+            str(host.port),
+        ]
+        if host.identity_file:
+            ssh_argv.extend(("-i", host.identity_file, "-o", "IdentitiesOnly=yes"))
+        if host.known_hosts_file:
+            ssh_argv.extend(("-o", f"UserKnownHostsFile={host.known_hosts_file}"))
+        ssh_argv.extend(("--", target, remote_command))
+
         result = self._runner.run(
-            (
-                "ssh",
-                "-p",
-                str(host.port),
-                "--",
-                target,
-                remote_command,
-            ),
+            ssh_argv,
             timeout=command.timeout,
         )
 
