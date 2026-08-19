@@ -222,12 +222,12 @@ auditoria separada por host.
 
 ### R3 — GUI e auditoria
 
-- [ ] selecionar explicitamente o computador de destino;
-- [ ] manter o destino visível durante toda a operação;
-- [ ] impedir execução quando o destino estiver indefinido;
-- [ ] apresentar conexão, diagnóstico, resultado e falhas na GUI;
-- [ ] manter histórico e logs separados por host;
-- [ ] proteger contra execução acidental no computador errado.
+- [x] selecionar explicitamente o computador de destino;
+- [x] manter o destino visível durante toda a operação;
+- [x] impedir execução quando o destino estiver indefinido;
+- [x] apresentar conexão, diagnóstico, resultado e falhas na GUI;
+- [x] manter histórico e logs separados por host;
+- [x] proteger contra execução acidental no computador errado.
 
 ### R4 — Integração e release v1.4.0
 

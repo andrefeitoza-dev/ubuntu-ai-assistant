@@ -4,10 +4,12 @@ import threading
 import tkinter as tk
 from pathlib import Path
 from time import perf_counter
+from tkinter import messagebox, simpledialog
 
 from ubuntu_ai.agent_loop.models import LoopSnapshot, LoopState
 from ubuntu_ai.gui.backend import GUIBackend
 from ubuntu_ai.interaction import ChatResponse, InteractionRoute
+from ubuntu_ai.remote.diagnostics import RemoteSystemContext
 
 # ---------------------------------------------------------------------------
 # Theme
@@ -54,6 +56,7 @@ class UbuntuAIApp:
         self._set_window_icon()
 
         self._build_interface()
+        self._refresh_remote_targets()
         self._bind_accessibility_shortcuts()
         self._show_welcome()
 
@@ -132,6 +135,57 @@ class UbuntuAIApp:
             font=("Sans", 10),
         )
         self.status_label.pack(side=tk.RIGHT)
+
+        target = tk.Frame(header, bg=BACKGROUND)
+        target.pack(side=tk.RIGHT, padx=(0, 24))
+
+        tk.Label(
+            target,
+            text="Destino:",
+            bg=BACKGROUND,
+            fg=TEXT_MUTED,
+            font=("Sans", 9),
+        ).pack(side=tk.LEFT, padx=(0, 6))
+
+        self.target_variable = tk.StringVar(value="local")
+        self.target_menu = tk.OptionMenu(
+            target,
+            self.target_variable,
+            "local",
+            command=self._on_target_selected,
+        )
+        self.target_menu.configure(
+            bg=SURFACE_ALT,
+            fg=TEXT,
+            activebackground=SURFACE_HOVER,
+            activeforeground=TEXT,
+            highlightthickness=0,
+            borderwidth=0,
+            font=("Sans", 9),
+            cursor="hand2",
+        )
+        self.target_menu["menu"].configure(bg=SURFACE_ALT, fg=TEXT)
+        self.target_menu.pack(side=tk.LEFT)
+
+        for label, command in (
+            ("+", self._add_remote_host),
+            ("−", self._remove_remote_host),
+            ("Diagnosticar", self._start_remote_diagnostics),
+        ):
+            tk.Button(
+                target,
+                text=label,
+                command=command,
+                bg=BACKGROUND,
+                fg=TEXT_MUTED,
+                activebackground=SURFACE_HOVER,
+                activeforeground=TEXT,
+                relief=tk.FLAT,
+                borderwidth=0,
+                cursor="hand2",
+                takefocus=True,
+                font=("Sans", 9),
+            ).pack(side=tk.LEFT, padx=(5, 0))
 
         self.content = tk.Frame(
             self.root,
@@ -267,6 +321,117 @@ class UbuntuAIApp:
 
         self.request_entry.focus_set()
 
+    def _refresh_remote_targets(self) -> None:
+        names = ("local", *(host.name for host in self._backend.remote_hosts()))
+        menu = self.target_menu["menu"]
+        menu.delete(0, tk.END)
+        for name in names:
+            menu.add_command(
+                label=name,
+                command=lambda selected=name: self._select_target(selected),
+            )
+        if self.target_variable.get() not in names:
+            self._select_target("local")
+
+    def _select_target(self, name: str) -> None:
+        host = self._backend.select_target(name)
+        self.target_variable.set(host.name)
+        remote = host.name.lower() != "local"
+        self.target_menu.configure(fg=WARNING if remote else TEXT)
+        self.status_label.configure(
+            text=f"●  {'Remoto: ' + host.name if remote else 'Pronto'}",
+            fg=WARNING if remote else SUCCESS,
+        )
+
+    def _on_target_selected(self, name: str) -> None:
+        try:
+            self._select_target(name)
+        except (KeyError, ValueError) as exc:
+            messagebox.showerror("Destino inválido", str(exc), parent=self.root)
+            self._select_target("local")
+
+    def _add_remote_host(self) -> None:
+        name = simpledialog.askstring("Novo host", "Nome do destino:", parent=self.root)
+        if not name:
+            return
+        hostname = simpledialog.askstring("Novo host", "Hostname ou IP:", parent=self.root)
+        if not hostname:
+            return
+        user = simpledialog.askstring("Novo host", "Usuário SSH (opcional):", parent=self.root)
+        port_text = simpledialog.askstring(
+            "Novo host", "Porta SSH:", initialvalue="22", parent=self.root
+        )
+        identity = simpledialog.askstring(
+            "Novo host", "Caminho absoluto da chave (opcional):", parent=self.root
+        )
+        known_hosts = simpledialog.askstring(
+            "Novo host", "Caminho absoluto de known_hosts (opcional):", parent=self.root
+        )
+        try:
+            host = self._backend.register_remote_host(
+                name=name,
+                hostname=hostname,
+                user=user or None,
+                port=int(port_text or "22"),
+                identity_file=identity or None,
+                known_hosts_file=known_hosts or None,
+            )
+        except (TypeError, ValueError) as exc:
+            messagebox.showerror("Host não cadastrado", str(exc), parent=self.root)
+            return
+        self._refresh_remote_targets()
+        self._select_target(host.name)
+
+    def _remove_remote_host(self) -> None:
+        name = self.target_variable.get()
+        if name == "local":
+            messagebox.showinfo(
+                "Destino local", "O computador local não pode ser removido.", parent=self.root
+            )
+            return
+        if not messagebox.askyesno("Remover host", f"Remover o destino {name}?", parent=self.root):
+            return
+        self._backend.remove_remote_host(name)
+        self._refresh_remote_targets()
+
+    def _start_remote_diagnostics(self) -> None:
+        if not self._backend.is_remote_selected:
+            messagebox.showinfo(
+                "Destino remoto", "Selecione primeiro um computador remoto.", parent=self.root
+            )
+            return
+        operation = self._begin_operation("Conectando")
+        threading.Thread(
+            target=self._collect_remote_diagnostics,
+            args=(operation,),
+            daemon=True,
+        ).start()
+
+    def _collect_remote_diagnostics(self, operation: int) -> None:
+        try:
+            health = self._backend.test_remote_connection()
+            if not health.healthy:
+                raise ConnectionError(health.message)
+            context = self._backend.remote_diagnostics()
+        except Exception as exc:
+            self.root.after(0, self._deliver_error, operation, str(exc))
+            return
+        self.root.after(0, self._deliver_remote_diagnostics, operation, context)
+
+    def _deliver_remote_diagnostics(
+        self,
+        operation: int,
+        context: RemoteSystemContext,
+    ) -> None:
+        if operation != self._operation_generation:
+            return
+        self._set_busy(False)
+        lines = [f"Diagnóstico remoto · {context.host_name}"]
+        for item in context.items:
+            status = "OK" if item.success else "FALHA"
+            lines.append(f"\n[{status}] {item.name}\n{item.output or 'Sem saída.'}")
+        self._add_system_message("\n".join(lines), color=TEXT)
+
     def _show_welcome(self) -> None:
         self.welcome = tk.Frame(
             self.messages,
@@ -331,6 +496,15 @@ class UbuntuAIApp:
                 args=(request, operation),
                 daemon=True,
             ).start()
+            return
+
+        if self._backend.is_remote_selected:
+            self._add_system_message(
+                "Destino remoto selecionado. Por segurança, use Diagnosticar para "
+                "consultas remotas nesta etapa. A solicitação não foi executada localmente.",
+                color=WARNING,
+            )
+            self.request_entry.focus_set()
             return
 
         operation = self._begin_operation("Analisando")

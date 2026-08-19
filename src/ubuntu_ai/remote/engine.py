@@ -1,10 +1,12 @@
 from __future__ import annotations
 
+from ubuntu_ai.remote.audit import RemoteAuditRecord, RemoteAuditService
 from ubuntu_ai.remote.docker_executor import DockerExecutor
 from ubuntu_ai.remote.local_executor import LocalExecutor
 from ubuntu_ai.remote.models import (
     RemoteCommand,
     RemoteExecutionResult,
+    RemoteHost,
     RemoteHostKind,
 )
 from ubuntu_ai.remote.policy import RemoteExecutionPolicy
@@ -27,12 +29,24 @@ class RemoteExecutionEngine:
         ssh_executor: SSHExecutor | None = None,
         docker_executor: DockerExecutor | None = None,
         policy: RemoteExecutionPolicy | None = None,
+        audit: RemoteAuditService | None = None,
     ) -> None:
         self._registry = registry
         self._local = local_executor or LocalExecutor()
         self._ssh = ssh_executor or SSHExecutor()
         self._docker = docker_executor or DockerExecutor()
         self._policy = policy or RemoteExecutionPolicy()
+        self._audit = audit
+
+    @property
+    def registry(self) -> RemoteHostRegistry:
+        return self._registry
+
+    def audit_records(self, host_name: str) -> tuple[RemoteAuditRecord, ...]:
+        if self._audit is None:
+            return ()
+        self._registry.get(host_name)
+        return self._audit.records(host_name)
 
     def execute(
         self,
@@ -50,6 +64,36 @@ class RemoteExecutionEngine:
         if decision.requires_confirmation and not confirmed:
             raise RemoteConfirmationRequired(decision.reason)
 
+        if self._audit is not None:
+            self._audit.record(
+                host,
+                command.argv,
+                decision.risk,
+                status="started",
+            )
+
+        try:
+            result = self._dispatch(host, command)
+        except Exception:
+            if self._audit is not None:
+                self._audit.record(host, command.argv, decision.risk, status="failed")
+            raise
+
+        if self._audit is not None:
+            self._audit.record(
+                host,
+                command.argv,
+                decision.risk,
+                result=result,
+                status="completed" if result.success else "failed",
+            )
+        return result
+
+    def _dispatch(
+        self,
+        host: RemoteHost,
+        command: RemoteCommand,
+    ) -> RemoteExecutionResult:
         if host.kind is RemoteHostKind.LOCAL:
             return self._local.execute(host, command)
 

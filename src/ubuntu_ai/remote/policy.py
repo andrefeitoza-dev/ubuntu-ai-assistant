@@ -45,6 +45,7 @@ class RemoteExecutionPolicy:
         "nproc",
         "ps",
         "systemctl",
+        "true",
         "uname",
         "uptime",
         "whoami",

@@ -46,8 +46,10 @@ from ubuntu_ai.planner.planner import Planner
 from ubuntu_ai.planner.rule_planner import RulePlanner
 from ubuntu_ai.plugins import PluginManager, PluginPolicy, PluginRegistry
 from ubuntu_ai.reflection.engine import ReflectionEngine
+from ubuntu_ai.remote.audit import default_remote_audit_directory
 from ubuntu_ai.remote.engine import RemoteExecutionEngine
 from ubuntu_ai.remote.factory import build_remote_engine
+from ubuntu_ai.remote.inventory import default_inventory_path
 from ubuntu_ai.renderer.preview_renderer import PreviewRenderer
 from ubuntu_ai.runtime_integration.factory import build_multi_agent_runtime
 from ubuntu_ai.runtime_integration.runtime import MultiAgentRuntime
@@ -582,7 +584,10 @@ class Container:
 
         return self._singleton(
             "remote_execution_engine",
-            build_remote_engine,
+            lambda: build_remote_engine(
+                inventory_path=default_inventory_path(),
+                audit_directory=default_remote_audit_directory(),
+            ),
         )
 
     def runtime_telemetry(self) -> RuntimeTelemetry:

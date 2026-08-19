@@ -18,6 +18,8 @@ from ubuntu_ai.remote.registry import RemoteHostRegistry
 
 __all__ = [
     "RemoteCommand",
+    "RemoteAuditRecord",
+    "RemoteAuditService",
     "RemoteCancellationToken",
     "RemoteDiagnosticService",
     "RemoteExecutionEngine",
@@ -29,3 +31,4 @@ __all__ = [
     "RemoteInventoryService",
     "RemoteSystemContext",
 ]
+from ubuntu_ai.remote.audit import RemoteAuditRecord, RemoteAuditService
