@@ -55,12 +55,13 @@ class SystemExecutor:
                 )
         except Exception as error:
             duration = perf_counter() - started_at
+            detail = str(error)
 
             return ExecutionResult(
                 status=ExecutionStatus.FAILED,
-                message=f"Falha ao executar o comando: {error}",
+                message=self._failure_message(detail),
                 command=command,
-                stderr=str(error),
+                stderr=detail,
                 duration=duration,
             )
 
@@ -79,10 +80,36 @@ class SystemExecutor:
 
         return ExecutionResult(
             status=ExecutionStatus.FAILED,
-            message="O comando terminou com erro.",
+            message=self._failure_message(command_result.stderr),
             command=command_result.command,
             return_code=command_result.return_code,
             stdout=command_result.stdout,
             stderr=command_result.stderr,
             duration=duration,
         )
+
+    @staticmethod
+    def _failure_message(detail: str) -> str:
+        normalized = detail.casefold()
+        permission_markers = (
+            "permission denied",
+            "permissão negada",
+            "operation not permitted",
+            "operação não permitida",
+            "errno 13",
+        )
+        if any(marker in normalized for marker in permission_markers):
+            return (
+                "A operação não foi executada porque o usuário atual não possui "
+                "permissão. Nenhuma elevação automática foi tentada."
+            )
+
+        missing_markers = (
+            "no such file or directory",
+            "arquivo ou diretório inexistente",
+            "errno 2",
+        )
+        if any(marker in normalized for marker in missing_markers):
+            return "O recurso solicitado não foi encontrado."
+
+        return "O comando terminou com erro."

@@ -186,9 +186,9 @@ resposta determinística segura for suficiente.
 - [x] iniciar aplicativos Ubuntu por identificadores confiáveis;
 - [x] tratar pedidos ambíguos, como “abra meu e-mail”;
 - [x] bloquear esquemas, caminhos e argumentos potencialmente perigosos;
-- [ ] explicar falhas de permissão sem tentar elevação automática;
+- [x] explicar falhas de permissão sem tentar elevação automática;
 - [x] consolidar perfil automático de saúde do computador;
-- [ ] validar consultas locais na GUI e documentar evidências.
+- [x] validar consultas locais na GUI e documentar evidências.
 
 ---
 

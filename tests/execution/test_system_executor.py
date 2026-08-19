@@ -61,6 +61,52 @@ def test_system_executor_returns_failed_result() -> None:
     assert result.duration >= 0
 
 
+def test_system_executor_explains_permission_denied_without_elevation() -> None:
+    shell_service = Mock(spec=ShellService)
+    shell_service.run.return_value = CommandResult(
+        command="find /protected",
+        return_code=1,
+        stdout="",
+        stderr="find: /protected: Permission denied",
+    )
+    executor = SystemExecutor(shell_service=shell_service)
+
+    result = executor.execute(ExecutionRequest(command="find /protected"))
+
+    assert result.status is ExecutionStatus.FAILED
+    assert "não possui permissão" in result.message
+    assert "Nenhuma elevação automática" in result.message
+    assert result.stderr == "find: /protected: Permission denied"
+
+
+def test_system_executor_distinguishes_missing_resource() -> None:
+    shell_service = Mock(spec=ShellService)
+    shell_service.run.return_value = CommandResult(
+        command="ls /missing",
+        return_code=2,
+        stdout="",
+        stderr="ls: cannot access '/missing': No such file or directory",
+    )
+    executor = SystemExecutor(shell_service=shell_service)
+
+    result = executor.execute(ExecutionRequest(command="ls /missing"))
+
+    assert result.status is ExecutionStatus.FAILED
+    assert result.message == "O recurso solicitado não foi encontrado."
+
+
+def test_system_executor_explains_permission_exception() -> None:
+    shell_service = Mock(spec=ShellService)
+    shell_service.run.side_effect = PermissionError(13, "Permission denied")
+    executor = SystemExecutor(shell_service=shell_service)
+
+    result = executor.execute(ExecutionRequest(command="cat /protected"))
+
+    assert result.status is ExecutionStatus.FAILED
+    assert "não possui permissão" in result.message
+    assert "Nenhuma elevação automática" in result.message
+
+
 def test_system_executor_preserves_quoted_arguments() -> None:
     shell_service = Mock(spec=ShellService)
     shell_service.run.return_value = CommandResult(
