@@ -140,4 +140,3 @@ class AutonomousLoopController:
                     retry_scheduled=False,
                     reason="Limite de tentativas atingido.",
                 )
-

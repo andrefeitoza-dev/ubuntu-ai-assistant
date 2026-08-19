@@ -1,5 +1,6 @@
 from ubuntu_ai.autonomy.goal import Goal
 from ubuntu_ai.autonomy.goal_manager import GoalManager
+from ubuntu_ai.autonomy.long_tasks import LongTask
 from ubuntu_ai.autonomy.models import AutonomousCycleResult
 from ubuntu_ai.autonomy.runtime import AutonomousRuntime
 
@@ -45,3 +46,22 @@ def test_autonomous_runtime_registers_and_runs_goal() -> None:
     )
 
     assert result.completed
+
+
+def test_autonomous_runtime_exposes_long_tasks() -> None:
+    manager = GoalManager()
+    runtime = AutonomousRuntime(
+        controller=FakeController(),
+        goal_manager=manager,
+    )
+
+    registered = runtime.register_long_task(
+        LongTask(
+            task_id="long-1",
+            goal_id="g1",
+            description="Diagnóstico prolongado",
+            total_steps=3,
+        )
+    )
+
+    assert runtime.long_tasks.get("long-1") == registered

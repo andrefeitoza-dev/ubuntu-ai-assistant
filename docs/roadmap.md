@@ -242,17 +242,42 @@ auditoria separada por host.
 
 ## v1.5 — Automação e agentes especializados
 
-### Planejado
+### Objetivo
 
-- tarefas longas com progresso;
-- retomada segura após interrupção;
-- agendamento local de tarefas;
-- agentes especializados em sistema, rede, armazenamento e serviços;
-- replanejamento baseado em falhas;
-- observabilidade estruturada;
-- histórico de automações;
-- limites operacionais por agente;
-- políticas específicas por ambiente.
+Executar automações longas de forma observável, retomável e segura, usando
+agentes especializados com limites operacionais explícitos.
+
+### A1 — Tarefas longas e progresso
+
+- [x] formalizar estados de tarefas longas;
+- [x] publicar progresso incremental para observadores;
+- [x] implementar pausa, retomada e cancelamento cooperativos;
+- [x] limitar duração de tarefas;
+- [x] impedir retrocesso e extrapolação do progresso;
+- [x] integrar o gerenciador ao runtime autônomo;
+- [x] validar concorrência, limites e transições com testes automatizados.
+
+### A2 — Persistência, retomada e agendamento
+
+- [ ] persistir tarefas e checkpoints sem armazenar segredos;
+- [ ] recuperar tarefas interrompidas de forma segura;
+- [ ] agendar execuções locais com política de risco;
+- [ ] manter histórico de automações e tentativas.
+
+### A3 — Agentes especializados
+
+- [ ] especializar agentes de sistema, rede, armazenamento e serviços;
+- [ ] aplicar limites operacionais por agente e ambiente;
+- [ ] replanejar tarefas com base em falhas observadas;
+- [ ] impedir que agentes contornem confirmação ou política de risco.
+
+### A4 — Observabilidade e release v1.5.0
+
+- [ ] emitir eventos e métricas estruturadas;
+- [ ] integrar progresso, automações e agentes à GUI;
+- [ ] validar tarefas longas, retomada e agentes especializados;
+- [ ] executar auditoria, build e instalação limpa;
+- [ ] preparar e criar a tag `v1.5.0`.
 
 ---
 
