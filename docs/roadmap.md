@@ -235,8 +235,8 @@ auditoria separada por host.
 - [x] validar conexão, identidade, timeout e falhas;
 - [x] validar políticas `LOW`, `MEDIUM`, `HIGH` e `CRITICAL`;
 - [x] atualizar documentação e evidências;
-- [ ] executar auditoria, build e instalação limpa;
-- [ ] preparar e criar a tag `v1.4.0`.
+- [x] executar auditoria, build e instalação limpa;
+- [x] preparar e criar a tag `v1.4.0`.
 
 ---
 

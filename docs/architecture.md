@@ -1,6 +1,6 @@
 # Ubuntu AI Assistant Architecture
 
-**Versão:** 1.3.0
+**Versão:** 1.4.0
 **Status:** Estável — v1.2.0
 **Arquitetura:** Clean Architecture + SOLID + Strategy + Dependency Injection
 
@@ -374,6 +374,19 @@ confirmação explícita. Falhas de permissão nunca provocam elevação automá
 
 Fast Path adaptativo, aprendizado de frases, administração remota, agentes
 especializados, observabilidade, automação e distribuição ampliada.
+
+## v1.4 — Administração remota segura
+
+A camada remota administra hosts Ubuntu autorizados por SSH. O inventário,
+diagnóstico, política de risco, cancelamento e auditoria permanecem separados
+por destino.
+
+A autenticação utiliza chaves, verificação obrigatória de `known_hosts` e modo
+não interativo. Elevação automática, shells intermediários e ações críticas
+não autorizadas permanecem bloqueados.
+
+A GUI mantém o computador selecionado visível e impede operações quando o
+destino remoto não está definido.
 
 # Conclusão
 

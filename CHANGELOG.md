@@ -2,6 +2,30 @@
 
 Todas as mudanças relevantes deste projeto são registradas neste arquivo.
 
+## [1.4.0] - 2026-08-19
+
+### Added
+
+- Administração remota segura por SSH.
+- Inventário persistente de hosts autorizados.
+- Diagnóstico e contexto remoto.
+- Seleção explícita do destino na GUI.
+- Timeout, cancelamento e auditoria separados por host.
+- Ambiente SSH real e isolado para testes de integração.
+
+### Security
+
+- Autenticação não interativa exclusivamente por chave.
+- Verificação obrigatória por `known_hosts`.
+- Elevação automática e shells intermediários bloqueados.
+- Matriz remota `LOW`, `MEDIUM`, `HIGH` e `CRITICAL`.
+- Proteção contra execução no computador errado.
+
+### Validation
+
+- Integração SSH real e isolada aprovada.
+- Identidade, autenticação, timeout e chave não autorizada validados.
+
 ## [1.3.0] - 2026-08-19
 
 ### Added

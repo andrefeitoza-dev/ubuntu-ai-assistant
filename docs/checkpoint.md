@@ -4,46 +4,40 @@
 
 ## Estado atual
 
-- Versão: `1.3.0`
-- Branch: `develop/v1.3`
-- Release-base: `v1.2.0`
-- F1, F2, F3 técnica e F4: concluídas
-- Release `v1.3.0`: concluída e validada
+- Versão: `1.4.0`
+- Branch: `develop/v1.4`
+- Release `v1.3.0`: concluída e publicada
+- R1, R2 e R3 da v1.4: concluídos
+- R4: auditoria e release final
 
 ## Funcionalidades validadas
 
-- GUI, launcher, ícone e integração com o Dock;
-- roteamento `LOCAL`, `ACTION` e `CHAT`;
-- conversa geral pelo Ollama com memória recente;
-- Fast Path adaptativo e aprendizado aprovado;
-- cancelamento protegido contra resultados antigos;
-- contexto automático e perfil de saúde do computador;
-- consultas de sistema, hardware, memória, disco, rede e serviços;
-- busca segura de arquivos e pastas;
-- ações desktop para pastas, arquivos, sites e aplicativos;
-- tratamento de ambiguidade e bloqueio de destinos perigosos;
-- mensagens de permissão sem elevação automática;
-- métricas e benchmark reproduzível;
-- 609 testes aprovados antes da auditoria final.
+- respostas locais rápidas e conversa pelo Ollama;
+- contexto inteligente do computador local;
+- ações desktop e pesquisas locais seguras;
+- administração remota por SSH;
+- inventário persistente de hosts autorizados;
+- autenticação por chave e validação de `known_hosts`;
+- diagnóstico remoto;
+- seleção explícita do destino na GUI;
+- timeout e cancelamento remoto;
+- matriz de risco remoto completa;
+- auditoria e histórico separados por host.
 
-## Segurança
+## Segurança remota
 
-Somente planos `LOW` executam automaticamente. Planos `MEDIUM`, `HIGH` e
-`CRITICAL` exigem confirmação. Caminhos, URLs e aplicativos são validados.
-Nenhuma falha de permissão provoca uso automático de `sudo`.
+O assistente não utiliza senha SSH interativa, não tenta elevar privilégios
+automaticamente e não executa comandos por shells intermediários. O destino
+permanece visível, e alterações exigem confirmação proporcional ao risco.
 
-## Evidências
+## Evidências da v1.4
 
-- `docs/releases/v1.3-performance-validation.md`
-- `docs/releases/v1.3-local-context-validation.md`
-- `docs/releases/v1.3-desktop-actions-validation.md`
-- `docs/releases/v1.3.0.md`
-
-## Próxima tarefa
-
-Preparar os cenários, roteiro e materiais da apresentação do TCC
-usando a release estável `v1.3.0`.
+- `docs/releases/v1.4-r1-foundation-validation.md`
+- `docs/releases/v1.4-r2-context-execution-validation.md`
+- `docs/releases/v1.4-r3-gui-audit-validation.md`
+- `docs/releases/v1.4-ssh-integration-validation.md`
+- `docs/releases/v1.4.0.md`
 
 ## Próxima evolução
 
-A versão `v1.4` iniciará administração remota segura via SSH.
+A v1.5 será dedicada a automação, tarefas longas e agentes especializados.
