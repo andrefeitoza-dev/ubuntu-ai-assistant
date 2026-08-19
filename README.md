@@ -4,25 +4,25 @@ Framework local e extensível para construir agentes inteligentes voltados à ad
 
 O Ubuntu AI transforma solicitações em linguagem natural em planos auditáveis, apresenta um preview, aplica políticas de risco, solicita confirmação quando necessário e executa comandos de forma controlada.
 
-## Recursos da v1.2.0
+## Recursos da v1.3.0
 
-- GUI moderna em Tkinter com launcher e ícone próprios;
-- execução automática exclusiva para risco `LOW`;
-- confirmação para `MEDIUM`, `HIGH` e `CRITICAL`;
-- interrupção cooperativa e atalhos de teclado;
-- instalador `ubuntu-ai-install-launcher`;
+- GUI desktop moderna em Tkinter;
+- launcher, ícone e integração com o Dock do Ubuntu;
 - planejamento determinístico e por IA local com Ollama;
-- preview em modo seguro antes da execução;
-- confirmação humana e políticas de execução;
-- contexto do sistema, memória, conversa e aprendizado;
-- conhecimento local com busca e RAG;
-- skills, plugins e seleção de ferramentas;
-- reflexão antes e depois da execução;
-- Agent Loop com replanejamento controlado;
-- TUI com Rich, spinner e resumo de benchmark;
-- logging rotativo, diagnóstico de IA e benchmark;
-- SDK Python para integração com outras aplicações;
-- suíte com mais de 500 testes automatizados.
+- roteamento entre resposta local, ação segura e conversa;
+- Fast Path adaptativo com sinônimos e similaridade;
+- aprendizado somente após sucesso e aprovação;
+- contexto automático do computador;
+- consultas locais de sistema, CPU, memória, disco, rede e serviços;
+- busca segura de arquivos e pastas;
+- perfil automático de saúde do computador;
+- abertura validada de pastas, arquivos, sites e aplicativos;
+- autoexecução exclusiva para planos `LOW`;
+- confirmação para riscos `MEDIUM`, `HIGH` e `CRITICAL`;
+- mensagens de permissão sem elevação automática;
+- cancelamento confiável de operações;
+- benchmark reproduzível por rota;
+- mais de 600 testes automatizados.
 
 ## Requisitos
 
@@ -104,7 +104,14 @@ print(result.rendered_preview)
 
 ## Estado do projeto
 
-A versão `1.2.0` consolida o assistente como aplicação desktop. A próxima evolução priorizará respostas mais inteligentes e rápidas, Fast Path adaptativo e aprendizado de variações de linguagem.
+A versão `1.3.0` consolida o Ubuntu AI Assistant como aplicação desktop
+inteligente, rápida, contextual e segura. Consultas conhecidas são resolvidas
+localmente em microssegundos ou milissegundos, enquanto o Ollama permanece
+reservado para conversação e raciocínio.
+
+Esta é a versão preparada para apresentação do TCC. As próximas versões
+avançarão para administração remota, automação, agentes especializados,
+distribuição e colaboração multiagente.
 
 ## Licença
 

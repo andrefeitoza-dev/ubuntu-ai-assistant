@@ -172,7 +172,7 @@ resposta determinística segura for suficiente.
 - [x] preparar cenários reproduzíveis de demonstração;
 - [x] validar operação em hardware CPU-only com 8 GB de RAM;
 - [x] documentar arquitetura, segurança e resultados;
-- [ ] executar auditoria e preparar a release de apresentação.
+- [x] executar auditoria e preparar a release de apresentação.
 
 ### F4 — Contexto Local Inteligente
 

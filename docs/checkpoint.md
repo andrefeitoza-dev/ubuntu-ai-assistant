@@ -1,44 +1,49 @@
 # Ubuntu AI Assistant — Development Checkpoint
 
-> Última atualização: 2026-08-18
+> Última atualização: 2026-08-19
 
 ## Estado atual
 
-- Versão-base: `1.2.0`
+- Versão: `1.3.0`
 - Branch: `develop/v1.3`
-- Release `v1.2.0`: concluída
-- Fase atual: v1.3 — inteligência, conversa e desempenho
+- Release-base: `v1.2.0`
+- F1, F2, F3 técnica e F4: concluídas
+- Release `v1.3.0`: concluída e validada
 
 ## Funcionalidades validadas
 
-- GUI Tkinter moderna;
-- launcher no menu e no Dock;
-- ícone e assets no wheel;
-- comando `ubuntu-ai-install-launcher`;
-- instalação e desinstalação isoladas;
-- autoexecução para `LOW`;
-- confirmação para `MEDIUM`, `HIGH` e `CRITICAL`;
-- mensagens amigáveis e interrupção cooperativa;
-- atalhos `Esc` e `Ctrl+L`;
-- CLI, TUI, GUI e SDK preservados.
-- respostas locais instantâneas;
+- GUI, launcher, ícone e integração com o Dock;
+- roteamento `LOCAL`, `ACTION` e `CHAT`;
+- conversa geral pelo Ollama com memória recente;
+- Fast Path adaptativo e aprendizado aprovado;
 - cancelamento protegido contra resultados antigos;
-- roteamento entre resposta local, ação auditável e conversa;
-- conversa geral pelo Ollama sem criar planos executáveis;
-- histórico recente incorporado às respostas conversacionais.
+- contexto automático e perfil de saúde do computador;
+- consultas de sistema, hardware, memória, disco, rede e serviços;
+- busca segura de arquivos e pastas;
+- ações desktop para pastas, arquivos, sites e aplicativos;
+- tratamento de ambiguidade e bloqueio de destinos perigosos;
+- mensagens de permissão sem elevação automática;
+- métricas e benchmark reproduzível;
+- 609 testes aprovados antes da auditoria final.
 
 ## Segurança
 
-Somente planos `LOW` podem executar automaticamente. Planos sensíveis aguardam
-confirmação e podem ser cancelados sem chamar o executor.
+Somente planos `LOW` executam automaticamente. Planos `MEDIUM`, `HIGH` e
+`CRITICAL` exigem confirmação. Caminhos, URLs e aplicativos são validados.
+Nenhuma falha de permissão provoca uso automático de `sudo`.
 
 ## Evidências
 
-- `docs/releases/v1.2.0-risk-validation.md`
-- `docs/releases/v1.2.0-installation-validation.md`
-- `docs/releases/v1.2.0.md`
+- `docs/releases/v1.3-performance-validation.md`
+- `docs/releases/v1.3-local-context-validation.md`
+- `docs/releases/v1.3-desktop-actions-validation.md`
+- `docs/releases/v1.3.0.md`
 
 ## Próxima tarefa
 
-Validar o roteador conversacional na GUI real e avançar para sinônimos,
-similaridade de intenções, aprendizado aprovado e métricas de latência.
+Preparar os cenários, roteiro e materiais da apresentação do TCC
+usando a release estável `v1.3.0`.
+
+## Próxima evolução
+
+A versão `v1.4` iniciará administração remota segura via SSH.

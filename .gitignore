@@ -41,3 +41,10 @@ site/
 .rc*-backup/
 .sprint*-backup/
 .c1-backup/
+
+# Backups locais de editores
+*.bak
+*.backup
+*.orig
+*.rej
+*~

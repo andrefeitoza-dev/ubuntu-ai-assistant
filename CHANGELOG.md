@@ -2,6 +2,36 @@
 
 Todas as mudanças relevantes deste projeto são registradas neste arquivo.
 
+## [1.3.0] - 2026-08-19
+
+### Added
+
+- Roteamento entre resposta local, ação segura e conversa.
+- Conversação pelo Ollama com memória recente.
+- Fast Path adaptativo, sinônimos e aprendizado aprovado.
+- Métricas de latência e benchmark por rota.
+- Contexto local e perfil automático de saúde.
+- Busca segura de arquivos e pastas.
+- Ações desktop validadas para pastas, arquivos, sites e aplicativos.
+- Evidências reproduzíveis para apresentação do TCC.
+
+### Changed
+
+- Consultas conhecidas deixam de utilizar o Ollama.
+- Processos gráficos são iniciados de forma desacoplada.
+- Falhas de permissão recebem mensagens específicas.
+
+### Security
+
+- Autoexecução continua exclusiva para risco `LOW`.
+- Caminhos, URLs e aplicativos recebem validação antes da execução.
+- Nenhuma elevação automática é tentada após falha de permissão.
+
+### Validation
+
+- 609 testes automatizados aprovados antes da auditoria final.
+- Validado em notebook CPU-only com aproximadamente 8 GB de RAM.
+
 ## [1.2.0] - 2026-08-16
 
 ### Added

@@ -1,6 +1,6 @@
 # Ubuntu AI Assistant Architecture
 
-**Versão:** 1.2.0
+**Versão:** 1.3.0
 **Status:** Estável — v1.2.0
 **Arquitetura:** Clean Architecture + SOLID + Strategy + Dependency Injection
 
@@ -353,6 +353,22 @@ Builtin Planner, Fast Path, Response Formatter, vocabulário e melhorias de UX.
 GUI Tkinter, launcher nativo, assets no wheel, instalador reproduzível,
 autoexecução exclusiva para `LOW`, confirmação para riscos sensíveis,
 interrupção cooperativa, acessibilidade e instalação limpa.
+
+## Arquitetura da v1.3
+
+A interação utiliza três rotas:
+
+1. `LOCAL` — respostas determinísticas e métricas do computador;
+2. `ACTION` — planos auditáveis submetidos à política de risco;
+3. `CHAT` — conversação geral pelo Ollama.
+
+O Fast Path resolve consultas conhecidas sem IA generativa. O contexto local
+combina configuração, saúde, sistema de arquivos, rede, processos e serviços.
+Ações desktop usam argumentos estruturados, caminhos validados e uma segunda
+verificação na política de execução.
+
+Somente planos `LOW` podem executar automaticamente. Riscos superiores mantêm
+confirmação explícita. Falhas de permissão nunca provocam elevação automática.
 
 ## Próximas versões
 
