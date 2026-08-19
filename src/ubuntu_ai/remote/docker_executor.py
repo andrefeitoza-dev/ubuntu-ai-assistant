@@ -31,6 +31,7 @@ class DockerExecutor:
                 *command.argv,
             ),
             timeout=command.timeout,
+            cancellation=command.cancellation,
         )
 
         return RemoteExecutionResult(

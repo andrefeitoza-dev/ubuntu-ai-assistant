@@ -213,12 +213,12 @@ auditoria separada por host.
 
 ### R2 — Contexto e execução remota
 
-- [ ] cadastrar, listar, editar e remover hosts autorizados;
-- [ ] testar conectividade e apresentar diagnóstico amigável;
-- [ ] consultar sistema, CPU, memória, disco, rede e serviços;
-- [ ] aplicar classificação de risco aos comandos remotos;
-- [ ] implementar confirmação, cancelamento e timeout;
-- [ ] separar contexto local e contexto remoto.
+- [x] cadastrar, listar, editar e remover hosts autorizados;
+- [x] testar conectividade e apresentar diagnóstico amigável;
+- [x] consultar sistema, CPU, memória, disco, rede e serviços;
+- [x] aplicar classificação de risco aos comandos remotos;
+- [x] implementar confirmação, cancelamento e timeout;
+- [x] separar contexto local e contexto remoto.
 
 ### R3 — GUI e auditoria
 

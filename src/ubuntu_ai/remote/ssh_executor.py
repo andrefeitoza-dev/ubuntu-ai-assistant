@@ -53,6 +53,7 @@ class SSHExecutor:
         result = self._runner.run(
             ssh_argv,
             timeout=command.timeout,
+            cancellation=command.cancellation,
         )
 
         return RemoteExecutionResult(

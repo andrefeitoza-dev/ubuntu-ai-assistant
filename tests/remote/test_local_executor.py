@@ -8,7 +8,7 @@ from ubuntu_ai.remote.runner import ProcessResult
 
 
 class FakeRunner:
-    def run(self, argv, *, timeout):
+    def run(self, argv, *, timeout, cancellation=None):
         return ProcessResult(0, "local-ok", "")
 
 

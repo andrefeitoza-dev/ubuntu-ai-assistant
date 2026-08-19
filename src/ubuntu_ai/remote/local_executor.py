@@ -26,6 +26,7 @@ class LocalExecutor:
         result = self._runner.run(
             command.argv,
             timeout=command.timeout,
+            cancellation=command.cancellation,
         )
 
         return RemoteExecutionResult(

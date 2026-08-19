@@ -1,9 +1,11 @@
 from __future__ import annotations
 
 import re
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from enum import StrEnum
 from pathlib import Path
+
+from ubuntu_ai.remote.cancellation import RemoteCancellationToken
 
 _HOST_NAME = re.compile(r"^[A-Za-z0-9](?:[A-Za-z0-9.-]{0,251}[A-Za-z0-9])?$")
 _USER_NAME = re.compile(r"^[A-Za-z_][A-Za-z0-9_.-]{0,31}$")
@@ -75,6 +77,11 @@ class RemoteCommand:
 
     argv: tuple[str, ...]
     timeout: float = 30.0
+    cancellation: RemoteCancellationToken | None = field(
+        default=None,
+        compare=False,
+        repr=False,
+    )
 
     def __post_init__(self) -> None:
         if not self.argv:
