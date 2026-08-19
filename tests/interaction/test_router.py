@@ -26,6 +26,13 @@ def router() -> InteractionRouter:
         ("qual a memória?", InteractionRoute.ACTION),
         ("mostre os processos", InteractionRoute.ACTION),
         ("mostre a configuração desse computador", InteractionRoute.ACTION),
+        ("mostre os discos e partições", InteractionRoute.ACTION),
+        ("quais serviços estão ativos?", InteractionRoute.ACTION),
+        ("existem serviços com falha?", InteractionRoute.ACTION),
+        ("mostre o gateway padrão", InteractionRoute.ACTION),
+        ("mostre os arquivos ocultos", InteractionRoute.ACTION),
+        ("encontre o arquivo pyproject.toml", InteractionRoute.ACTION),
+        ("procure a pasta Downloads", InteractionRoute.ACTION),
         ("instale o Docker", InteractionRoute.ACTION),
         ("sudo apt update", InteractionRoute.ACTION),
         ("o que é memória RAM?", InteractionRoute.CHAT),
@@ -80,3 +87,12 @@ def test_router_records_selected_route_latency() -> None:
     record = benchmark.report().records[0]
     assert record.operation == "interaction.route.local"
     assert record.success is True
+
+
+def test_router_refuses_unsafe_file_search_without_action() -> None:
+    decision = InteractionRouter().route("encontre o arquivo ../../etc/passwd")
+
+    assert decision.route is InteractionRoute.LOCAL
+    assert decision.response is not None
+    assert "não executada" in decision.response
+    assert "sem caminhos" in decision.response

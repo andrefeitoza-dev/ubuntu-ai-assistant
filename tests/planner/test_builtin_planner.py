@@ -140,3 +140,56 @@ def test_builtin_computer_configuration_uses_real_local_data() -> None:
 
     assert plan is not None
     assert plan.steps[0].command == ["hostnamectl"]
+
+
+def test_builtin_lists_block_devices_without_elevation() -> None:
+    plan = planner.try_create_plan("mostre os discos e partições")
+
+    assert plan is not None
+    assert plan.steps[0].command[0] == "lsblk"
+    assert plan.steps[0].command[-1].endswith("MOUNTPOINTS")
+
+
+def test_builtin_lists_running_services_as_read_only_query() -> None:
+    plan = planner.try_create_plan("quais serviços estão ativos?")
+
+    assert plan is not None
+    assert plan.steps[0].command[:2] == ["systemctl", "list-units"]
+    assert "--state=running" in plan.steps[0].command
+
+
+def test_builtin_lists_failed_services_as_read_only_query() -> None:
+    plan = planner.try_create_plan("existem serviços com falha?")
+
+    assert plan is not None
+    assert plan.steps[0].command == ["systemctl", "--failed", "--no-pager", "--plain"]
+
+
+def test_builtin_shows_network_gateway() -> None:
+    plan = planner.try_create_plan("mostre o gateway padrão")
+
+    assert plan is not None
+    assert plan.steps[0].command == ["ip", "route"]
+
+
+def test_builtin_lists_hidden_files() -> None:
+    plan = planner.try_create_plan("mostre os arquivos ocultos")
+
+    assert plan is not None
+    assert plan.steps[0].command == ["ls", "-la"]
+
+
+def test_builtin_routes_dynamic_file_search_without_ai() -> None:
+    plan = planner.try_create_plan("encontre o arquivo pyproject.toml")
+
+    assert plan is not None
+    assert plan.risk.value == "low"
+    assert plan.steps[0].command[0] == "find"
+    assert plan.steps[0].command[-2] == "*pyproject.toml*"
+
+
+def test_builtin_does_not_fall_back_after_rejected_file_search() -> None:
+    request = "encontre o arquivo ../../etc/passwd"
+
+    assert planner.try_create_plan(request) is None
+    assert planner.rejection_reason(request) is not None

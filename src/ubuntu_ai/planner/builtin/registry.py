@@ -129,7 +129,6 @@ BUILTIN_COMMANDS: tuple[BuiltinCommand, ...] = (
         command=("ls",),
         keywords=(
             "ls",
-            "arquivo",
             "arquivos",
             "listar arquivos",
             "liste os arquivos",
@@ -161,6 +160,23 @@ BUILTIN_COMMANDS: tuple[BuiltinCommand, ...] = (
             "arvore de diretorios",
             "arquitetura das pastas",
             "hierarquia de pastas",
+        ),
+    ),
+    #
+    # ARQUIVOS OCULTOS
+    #
+    BuiltinCommand(
+        goal="Listar arquivos ocultos",
+        title="Arquivos ocultos",
+        description="Lista os itens do diretório atual, incluindo arquivos ocultos.",
+        command=("ls", "-la"),
+        keywords=(
+            "arquivos ocultos",
+            "mostrar arquivos ocultos",
+            "mostre os arquivos ocultos",
+            "listar arquivos ocultos",
+            "itens ocultos da pasta",
+            "ls -la",
         ),
     ),
     #
@@ -206,6 +222,24 @@ BUILTIN_COMMANDS: tuple[BuiltinCommand, ...] = (
         ),
     ),
     #
+    # ROTAS DE REDE
+    #
+    BuiltinCommand(
+        goal="Mostrar rotas de rede",
+        title="Rotas de rede",
+        description="Exibe rotas locais e o gateway padrão.",
+        command=("ip", "route"),
+        keywords=(
+            "rotas de rede",
+            "rota de rede",
+            "mostrar gateway",
+            "mostre o gateway",
+            "gateway padrão",
+            "gateway padrao",
+            "ip route",
+        ),
+    ),
+    #
     # CPU
     #
     BuiltinCommand(
@@ -243,6 +277,74 @@ BUILTIN_COMMANDS: tuple[BuiltinCommand, ...] = (
             "detalhes da maquina",
             "resumo do sistema",
             "mostre meu computador",
+        ),
+    ),
+    #
+    # DISPOSITIVOS DE BLOCO
+    #
+    BuiltinCommand(
+        goal="Mostrar discos e partições",
+        title="Discos e partições",
+        description="Lista discos, partições, sistemas de arquivos e pontos de montagem.",
+        command=("lsblk", "-o", "NAME,SIZE,TYPE,FSTYPE,MOUNTPOINTS"),
+        keywords=(
+            "discos e partições",
+            "discos e particoes",
+            "mostrar partições",
+            "mostrar particoes",
+            "mostre as partições",
+            "mostre as particoes",
+            "dispositivos de bloco",
+            "discos conectados",
+            "lsblk",
+        ),
+    ),
+    #
+    # SERVIÇOS EM EXECUÇÃO
+    #
+    BuiltinCommand(
+        goal="Mostrar serviços em execução",
+        title="Serviços em execução",
+        description="Lista serviços systemd atualmente em execução.",
+        command=(
+            "systemctl",
+            "list-units",
+            "--type=service",
+            "--state=running",
+            "--no-pager",
+            "--plain",
+        ),
+        keywords=(
+            "serviços em execução",
+            "servicos em execucao",
+            "serviços rodando",
+            "servicos rodando",
+            "listar serviços ativos",
+            "listar servicos ativos",
+            "quais serviços estão ativos",
+            "quais servicos estao ativos",
+        ),
+    ),
+    #
+    # SERVIÇOS COM FALHA
+    #
+    BuiltinCommand(
+        goal="Mostrar serviços com falha",
+        title="Serviços com falha",
+        description="Lista serviços systemd que estão em estado de falha.",
+        command=("systemctl", "--failed", "--no-pager", "--plain"),
+        keywords=(
+            "serviços com falha",
+            "servicos com falha",
+            "existem serviços com falha",
+            "existem servicos com falha",
+            "serviços falhando",
+            "servicos falhando",
+            "falhas nos serviços",
+            "falhas nos servicos",
+            "problemas nos serviços",
+            "problemas nos servicos",
+            "systemctl --failed",
         ),
     ),
     #

@@ -174,6 +174,16 @@ resposta determinística segura for suficiente.
 - [x] documentar arquitetura, segurança e resultados;
 - [ ] executar auditoria e preparar a release de apresentação.
 
+### F4 — Contexto Local Inteligente
+
+- [x] consultar configuração geral, CPU, memória e uso de disco sem Ollama;
+- [x] consultar discos, partições, interfaces e rotas de rede;
+- [x] consultar processos e estados de serviços em modo somente leitura;
+- [x] listar diretórios, estruturas e arquivos ocultos com permissões do usuário;
+- [x] adicionar busca dinâmica segura de arquivos e pastas;
+- [ ] consolidar perfil automático de saúde do computador;
+- [ ] validar consultas locais na GUI e documentar evidências.
+
 ---
 
 ## v1.4 — Administração remota segura

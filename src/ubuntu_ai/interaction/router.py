@@ -89,6 +89,7 @@ class InteractionRouter:
         "hostname",
         "ip",
         "kernel",
+        "lsblk",
         "memoria",
         "maquina",
         "nginx",
@@ -123,6 +124,7 @@ class InteractionRouter:
         "ps",
         "pwd",
         "systemctl",
+        "lsblk",
         "uname",
         "uptime",
         "whoami",
@@ -159,6 +161,10 @@ class InteractionRouter:
         local = self._local_responder.respond(request)
         if local is not None:
             return InteractionDecision(InteractionRoute.LOCAL, local.text)
+
+        rejection = self._builtin_planner.rejection_reason(request)
+        if rejection is not None:
+            return InteractionDecision(InteractionRoute.LOCAL, rejection)
 
         if normalized.startswith(self._INFORMATION_PREFIXES):
             return InteractionDecision(InteractionRoute.CHAT)
