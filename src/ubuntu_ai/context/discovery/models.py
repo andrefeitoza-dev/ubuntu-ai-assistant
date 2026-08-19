@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
+from ubuntu_ai.context.health import SystemHealthSnapshot
+
 
 @dataclass(slots=True, frozen=True)
 class EnvironmentSnapshot:
@@ -27,3 +29,4 @@ class EnvironmentSnapshot:
     disk_gb: int | None = None
     hostname: str | None = None
     kernel: str | None = None
+    health: SystemHealthSnapshot | None = None

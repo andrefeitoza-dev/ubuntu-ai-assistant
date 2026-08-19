@@ -2,6 +2,7 @@ from datetime import datetime
 
 import pytest
 
+from ubuntu_ai.context import SystemHealthService, SystemMetrics
 from ubuntu_ai.fast_path import LocalResponder
 
 
@@ -55,3 +56,27 @@ def test_unknown_request_continues_to_planners(
     responder: LocalResponder,
 ) -> None:
     assert responder.respond("configure o nginx") is None
+
+
+def test_system_health_is_answered_locally_without_ollama() -> None:
+    sample = SystemMetrics(
+        cpu_percent=12.0,
+        memory_percent=45.0,
+        memory_available_mb=3500,
+        swap_percent=5.0,
+        disk_percent=60.0,
+        disk_free_gb=80.0,
+        active_network_interfaces=2,
+        process_count=140,
+        uptime_seconds=3600,
+    )
+    responder = LocalResponder(
+        health_service=SystemHealthService(lambda: sample),
+    )
+
+    response = responder.respond("como está este computador?")
+
+    assert response is not None
+    assert "saudável" in response.text
+    assert "CPU: 12.0%" in response.text
+    assert "RAM: 45.0%" in response.text

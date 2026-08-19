@@ -15,3 +15,5 @@ def test_discover_environment(tmp_path: Path) -> None:
     assert snapshot.project_name == tmp_path.name
     assert snapshot.operating_system
     assert snapshot.python_version
+    assert snapshot.health is not None
+    assert snapshot.health.metrics is not None

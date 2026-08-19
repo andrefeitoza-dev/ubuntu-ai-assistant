@@ -181,7 +181,13 @@ resposta determinística segura for suficiente.
 - [x] consultar processos e estados de serviços em modo somente leitura;
 - [x] listar diretórios, estruturas e arquivos ocultos com permissões do usuário;
 - [x] adicionar busca dinâmica segura de arquivos e pastas;
-- [ ] consolidar perfil automático de saúde do computador;
+- [ ] abrir pastas e arquivos com caminhos validados;
+- [ ] abrir sites aceitando somente URLs HTTP/HTTPS;
+- [ ] iniciar aplicativos Ubuntu por identificadores confiáveis;
+- [ ] tratar pedidos ambíguos, como “abra meu e-mail”;
+- [ ] bloquear esquemas, caminhos e argumentos potencialmente perigosos;
+- [ ] explicar falhas de permissão sem tentar elevação automática;
+- [x] consolidar perfil automático de saúde do computador;
 - [ ] validar consultas locais na GUI e documentar evidências.
 
 ---

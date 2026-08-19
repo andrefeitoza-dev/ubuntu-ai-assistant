@@ -12,6 +12,7 @@ from ubuntu_ai.context.discovery.ollama_detector import OllamaDetector
 from ubuntu_ai.context.discovery.os_detector import OperatingSystemDetector
 from ubuntu_ai.context.discovery.project_detector import ProjectDetector
 from ubuntu_ai.context.discovery.python_detector import PythonDetector
+from ubuntu_ai.context.health import SystemHealthService
 
 
 class ContextDiscoveryService:
@@ -30,6 +31,7 @@ class ContextDiscoveryService:
         hostname: HostnameDetector | None = None,
         kernel: KernelDetector | None = None,
         operating_system: OperatingSystemDetector | None = None,
+        health: SystemHealthService | None = None,
     ) -> None:
         self._git = git or GitDetector()
         self._project = project or ProjectDetector()
@@ -43,6 +45,7 @@ class ContextDiscoveryService:
         self._hostname = hostname or HostnameDetector()
         self._kernel = kernel or KernelDetector()
         self._operating_system = operating_system or OperatingSystemDetector()
+        self._health = health or SystemHealthService()
 
     def discover(
         self,
@@ -63,4 +66,5 @@ class ContextDiscoveryService:
             disk_gb=self._disk.detect(),
             hostname=self._hostname.detect(),
             kernel=self._kernel.detect(),
+            health=self._health.snapshot(),
         )

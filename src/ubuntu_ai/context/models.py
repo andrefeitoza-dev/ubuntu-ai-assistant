@@ -47,6 +47,8 @@ class ContextSnapshot:
                 f"memory_mb={self.environment.memory_mb}; "
                 f"disk_gb={self.environment.disk_gb}"
             )
+            if self.environment.health is not None:
+                environment += f"; health=({self.environment.health.to_prompt()})"
 
         return (
             f"session_id={self.session_id}\n"

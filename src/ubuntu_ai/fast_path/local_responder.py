@@ -8,6 +8,8 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import datetime
 
+from ubuntu_ai.context.health import SystemHealthService
+
 
 @dataclass(frozen=True, slots=True)
 class LocalResponse:
@@ -70,12 +72,23 @@ class LocalResponder:
         "cancel",
         "interromper",
     }
+    _HEALTH_REQUESTS = {
+        "como esta o computador",
+        "como esta este computador",
+        "saude do computador",
+        "estado do computador",
+        "estado do sistema",
+        "o computador esta sobrecarregado",
+        "diagnostico rapido do computador",
+    }
 
     def __init__(
         self,
         now: Callable[[], datetime] | None = None,
+        health_service: SystemHealthService | None = None,
     ) -> None:
         self._now = now or datetime.now
+        self._health_service = health_service or SystemHealthService()
 
     def respond(self, request: str) -> LocalResponse | None:
         normalized = self._normalize(request)
@@ -99,6 +112,9 @@ class LocalResponder:
 
         if normalized in self._CANCEL_REQUESTS:
             return LocalResponse("Não há nenhuma operação em andamento para cancelar.")
+
+        if normalized in self._HEALTH_REQUESTS:
+            return LocalResponse(self._health_service.snapshot().to_text())
 
         return None
 

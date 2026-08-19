@@ -23,6 +23,7 @@ def router() -> InteractionRouter:
     ("phrase", "expected"),
     [
         ("que dia é hoje?", InteractionRoute.LOCAL),
+        ("como está este computador?", InteractionRoute.LOCAL),
         ("qual a memória?", InteractionRoute.ACTION),
         ("mostre os processos", InteractionRoute.ACTION),
         ("mostre a configuração desse computador", InteractionRoute.ACTION),
