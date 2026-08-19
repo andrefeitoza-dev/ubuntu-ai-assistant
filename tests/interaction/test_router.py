@@ -34,6 +34,8 @@ def router() -> InteractionRouter:
         ("mostre os arquivos ocultos", InteractionRoute.ACTION),
         ("encontre o arquivo pyproject.toml", InteractionRoute.ACTION),
         ("procure a pasta Downloads", InteractionRoute.ACTION),
+        ("acesse o site ubuntu.com", InteractionRoute.ACTION),
+        ("abra o Firefox", InteractionRoute.ACTION),
         ("instale o Docker", InteractionRoute.ACTION),
         ("sudo apt update", InteractionRoute.ACTION),
         ("o que é memória RAM?", InteractionRoute.CHAT),
@@ -97,3 +99,19 @@ def test_router_refuses_unsafe_file_search_without_action() -> None:
     assert decision.response is not None
     assert "não executada" in decision.response
     assert "sem caminhos" in decision.response
+
+
+def test_router_explains_ambiguous_email_without_execution() -> None:
+    decision = InteractionRouter().route("abra meu email")
+
+    assert decision.route is InteractionRoute.LOCAL
+    assert decision.response is not None
+    assert "ambíguo" in decision.response
+
+
+def test_router_refuses_unsafe_url_without_execution() -> None:
+    decision = InteractionRouter().route("abra javascript:alert(1)")
+
+    assert decision.route is InteractionRoute.LOCAL
+    assert decision.response is not None
+    assert "Aplicativo não aberto" in decision.response

@@ -5,6 +5,7 @@ from dataclasses import dataclass
 from difflib import SequenceMatcher
 
 from ubuntu_ai.domain.plan import Plan, PlanStep
+from ubuntu_ai.planner.builtin.desktop_action import SafeDesktopActionPlanner
 from ubuntu_ai.planner.builtin.file_search import SafeFileSearchPlanner
 from ubuntu_ai.planner.builtin.registry import (
     BUILTIN_COMMANDS,
@@ -53,11 +54,22 @@ class BuiltinMatch:
 class BuiltinPlanner:
     """Cria planos determinísticos simples sem utilizar IA."""
 
-    def __init__(self, file_search: SafeFileSearchPlanner | None = None) -> None:
+    def __init__(
+        self,
+        file_search: SafeFileSearchPlanner | None = None,
+        desktop_action: SafeDesktopActionPlanner | None = None,
+    ) -> None:
         self._file_search = file_search or SafeFileSearchPlanner()
+        self._desktop_action = desktop_action or SafeDesktopActionPlanner()
 
     def try_create_plan(self, request: str) -> Plan | None:
         """Retorna um plano builtin ou None quando não houver correspondência."""
+
+        desktop_plan = self._desktop_action.try_create_plan(request)
+        if desktop_plan is not None:
+            return desktop_plan
+        if self._desktop_action.has_desktop_intent(request):
+            return None
 
         file_search_plan = self._file_search.try_create_plan(request)
         if file_search_plan is not None:
@@ -80,7 +92,9 @@ class BuiltinPlanner:
     def rejection_reason(self, request: str) -> str | None:
         """Explica por que uma consulta builtin foi recusada antes do fallback."""
 
-        return self._file_search.rejection_reason(request)
+        return self._desktop_action.rejection_reason(request) or self._file_search.rejection_reason(
+            request
+        )
 
     def find_match(self, request: str) -> BuiltinMatch | None:
         """Retorna a melhor correspondência e sua confiança, sem criar plano."""

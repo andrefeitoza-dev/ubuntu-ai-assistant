@@ -80,6 +80,38 @@ def test_system_executor_preserves_quoted_arguments() -> None:
     )
 
 
+def test_system_executor_detaches_desktop_application() -> None:
+    shell_service = Mock(spec=ShellService)
+    shell_service.launch.return_value = CommandResult(
+        command="gtk-launch firefox",
+        return_code=0,
+        stdout="",
+        stderr="",
+    )
+    executor = SystemExecutor(shell_service=shell_service)
+
+    result = executor.execute(ExecutionRequest(command="gtk-launch firefox"))
+
+    assert result.status is ExecutionStatus.EXECUTED
+    shell_service.launch.assert_called_once_with(["gtk-launch", "firefox"])
+    shell_service.run.assert_not_called()
+
+
+def test_system_executor_detaches_xdg_open_with_quoted_path() -> None:
+    shell_service = Mock(spec=ShellService)
+    shell_service.launch.return_value = CommandResult(
+        command="xdg-open /home/teste/Minha Pasta",
+        return_code=0,
+        stdout="",
+        stderr="",
+    )
+    executor = SystemExecutor(shell_service=shell_service)
+
+    executor.execute(ExecutionRequest(command='xdg-open "/home/teste/Minha Pasta"'))
+
+    shell_service.launch.assert_called_once_with(["xdg-open", "/home/teste/Minha Pasta"])
+
+
 def test_system_executor_does_not_run_dry_run_request() -> None:
     shell_service = Mock(spec=ShellService)
     executor = SystemExecutor(shell_service=shell_service)

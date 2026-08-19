@@ -35,3 +35,35 @@ def test_policy_blocks_shutdown() -> None:
     decision = policy.evaluate(ExecutionRequest(command="shutdown now"))
 
     assert decision.allowed is False
+
+
+def test_policy_allows_trusted_desktop_application() -> None:
+    decision = DefaultExecutionPolicy().evaluate(ExecutionRequest(command="gtk-launch firefox"))
+
+    assert decision.allowed is True
+
+
+def test_policy_blocks_unknown_desktop_application() -> None:
+    decision = DefaultExecutionPolicy().evaluate(
+        ExecutionRequest(command="gtk-launch unknown.desktop")
+    )
+
+    assert decision.allowed is False
+    assert "Aplicativo bloqueado" in decision.reason
+
+
+def test_policy_allows_http_site() -> None:
+    decision = DefaultExecutionPolicy().evaluate(
+        ExecutionRequest(command="xdg-open https://ubuntu.com")
+    )
+
+    assert decision.allowed is True
+
+
+def test_policy_blocks_unsafe_uri_scheme() -> None:
+    decision = DefaultExecutionPolicy().evaluate(
+        ExecutionRequest(command="xdg-open javascript:alert(1)")
+    )
+
+    assert decision.allowed is False
+    assert "Destino bloqueado" in decision.reason

@@ -36,3 +36,20 @@ class ShellService:
             stdout=process.stdout.strip(),
             stderr=process.stderr.strip(),
         )
+
+    def launch(self, command: list[str]) -> CommandResult:
+        """Inicia um processo gráfico desacoplado da execução do agente."""
+
+        subprocess.Popen(
+            command,
+            stdin=subprocess.DEVNULL,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+            start_new_session=True,
+        )
+        return CommandResult(
+            command=" ".join(command),
+            return_code=0,
+            stdout="",
+            stderr="",
+        )

@@ -14,6 +14,8 @@ from ubuntu_ai.services.shell import ShellService
 class SystemExecutor:
     """Executa comandos reais por meio do ShellService."""
 
+    _DETACHED_EXECUTABLES = frozenset({"gtk-launch", "xdg-open"})
+
     def __init__(
         self,
         shell_service: ShellService | None = None,
@@ -44,10 +46,13 @@ class SystemExecutor:
         started_at = perf_counter()
 
         try:
-            command_result = self._shell_service.run(
-                arguments,
-                timeout=self._timeout,
-            )
+            if arguments[0] in self._DETACHED_EXECUTABLES:
+                command_result = self._shell_service.launch(arguments)
+            else:
+                command_result = self._shell_service.run(
+                    arguments,
+                    timeout=self._timeout,
+                )
         except Exception as error:
             duration = perf_counter() - started_at
 
