@@ -291,12 +291,12 @@ reprodutibilidade.
 
 ### D1 — Instalação e ciclo de vida
 
-- [ ] consolidar instalação pelo wheel e por ferramenta isolada;
-- [ ] implementar atualização controlada com validação de versão;
-- [ ] implementar desinstalação completa e segura;
-- [ ] preservar configurações e dados durante atualizações;
-- [ ] validar launcher, ícone e comandos após instalação;
-- [ ] testar instalação, atualização e remoção em ambiente limpo.
+- [x] consolidar instalação pelo wheel e por ferramenta isolada;
+- [x] implementar atualização controlada com validação de versão;
+- [x] implementar desinstalação completa e segura;
+- [x] preservar configurações e dados durante atualizações;
+- [x] validar launcher, ícone e comandos após instalação;
+- [x] testar instalação, atualização e remoção em ambiente limpo.
 
 ### D2 — Configurações, perfis e plugins
 

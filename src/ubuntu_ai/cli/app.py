@@ -9,6 +9,7 @@ from ubuntu_ai.cli.examples import examples
 from ubuntu_ai.cli.health import health
 from ubuntu_ai.cli.intent import intent
 from ubuntu_ai.cli.knowledge import app as knowledge_app
+from ubuntu_ai.cli.lifecycle import app as lifecycle_app
 from ubuntu_ai.cli.plan import plan
 from ubuntu_ai.cli.run import run
 from ubuntu_ai.cli.shell import shell
@@ -37,6 +38,7 @@ def main(
 
 
 app.add_typer(knowledge_app, name="knowledge")
+app.add_typer(lifecycle_app, name="lifecycle")
 
 app.command(name="diagnose-ai")(diagnose_ai)
 app.command(name="doctor")(doctor)
