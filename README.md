@@ -4,7 +4,7 @@ Framework local e extensível para construir agentes inteligentes voltados à ad
 
 O Ubuntu AI transforma solicitações em linguagem natural em planos auditáveis, apresenta um preview, aplica políticas de risco, solicita confirmação quando necessário e executa comandos de forma controlada.
 
-## Recursos da v1.5.0
+## Recursos atuais
 
 - GUI desktop moderna em Tkinter;
 - launcher, ícone e integração com o Dock do Ubuntu;
@@ -35,6 +35,11 @@ O Ubuntu AI transforma solicitações em linguagem natural em planos auditáveis
 - agendamento protegido por classificação de risco;
 - agentes especializados em sistema, rede, armazenamento e serviços;
 - observabilidade estruturada e progresso na GUI;
+- instalação, atualização e desinstalação controladas;
+- configurações portáteis sem segredos;
+- perfis restritivos de agentes;
+- catálogo local com confiança explícita de plugins;
+- integração opcional e segura com VS Code;
 
 ## Requisitos
 
@@ -48,16 +53,17 @@ Para máquinas com aproximadamente 8 GB de RAM:
 ollama pull qwen2.5:3b
 ```
 
-## Instalação com pipx
-
-Depois de baixar ou clonar o projeto:
+## Instalação isolada
 
 ```bash
-pipx install .
+uv tool install ubuntu-ai-assistant
 ubuntu-ai-install-launcher
 ubuntu-ai version
 ubuntu-ai doctor
 ```
+
+Consulte [instalação e ciclo de vida](docs/installation.md) para atualização,
+wheel local e desinstalação.
 
 Para desenvolvimento:
 
@@ -75,6 +81,9 @@ ubuntu-ai doctor
 ubuntu-ai diagnose-ai
 ubuntu-ai benchmark
 ubuntu-ai plan "mostrar o diretório atual"
+ubuntu-ai run --dry-run "mostrar os serviços com falha"
+ubuntu-ai lifecycle status
+ubuntu-ai ecosystem profiles
 ubuntu-ai tui
 ubuntu-ai-gui
 ```
@@ -108,6 +117,11 @@ print(result.rendered_preview)
 ## Documentação
 
 - `docs/architecture.md` — arquitetura atual;
+- `docs/installation.md` — instalação e ciclo de vida;
+- `docs/configuration-profiles-plugins.md` — ecossistema extensível;
+- `docs/vscode-integration.md` — integração opcional com VS Code;
+- `docs/troubleshooting.md` — solução de problemas;
+- `docs/examples.md` — exemplos reproduzíveis;
 - `docs/project-context.md` — contexto técnico do projeto;
 - `docs/roadmap.md` — roadmap;
 - `docs/releases/` — notas das RCs e releases;
@@ -116,14 +130,10 @@ print(result.rendered_preview)
 
 ## Estado do projeto
 
-A versão `1.3.0` consolida o Ubuntu AI Assistant como aplicação desktop
-inteligente, rápida, contextual e segura. Consultas conhecidas são resolvidas
-localmente em microssegundos ou milissegundos, enquanto o Ollama permanece
-reservado para conversação e raciocínio.
-
-Esta é a versão preparada para apresentação do TCC. As próximas versões
-avançarão para administração remota, automação, agentes especializados,
-distribuição e colaboração multiagente.
+A linha `1.x` consolida aplicação desktop, contexto local, administração SSH,
+automação, agentes especializados e distribuição segura. A v1.6 prepara o
+produto para instalação pública e integrações opcionais, mantendo execução e
+confirmação sob as mesmas políticas centrais.
 
 ## Licença
 

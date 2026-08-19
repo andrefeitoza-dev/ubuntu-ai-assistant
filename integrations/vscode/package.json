@@ -1,0 +1,62 @@
+{
+  "name": "ubuntu-ai-assistant",
+  "displayName": "Ubuntu AI Assistant",
+  "description": "Integração segura e opcional com o Ubuntu AI Assistant",
+  "version": "1.6.0",
+  "publisher": "ubuntu-ai",
+  "license": "MIT",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [],
+  "main": "./extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "ubuntuAI.openGui",
+        "title": "Ubuntu AI: Abrir interface gráfica"
+      },
+      {
+        "command": "ubuntuAI.doctor",
+        "title": "Ubuntu AI: Verificar ambiente"
+      },
+      {
+        "command": "ubuntuAI.health",
+        "title": "Ubuntu AI: Exibir saúde"
+      },
+      {
+        "command": "ubuntuAI.plan",
+        "title": "Ubuntu AI: Gerar plano seguro"
+      },
+      {
+        "command": "ubuntuAI.preview",
+        "title": "Ubuntu AI: Gerar prévia sem executar"
+      },
+      {
+        "command": "ubuntuAI.profiles",
+        "title": "Ubuntu AI: Listar perfis de agentes"
+      }
+    ],
+    "configuration": {
+      "title": "Ubuntu AI Assistant",
+      "properties": {
+        "ubuntuAI.executable": {
+          "type": "string",
+          "default": "ubuntu-ai",
+          "description": "Comando ubuntu-ai ou caminho absoluto terminado em ubuntu-ai."
+        },
+        "ubuntuAI.guiExecutable": {
+          "type": "string",
+          "default": "ubuntu-ai-gui",
+          "description": "Comando ubuntu-ai-gui ou caminho absoluto terminado em ubuntu-ai-gui."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "test": "node --check extension.js"
+  }
+}

@@ -309,12 +309,12 @@ reprodutibilidade.
 
 ### D3 — Integração e documentação pública
 
-- [ ] integrar comandos e tarefas seguras ao VS Code;
-- [ ] manter a integração opcional e desacoplada da aplicação;
-- [ ] publicar documentação de instalação, uso e solução de problemas;
-- [ ] atualizar guia de contribuição e desenvolvimento;
-- [ ] documentar plugins, perfis e configurações;
-- [ ] preparar exemplos reproduzíveis para usuários e contribuidores.
+- [x] integrar comandos e tarefas seguras ao VS Code;
+- [x] manter a integração opcional e desacoplada da aplicação;
+- [x] publicar documentação de instalação, uso e solução de problemas;
+- [x] atualizar guia de contribuição e desenvolvimento;
+- [x] documentar plugins, perfis e configurações;
+- [x] preparar exemplos reproduzíveis para usuários e contribuidores.
 
 ### D4 — Pipeline e release v1.6.0
 

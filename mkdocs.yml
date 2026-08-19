@@ -30,7 +30,19 @@ markdown_extensions:
       permalink: true
 
 nav:
-  - Home: checkpoint.md
+  - Início: checkpoint.md
+
+  - Usuário:
+      - Instalação: installation.md
+      - Guia de uso: user-guide.md
+      - Configurações, perfis e plugins: configuration-profiles-plugins.md
+      - VS Code: vscode-integration.md
+      - Exemplos: examples.md
+      - Solução de problemas: troubleshooting.md
+
+  - Desenvolvimento:
+      - Guia do desenvolvedor: developer-guide.md
+      - Compatibilidade de plugins: plugin-compatibility.md
 
   - Arquitetura:
       - Arquitetura Geral: architecture.md
