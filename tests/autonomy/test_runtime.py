@@ -65,3 +65,13 @@ def test_autonomous_runtime_exposes_long_tasks() -> None:
     )
 
     assert runtime.long_tasks.get("long-1") == registered
+
+
+def test_autonomous_runtime_exposes_scheduler_and_telemetry() -> None:
+    runtime = AutonomousRuntime(
+        controller=FakeController(),
+        goal_manager=GoalManager(),
+    )
+
+    assert runtime.scheduler is not None
+    assert runtime.telemetry.metrics().total_events == 0

@@ -183,3 +183,9 @@ def test_duration_format_adapts_to_latency_scale() -> None:
     assert gui_app.UbuntuAIApp._format_duration(0.0004) == "400 µs"
     assert gui_app.UbuntuAIApp._format_duration(0.125) == "125.0 ms"
     assert gui_app.UbuntuAIApp._format_duration(2.5) == "2.50 s"
+
+
+def test_automation_status_text_is_compact() -> None:
+    assert (
+        gui_app.UbuntuAIApp._automation_status_text(2, 5) == "Automações: 2 ativas · 5 concluídas"
+    )

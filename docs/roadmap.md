@@ -273,9 +273,9 @@ agentes especializados com limites operacionais explícitos.
 
 ### A4 — Observabilidade e release v1.5.0
 
-- [ ] emitir eventos e métricas estruturadas;
-- [ ] integrar progresso, automações e agentes à GUI;
-- [ ] validar tarefas longas, retomada e agentes especializados;
+- [x] emitir eventos e métricas estruturadas;
+- [x] integrar progresso, automações e agentes à GUI;
+- [x] validar tarefas longas, retomada e agentes especializados;
 - [ ] executar auditoria, build e instalação limpa;
 - [ ] preparar e criar a tag `v1.5.0`.
 

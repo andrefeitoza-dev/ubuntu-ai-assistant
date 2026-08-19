@@ -5,6 +5,8 @@ from ubuntu_ai.autonomy.goal_manager import GoalManager
 from ubuntu_ai.autonomy.long_tasks import LongTask, LongTaskManager
 from ubuntu_ai.autonomy.loop_controller import AutonomousLoopController
 from ubuntu_ai.autonomy.models import AutonomousCycleResult
+from ubuntu_ai.autonomy.observability import AutomationTelemetry
+from ubuntu_ai.autonomy.scheduler import LocalAutomationScheduler
 
 
 class AutonomousRuntime:
@@ -16,10 +18,22 @@ class AutonomousRuntime:
         controller: AutonomousLoopController,
         goal_manager: GoalManager,
         long_tasks: LongTaskManager | None = None,
+        scheduler: LocalAutomationScheduler | None = None,
+        telemetry: AutomationTelemetry | None = None,
     ) -> None:
         self._controller = controller
         self._goal_manager = goal_manager
         self._long_tasks = long_tasks or LongTaskManager()
+        self._scheduler = scheduler or LocalAutomationScheduler()
+        self._telemetry = telemetry or AutomationTelemetry()
+
+    @property
+    def scheduler(self) -> LocalAutomationScheduler:
+        return self._scheduler
+
+    @property
+    def telemetry(self) -> AutomationTelemetry:
+        return self._telemetry
 
     @property
     def long_tasks(self) -> LongTaskManager:

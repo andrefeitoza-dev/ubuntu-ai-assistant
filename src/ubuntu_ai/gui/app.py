@@ -59,6 +59,21 @@ class UbuntuAIApp:
         self._refresh_remote_targets()
         self._bind_accessibility_shortcuts()
         self._show_welcome()
+        self._refresh_automation_status()
+
+    def _refresh_automation_status(self) -> None:
+        metrics = self._backend.automation_metrics()
+        self.automation_label.configure(
+            text=self._automation_status_text(
+                metrics.active_tasks,
+                metrics.completed_tasks,
+            ),
+            fg=ACCENT if metrics.active_tasks else TEXT_DIM,
+        )
+
+    @staticmethod
+    def _automation_status_text(active: int, completed: int) -> str:
+        return f"Automações: {active} ativas · {completed} concluídas"
 
     @staticmethod
     def _icon_candidates() -> tuple[Path, ...]:
@@ -135,6 +150,15 @@ class UbuntuAIApp:
             font=("Sans", 10),
         )
         self.status_label.pack(side=tk.RIGHT)
+
+        self.automation_label = tk.Label(
+            header,
+            text="Automações: 0 ativas · 0 concluídas",
+            bg=BACKGROUND,
+            fg=TEXT_DIM,
+            font=("Sans", 9),
+        )
+        self.automation_label.pack(side=tk.RIGHT, padx=(0, 16))
 
         target = tk.Frame(header, bg=BACKGROUND)
         target.pack(side=tk.RIGHT, padx=(0, 24))
@@ -1294,6 +1318,7 @@ class UbuntuAIApp:
                 state=tk.NORMAL,
             )
             self.request_entry.focus_set()
+            self._refresh_automation_status()
 
     @staticmethod
     def _command_text(

@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 from ubuntu_ai.agent_loop.models import LoopSnapshot
+from ubuntu_ai.autonomy.long_tasks import LongTask
+from ubuntu_ai.autonomy.observability import AutomationMetrics
 from ubuntu_ai.container.bootstrap import container
 from ubuntu_ai.interaction import ChatResponse, InteractionDecision
 from ubuntu_ai.remote.audit import RemoteAuditRecord
@@ -108,3 +110,9 @@ class GUIBackend:
 
     def snapshot(self) -> LoopSnapshot:
         return self._runtime.snapshot()
+
+    def automation_tasks(self) -> tuple[LongTask, ...]:
+        return container.autonomous_runtime().long_tasks.all()
+
+    def automation_metrics(self) -> AutomationMetrics:
+        return container.autonomous_runtime().telemetry.metrics()
