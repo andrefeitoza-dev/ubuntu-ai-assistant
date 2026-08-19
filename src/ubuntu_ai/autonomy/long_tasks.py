@@ -67,12 +67,23 @@ TaskObserver = Callable[[LongTask], None]
 class LongTaskManager:
     """Gerencia tarefas longas com limites e progresso observável."""
 
-    def __init__(self, *, clock: Callable[[], float] = monotonic) -> None:
+    def __init__(
+        self,
+        *,
+        clock: Callable[[], float] = monotonic,
+        checkpoint: TaskObserver | None = None,
+    ) -> None:
         self._clock = clock
         self._tasks: dict[str, LongTask] = {}
         self._controls: dict[str, TaskControl] = {}
         self._observers: list[TaskObserver] = []
         self._lock = RLock()
+        if checkpoint is not None:
+            self._observers.append(checkpoint)
+
+    def restore(self, tasks: tuple[LongTask, ...]) -> None:
+        for task in tasks:
+            self.register(task)
 
     def register(self, task: LongTask) -> LongTask:
         with self._lock:

@@ -259,10 +259,10 @@ agentes especializados com limites operacionais explícitos.
 
 ### A2 — Persistência, retomada e agendamento
 
-- [ ] persistir tarefas e checkpoints sem armazenar segredos;
-- [ ] recuperar tarefas interrompidas de forma segura;
-- [ ] agendar execuções locais com política de risco;
-- [ ] manter histórico de automações e tentativas.
+- [x] persistir tarefas e checkpoints sem armazenar segredos;
+- [x] recuperar tarefas interrompidas de forma segura;
+- [x] agendar execuções locais com política de risco;
+- [x] manter histórico de automações e tentativas.
 
 ### A3 — Agentes especializados
 
