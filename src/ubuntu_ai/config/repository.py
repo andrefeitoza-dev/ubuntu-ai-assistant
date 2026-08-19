@@ -79,7 +79,9 @@ class ConfigRepository:
                 content,
                 encoding="utf-8",
             )
+            temporary_file.chmod(0o600)
             temporary_file.replace(self._config_file)
+            self._config_file.chmod(0o600)
         except OSError:
             temporary_file.unlink(missing_ok=True)
             raise

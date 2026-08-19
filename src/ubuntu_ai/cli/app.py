@@ -5,6 +5,7 @@ from ubuntu_ai.cli.benchmark_routes import benchmark_routes
 from ubuntu_ai.cli.context import CLIContext
 from ubuntu_ai.cli.diagnose_ai import diagnose_ai
 from ubuntu_ai.cli.doctor import doctor
+from ubuntu_ai.cli.ecosystem import app as ecosystem_app
 from ubuntu_ai.cli.examples import examples
 from ubuntu_ai.cli.health import health
 from ubuntu_ai.cli.intent import intent
@@ -38,6 +39,7 @@ def main(
 
 
 app.add_typer(knowledge_app, name="knowledge")
+app.add_typer(ecosystem_app, name="ecosystem")
 app.add_typer(lifecycle_app, name="lifecycle")
 
 app.command(name="diagnose-ai")(diagnose_ai)

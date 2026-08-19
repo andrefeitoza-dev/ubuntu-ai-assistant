@@ -1,6 +1,11 @@
 from pathlib import Path
 
-from ubuntu_ai.plugins import PluginManager, PluginRegistry
+from ubuntu_ai.plugins import (
+    PluginLoader,
+    PluginManager,
+    PluginRegistry,
+    PluginTrustStore,
+)
 from ubuntu_ai.skills import SkillRegistry
 
 
@@ -22,10 +27,21 @@ def _write_plugin(root: Path) -> Path:
     return package / "plugin.toml"
 
 
+def _manager(root: Path, registry: PluginRegistry) -> PluginManager:
+    trust = PluginTrustStore(root / "trusted.json")
+    manifest = root / "demo_plugin" / "plugin.toml"
+    trust.approve(manifest)
+    return PluginManager(
+        registry,
+        SkillRegistry(),
+        PluginLoader(trust_store=trust),
+    )
+
+
 def test_manager_discovers_and_installs_plugin(tmp_path: Path) -> None:
     manifest = _write_plugin(tmp_path)
     registry = PluginRegistry()
-    manager = PluginManager(registry, SkillRegistry())
+    manager = _manager(tmp_path, registry)
 
     assert manager.discover(tmp_path) == (manifest,)
     loaded = manager.install(manifest)
@@ -37,7 +53,7 @@ def test_manager_discovers_and_installs_plugin(tmp_path: Path) -> None:
 def test_manager_uninstalls_and_shutdowns_plugin(tmp_path: Path) -> None:
     manifest = _write_plugin(tmp_path)
     registry = PluginRegistry()
-    manager = PluginManager(registry, SkillRegistry())
+    manager = _manager(tmp_path, registry)
     manager.install(manifest)
 
     removed = manager.uninstall("demo-plugin")

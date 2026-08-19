@@ -20,9 +20,15 @@ from ubuntu_ai.config.models import (
 )
 from ubuntu_ai.config.repository import ConfigRepository
 from ubuntu_ai.config.service import ConfigService
+from ubuntu_ai.config.transfer import (
+    ConfigTransferError,
+    ConfigTransferService,
+)
 
 __all__ = [
     "ConfigService",
+    "ConfigTransferError",
+    "ConfigTransferService",
     "AIConfig",
     "APPLICATION_NAME",
     "AppSettings",

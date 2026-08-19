@@ -24,3 +24,15 @@ def test_manifest_rejects_entrypoint_without_object() -> None:
         PluginManifest.from_mapping(
             {"name": "demo", "version": "1", "api_version": 1, "entrypoint": "demo"}
         )
+
+
+def test_manifest_rejects_invalid_version() -> None:
+    with pytest.raises(PluginManifestError, match="versão"):
+        PluginManifest.from_mapping(
+            {
+                "name": "demo",
+                "version": "latest; command",
+                "api_version": 1,
+                "entrypoint": "demo:Plugin",
+            }
+        )

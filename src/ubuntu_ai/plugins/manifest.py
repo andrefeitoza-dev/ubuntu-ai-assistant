@@ -10,6 +10,8 @@ from typing import Any
 from ubuntu_ai.plugins.exceptions import PluginManifestError
 
 _NAME_RE = re.compile(r"^[a-z0-9][a-z0-9._-]*$")
+_VERSION_RE = re.compile(r"^[0-9]+(?:\.[0-9]+){0,2}(?:(?:a|b|rc)[0-9]+)?(?:\+[A-Za-z0-9.-]+)?$")
+_ENTRYPOINT_RE = re.compile(r"^[A-Za-z_][A-Za-z0-9_.]*:[A-Za-z_][A-Za-z0-9_]*$")
 
 
 @dataclass(frozen=True, slots=True)
@@ -38,11 +40,11 @@ class PluginManifest:
 
         if not _NAME_RE.fullmatch(name):
             raise PluginManifestError(f"Nome de plugin inválido: {name!r}")
-        if not version:
-            raise PluginManifestError("A versão do plugin não pode estar vazia.")
+        if not _VERSION_RE.fullmatch(version):
+            raise PluginManifestError("A versão do plugin é inválida.")
         if api_version < 1:
             raise PluginManifestError("api_version precisa ser maior ou igual a 1.")
-        if ":" not in entrypoint:
+        if not _ENTRYPOINT_RE.fullmatch(entrypoint):
             raise PluginManifestError("entrypoint deve usar o formato 'modulo:objeto'.")
 
         raw_permissions = data.get("permissions", ())

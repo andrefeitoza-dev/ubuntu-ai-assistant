@@ -5,6 +5,12 @@ from ubuntu_ai.agents.models import (
     AgentResult,
     AgentTask,
 )
+from ubuntu_ai.agents.profiles import (
+    AgentProfile,
+    AgentProfilePolicy,
+    AgentProfileRepository,
+    default_agent_profiles,
+)
 from ubuntu_ai.agents.registry import AgentRegistry
 from ubuntu_ai.agents.specialists import (
     AgentEnvironment,
@@ -25,6 +31,9 @@ __all__ = [
     "AgentRegistry",
     "AgentResult",
     "AgentTask",
+    "AgentProfile",
+    "AgentProfilePolicy",
+    "AgentProfileRepository",
     "AgentEnvironment",
     "NetworkAgent",
     "ServicesAgent",
@@ -34,4 +43,5 @@ __all__ = [
     "SpecialistPlan",
     "StorageAgent",
     "SystemAgent",
+    "default_agent_profiles",
 ]

@@ -300,12 +300,12 @@ reprodutibilidade.
 
 ### D2 — Configurações, perfis e plugins
 
-- [ ] importar e exportar configurações sem incluir segredos;
-- [ ] criar perfis de agentes com limites e políticas explícitas;
-- [ ] formalizar catálogo local de plugins;
-- [ ] validar versão, manifesto e compatibilidade dos plugins;
-- [ ] impedir carregamento de plugins inválidos ou não confiáveis;
-- [ ] documentar estabilidade e depreciação da API pública.
+- [x] importar e exportar configurações sem incluir segredos;
+- [x] criar perfis de agentes com limites e políticas explícitas;
+- [x] formalizar catálogo local de plugins;
+- [x] validar versão, manifesto e compatibilidade dos plugins;
+- [x] impedir carregamento de plugins inválidos ou não confiáveis;
+- [x] documentar estabilidade e depreciação da API pública.
 
 ### D3 — Integração e documentação pública
 

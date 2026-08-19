@@ -16,3 +16,7 @@ class PluginPermissionError(PluginError):
 
 class PluginLoadError(PluginError):
     """Raised when a plugin module cannot be imported or initialized."""
+
+
+class PluginTrustError(PluginPermissionError):
+    """Raised when plugin contents were not explicitly trusted."""

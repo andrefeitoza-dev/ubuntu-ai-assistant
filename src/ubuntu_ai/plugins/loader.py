@@ -5,6 +5,7 @@ import sys
 from pathlib import Path
 from typing import Any
 
+from ubuntu_ai.config.defaults import default_config_directory
 from ubuntu_ai.plugins.api import PLUGIN_API_VERSION, PluginContext, UbuntuAIPlugin
 from ubuntu_ai.plugins.exceptions import (
     PluginCompatibilityError,
@@ -13,13 +14,24 @@ from ubuntu_ai.plugins.exceptions import (
 from ubuntu_ai.plugins.manifest import PluginManifest
 from ubuntu_ai.plugins.registry import LoadedPlugin
 from ubuntu_ai.plugins.sandbox import PluginPolicy
+from ubuntu_ai.plugins.trust import PluginTrustStore
 
 
 class PluginLoader:
     """Loads a plugin from a validated manifest and explicit entrypoint."""
 
-    def __init__(self, policy: PluginPolicy | None = None) -> None:
+    def __init__(
+        self,
+        policy: PluginPolicy | None = None,
+        *,
+        trust_store: PluginTrustStore | None = None,
+        require_trust: bool = True,
+    ) -> None:
         self._policy = policy or PluginPolicy()
+        self._trust_store = trust_store or PluginTrustStore(
+            default_config_directory() / "trusted-plugins.json"
+        )
+        self._require_trust = require_trust
 
     def load(self, manifest_path: str | Path) -> LoadedPlugin:
         path = Path(manifest_path).resolve()
@@ -30,6 +42,8 @@ class PluginLoader:
                 f"esta versão suporta API {PLUGIN_API_VERSION}."
             )
         self._policy.validate(manifest)
+        if self._require_trust:
+            self._trust_store.require(path)
 
         module_name, object_name = manifest.entrypoint.split(":", 1)
         plugin_root = str(path.parent)
