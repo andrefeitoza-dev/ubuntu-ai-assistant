@@ -19,3 +19,15 @@ def test_factory_builds_default_multi_agent_runtime() -> None:
     )
 
     assert result.output == "plan:status"
+
+
+def test_factory_registers_domain_specialists() -> None:
+    coordinator = build_default_agent_coordinator(planner=FakePlanner())
+
+    for kind in (
+        AgentKind.SYSTEM,
+        AgentKind.NETWORK,
+        AgentKind.STORAGE,
+        AgentKind.SERVICES,
+    ):
+        assert coordinator.registry.get(kind).kind is kind

@@ -266,10 +266,10 @@ agentes especializados com limites operacionais explícitos.
 
 ### A3 — Agentes especializados
 
-- [ ] especializar agentes de sistema, rede, armazenamento e serviços;
-- [ ] aplicar limites operacionais por agente e ambiente;
-- [ ] replanejar tarefas com base em falhas observadas;
-- [ ] impedir que agentes contornem confirmação ou política de risco.
+- [x] especializar agentes de sistema, rede, armazenamento e serviços;
+- [x] aplicar limites operacionais por agente e ambiente;
+- [x] replanejar tarefas com base em falhas observadas;
+- [x] impedir que agentes contornem confirmação ou política de risco.
 
 ### A4 — Observabilidade e release v1.5.0
 

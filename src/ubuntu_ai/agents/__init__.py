@@ -6,6 +6,17 @@ from ubuntu_ai.agents.models import (
     AgentTask,
 )
 from ubuntu_ai.agents.registry import AgentRegistry
+from ubuntu_ai.agents.specialists import (
+    AgentEnvironment,
+    NetworkAgent,
+    ServicesAgent,
+    SpecialistAction,
+    SpecialistLimits,
+    SpecialistPayload,
+    SpecialistPlan,
+    StorageAgent,
+    SystemAgent,
+)
 
 __all__ = [
     "AgentCoordinator",
@@ -14,4 +25,13 @@ __all__ = [
     "AgentRegistry",
     "AgentResult",
     "AgentTask",
+    "AgentEnvironment",
+    "NetworkAgent",
+    "ServicesAgent",
+    "SpecialistAction",
+    "SpecialistLimits",
+    "SpecialistPayload",
+    "SpecialistPlan",
+    "StorageAgent",
+    "SystemAgent",
 ]

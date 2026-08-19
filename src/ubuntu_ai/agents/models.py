@@ -12,6 +12,10 @@ class AgentKind(StrEnum):
     EXECUTION = "execution"
     MEMORY = "memory"
     REFLECTION = "reflection"
+    SYSTEM = "system"
+    NETWORK = "network"
+    STORAGE = "storage"
+    SERVICES = "services"
 
 
 @dataclass(frozen=True, slots=True)

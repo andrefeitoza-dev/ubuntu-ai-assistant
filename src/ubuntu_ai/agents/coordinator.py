@@ -19,6 +19,10 @@ class AgentCoordinator:
         self._router = router or AgentRouter()
         self._policy = policy or AgentPolicy()
 
+    @property
+    def registry(self) -> AgentRegistry:
+        return self._registry
+
     def dispatch(self, task: AgentTask) -> AgentResult:
         decision = self._policy.evaluate(task)
 
