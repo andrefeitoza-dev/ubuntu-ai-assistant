@@ -11,5 +11,6 @@ def test_clean_lifecycle_script_uses_isolated_uv_tool_without_shell() -> None:
     assert '"XDG_CONFIG_HOME"' in source
     assert '"tool", "install"' in source
     assert '"tool", "uninstall"' in source
+    assert '"ubuntu-ai"), "--help"' in source
     assert "shell=False" in source
     assert "shell=True" not in source

@@ -42,7 +42,7 @@ def validate(wheel: Path, uv_executable: str) -> None:
         )
 
         run((uv_executable, "tool", "install", str(wheel)), env)
-        run((str(bin_dir / "ubuntu-ai"), "version"), env)
+        run((str(bin_dir / "ubuntu-ai"), "--help"), env)
         run((str(bin_dir / "ubuntu-ai-install-launcher"),), env)
 
         preserved = home / ".config/ubuntu-ai/release-marker"
