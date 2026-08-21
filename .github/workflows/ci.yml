@@ -4,12 +4,11 @@ on:
   push:
     branches:
       - main
+      - "develop/**"
       - "chore/**"
       - "feature/**"
       - "fix/**"
   pull_request:
-    branches:
-      - main
   workflow_dispatch:
 
 permissions:
@@ -21,34 +20,25 @@ concurrency:
 
 jobs:
   quality:
-    name: Quality · Python 3.12
+    name: Quality, tests and architecture
     runs-on: ubuntu-latest
-    timeout-minutes: 15
-
+    timeout-minutes: 20
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
-
       - name: Install uv
         uses: astral-sh/setup-uv@v7
         with:
           enable-cache: true
           cache-dependency-glob: uv.lock
-
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-
-      - name: Synchronize dependencies
+      - name: Synchronize locked dependencies
         run: uv sync --all-extras --dev --locked
-
       - name: Ruff lint
-        run: uv run ruff check src tests --output-format=github
-
-      - name: Ruff format
-        run: uv run ruff format --check src tests
-
+        run: uv run ruff check src tests scripts --output-format=github
       - name: Run tests with coverage
         run: |
           uv run pytest \
@@ -56,25 +46,51 @@ jobs:
             --cov-config=.coveragerc \
             --cov-report=term-missing \
             --cov-report=xml \
-            --cov-report=html \
             --junitxml=test-results.xml
-
-      - name: Upload coverage report
+      - name: Validate architecture and documentation
+        run: |
+          uv run python scripts/check_architecture.py
+          uv run python scripts/architecture_audit.py
+          uv run mkdocs build --strict
+      - name: Upload reports
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: coverage-report
+          name: quality-reports
           path: |
             coverage.xml
-            htmlcov/
+            test-results.xml
           if-no-files-found: warn
           retention-days: 14
 
-      - name: Upload test report
-        if: always()
+  artifacts:
+    name: Build and audit artifacts
+    needs: quality
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+      - name: Build wheel and source archive
+        run: uv build
+      - name: Audit and checksum artifacts
+        run: |
+          uv run python scripts/release_artifacts.py validate dist
+          uv run python scripts/release_artifacts.py checksums dist
+          uv run python scripts/release_artifacts.py verify dist
+      - name: Validate clean lifecycle
+        run: |
+          WHEEL="$(find dist -maxdepth 1 -name '*.whl' -print -quit)"
+          uv run python scripts/validate_clean_lifecycle.py "$WHEEL"
+      - name: Upload audited artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: pytest-results
-          path: test-results.xml
-          if-no-files-found: warn
+          name: distribution-artifacts
+          path: |
+            dist/*.whl
+            dist/*.tar.gz
+            dist/SHA256SUMS
+          if-no-files-found: error
           retention-days: 14

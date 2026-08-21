@@ -35,6 +35,11 @@ Consulte [configurações, perfis e plugins](configuration-profiles-plugins.md).
 
 Consulte [integração com VS Code](vscode-integration.md).
 
+## Computadores remotos
+
+Consulte [administração remota por SSH](remote-administration.md). O botão
+`Computador` da GUI expande o cadastro, a seleção e o diagnóstico dos hosts.
+
 ## Ajuda
 
 Consulte [solução de problemas](troubleshooting.md) e

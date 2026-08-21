@@ -318,12 +318,12 @@ reprodutibilidade.
 
 ### D4 — Pipeline e release v1.6.0
 
-- [ ] automatizar qualidade, testes, arquitetura e build;
-- [ ] validar integridade e conteúdo dos artefatos;
-- [ ] gerar checksums verificáveis da distribuição;
-- [ ] preparar assinatura sem armazenar chaves no repositório;
-- [ ] executar instalação, atualização e desinstalação limpas;
-- [ ] atualizar documentação e evidências da release;
+- [x] automatizar qualidade, testes, arquitetura e build;
+- [x] validar integridade e conteúdo dos artefatos;
+- [x] gerar checksums verificáveis da distribuição;
+- [x] preparar assinatura sem armazenar chaves no repositório;
+- [x] executar instalação, atualização e desinstalação limpas;
+- [x] atualizar documentação e evidências da release;
 - [ ] preparar e criar a tag `v1.6.0`.
 
 ---

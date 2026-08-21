@@ -86,6 +86,15 @@ def test_friendly_error_explains_timeout() -> None:
     assert "tempo esperado" in message
 
 
+def test_remote_button_keeps_selected_target_visible() -> None:
+    assert gui_app.UbuntuAIApp._remote_button_text("local", expanded=False) == (
+        "Computador: local  ▾"
+    )
+    assert gui_app.UbuntuAIApp._remote_button_text("servidor-tcc", expanded=True) == (
+        "Computador: servidor-tcc  ▴"
+    )
+
+
 def test_stale_snapshot_is_ignored() -> None:
     application = gui_app.UbuntuAIApp.__new__(gui_app.UbuntuAIApp)
     application._operation_generation = 2

@@ -29,7 +29,13 @@ uv run ruff check src tests scripts
 uv run ruff format --check src tests scripts
 uv run pytest -q
 uv run python scripts/check_architecture.py
+uv build
+uv run python scripts/release_artifacts.py validate dist
+uv run python scripts/release_artifacts.py checksums dist
 ```
+
+Consulte o [processo de release](release-process.md) para auditoria, checksums,
+proveniência e publicação dos artefatos.
 
 ## Integrações
 

@@ -35,6 +35,7 @@ nav:
   - Usuário:
       - Instalação: installation.md
       - Guia de uso: user-guide.md
+      - Administração remota por SSH: remote-administration.md
       - Configurações, perfis e plugins: configuration-profiles-plugins.md
       - VS Code: vscode-integration.md
       - Exemplos: examples.md
@@ -43,6 +44,7 @@ nav:
   - Desenvolvimento:
       - Guia do desenvolvedor: developer-guide.md
       - Compatibilidade de plugins: plugin-compatibility.md
+      - Processo de release: release-process.md
 
   - Arquitetura:
       - Arquitetura Geral: architecture.md

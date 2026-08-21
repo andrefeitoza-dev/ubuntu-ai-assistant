@@ -160,8 +160,27 @@ class UbuntuAIApp:
         )
         self.automation_label.pack(side=tk.RIGHT, padx=(0, 16))
 
-        target = tk.Frame(header, bg=BACKGROUND)
-        target.pack(side=tk.RIGHT, padx=(0, 24))
+        self._remote_controls_visible = False
+        self.remote_controls_button = tk.Button(
+            header,
+            text=self._remote_button_text("local", expanded=False),
+            command=self._toggle_remote_controls,
+            bg=SURFACE_ALT,
+            fg=TEXT,
+            activebackground=SURFACE_HOVER,
+            activeforeground=TEXT,
+            relief=tk.FLAT,
+            borderwidth=0,
+            cursor="hand2",
+            takefocus=True,
+            font=("Sans", 9),
+            padx=9,
+            pady=4,
+        )
+        self.remote_controls_button.pack(side=tk.RIGHT, padx=(0, 16))
+
+        self.remote_controls = tk.Frame(header, bg=BACKGROUND)
+        target = self.remote_controls
 
         tk.Label(
             target,
@@ -362,9 +381,34 @@ class UbuntuAIApp:
         self.target_variable.set(host.name)
         remote = host.name.lower() != "local"
         self.target_menu.configure(fg=WARNING if remote else TEXT)
+        self.remote_controls_button.configure(
+            text=self._remote_button_text(
+                host.name,
+                expanded=self._remote_controls_visible,
+            ),
+            fg=WARNING if remote else TEXT,
+        )
         self.status_label.configure(
             text=f"●  {'Remoto: ' + host.name if remote else 'Pronto'}",
             fg=WARNING if remote else SUCCESS,
+        )
+
+    @staticmethod
+    def _remote_button_text(target: str, *, expanded: bool) -> str:
+        indicator = "▴" if expanded else "▾"
+        return f"Computador: {target}  {indicator}"
+
+    def _toggle_remote_controls(self) -> None:
+        self._remote_controls_visible = not self._remote_controls_visible
+        if self._remote_controls_visible:
+            self.remote_controls.pack(side=tk.RIGHT, padx=(0, 10))
+        else:
+            self.remote_controls.pack_forget()
+        self.remote_controls_button.configure(
+            text=self._remote_button_text(
+                self.target_variable.get(),
+                expanded=self._remote_controls_visible,
+            )
         )
 
     def _on_target_selected(self, name: str) -> None:
