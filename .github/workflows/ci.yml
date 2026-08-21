@@ -80,6 +80,10 @@ jobs:
           uv run python scripts/release_artifacts.py validate dist
           uv run python scripts/release_artifacts.py checksums dist
           uv run python scripts/release_artifacts.py verify dist
+      - name: Install GUI runtime dependency
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes python3-tk
       - name: Validate clean lifecycle
         run: |
           WHEEL="$(find dist -maxdepth 1 -name '*.whl' -print -quit)"

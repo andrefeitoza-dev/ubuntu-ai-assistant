@@ -28,3 +28,12 @@ def test_release_requires_matching_tag_checksums_and_keyless_attestation() -> No
     assert "id-token: write" in source
     assert "dist/SHA256SUMS" in source
     assert "PRIVATE_KEY" not in source
+
+
+def test_ci_installs_tkinter_before_launcher_validation() -> None:
+    workflow = (Path(__file__).parents[2] / ".github/workflows/ci.yml").read_text(encoding="utf-8")
+
+    dependency = workflow.index("sudo apt-get install --yes python3-tk")
+    lifecycle = workflow.index("scripts/validate_clean_lifecycle.py")
+
+    assert dependency < lifecycle
