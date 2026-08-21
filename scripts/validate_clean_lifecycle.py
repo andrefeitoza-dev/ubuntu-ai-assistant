@@ -42,7 +42,18 @@ def validate(wheel: Path, uv_executable: str) -> None:
         )
 
         run((uv_executable, "tool", "install", str(wheel)), env)
-        run((str(bin_dir / "ubuntu-ai"), "--help"), env)
+
+        entry_points = (
+            bin_dir / "ubuntu-ai",
+            bin_dir / "ubuntu-ai-gui",
+            bin_dir / "ubuntu-ai-install-launcher",
+        )
+        missing = [
+            path.name for path in entry_points if not path.is_file() or not os.access(path, os.X_OK)
+        ]
+        if missing:
+            raise RuntimeError("Entry points ausentes ou não executáveis: " + ", ".join(missing))
+
         run((str(bin_dir / "ubuntu-ai-install-launcher"),), env)
 
         preserved = home / ".config/ubuntu-ai/release-marker"
