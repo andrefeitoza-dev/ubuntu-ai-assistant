@@ -1,6 +1,6 @@
 # Ubuntu AI Assistant Architecture
 
-**Versão:** 1.5.0
+**Versão:** 1.6.0
 **Status:** Estável — v1.2.0
 **Arquitetura:** Clean Architecture + SOLID + Strategy + Dependency Injection
 

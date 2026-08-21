@@ -38,6 +38,18 @@ def test_checksum_verification_detects_modification(tmp_path: Path) -> None:
         release_artifacts.verify_checksums(output, tmp_path)
 
 
-@pytest.mark.parametrize("name", ("../secret", "/absolute", "src/file.py.bak"))
+@pytest.mark.parametrize(
+    "name",
+    (
+        "../secret",
+        "/absolute",
+        "src/file.py.bak",
+        "ubuntu-ai-source.zip",
+        "ubuntu-ai-current.zip",
+        "projeto.txt",
+        "src_files.txt",
+        "test_files.txt",
+    ),
+)
 def test_unsafe_archive_members_are_rejected(name: str) -> None:
     assert not release_artifacts._safe_member(name) or release_artifacts._forbidden(name)

@@ -324,7 +324,7 @@ reprodutibilidade.
 - [x] preparar assinatura sem armazenar chaves no repositório;
 - [x] executar instalação, atualização e desinstalação limpas;
 - [x] atualizar documentação e evidências da release;
-- [ ] preparar e criar a tag `v1.6.0`.
+- [x] preparar e criar a tag `v1.6.0`.
 
 ---
 

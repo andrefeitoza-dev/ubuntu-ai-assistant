@@ -2,6 +2,33 @@
 
 Todas as mudanças relevantes deste projeto são registradas neste arquivo.
 
+## [1.6.0] - 2026-08-21
+
+### Added
+
+- Ciclo de vida controlado para instalação, atualização e desinstalação.
+- Configurações portáteis e perfis restritivos de agentes.
+- Catálogo de plugins com confiança explícita.
+- Integração opcional com VS Code.
+- Documentação pública e exemplos reproduzíveis.
+- Pipeline auditável com checksums e proveniência.
+- Menu expansível para seleção de computadores.
+
+### Security
+
+- Segredos e caminhos privados excluídos das exportações.
+- Plugins alterados perdem automaticamente a aprovação.
+- Integração VS Code sem shell ou confirmação automática.
+- Artefatos inseguros ou divergentes são recusados.
+- Proveniência sem chaves privadas armazenadas.
+
+### Validation
+
+- 742 testes automatizados aprovados.
+- Arquitetura e documentação aprovadas.
+- Ciclo de vida validado em ambiente isolado.
+- Wheel, source archive e checksums verificados.
+
 ## [1.5.0] - 2026-08-19
 
 ### Added

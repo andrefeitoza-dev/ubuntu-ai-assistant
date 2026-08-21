@@ -10,6 +10,13 @@ from pathlib import Path, PurePosixPath
 
 ROOT = Path(__file__).resolve().parents[1]
 FORBIDDEN_SUFFIXES = (".bak", ".backup", ".orig", ".rej", ".pyc")
+FORBIDDEN_SOURCE_FILES = {
+    "ubuntu-ai-source.zip",
+    "ubuntu-ai-current.zip",
+    "projeto.txt",
+    "src_files.txt",
+    "test_files.txt",
+}
 REQUIRED_WHEEL_FILES = {
     "ubuntu_ai/cli/app.py",
     "ubuntu_ai/gui/assets/ubuntu-ai-assistant.png",
@@ -31,7 +38,12 @@ def _safe_member(name: str) -> bool:
 
 def _forbidden(name: str) -> bool:
     lowered = name.lower()
-    return lowered.endswith(FORBIDDEN_SUFFIXES) or "/__pycache__/" in lowered
+    basename = PurePosixPath(lowered).name
+    return (
+        lowered.endswith(FORBIDDEN_SUFFIXES)
+        or "/__pycache__/" in lowered
+        or basename in FORBIDDEN_SOURCE_FILES
+    )
 
 
 def validate_wheel(path: Path, version: str) -> None:

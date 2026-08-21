@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "ubuntu-ai-assistant"
-version = "1.5.0"
+version = "1.6.0"
 description = "Framework local para agentes inteligentes e administração segura do Ubuntu"
 readme = "README.md"
 requires-python = ">=3.12"
@@ -60,6 +60,15 @@ pythonpath = ["src"]
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/ubuntu_ai"]
+
+[tool.hatch.build.targets.sdist]
+exclude = [
+    "/ubuntu-ai-source.zip",
+    "/ubuntu-ai-current.zip",
+    "/projeto.txt",
+    "/src_files.txt",
+    "/test_files.txt",
+]
 
 [dependency-groups]
 dev = [
