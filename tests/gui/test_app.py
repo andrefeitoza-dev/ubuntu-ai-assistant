@@ -109,6 +109,42 @@ def test_gui_exposes_capability_catalog_button() -> None:
     assert "tk.Toplevel(" not in source
 
 
+def test_gui_exposes_integrated_multi_agent_progress_panel() -> None:
+    source = Path(gui_app.__file__).read_text(encoding="utf-8")
+
+    assert 'text="Agentes e progresso  ▾"' in source
+    assert "_build_automation_panel" in source
+    assert "_refresh_automation_panel" in source
+    assert "pause_automation" in source
+    assert "resume_automation" in source
+    assert "cancel_automation" in source
+    assert "Eventos auditáveis" in source
+    assert "self._backend.selected_target" in source
+
+
+def test_multi_agent_prefix_is_explicit_and_preserves_request() -> None:
+    assert (
+        gui_app.UbuntuAIApp._multi_agent_request("agentes: diagnóstico completo")
+        == "diagnóstico completo"
+    )
+    assert gui_app.UbuntuAIApp._multi_agent_request("multiagente: rede e discos") == (
+        "rede e discos"
+    )
+    assert gui_app.UbuntuAIApp._multi_agent_request("qual é o kernel?") is None
+
+
+def test_multi_agent_flow_requires_confirmation_and_reports_results() -> None:
+    source = Path(gui_app.__file__).read_text(encoding="utf-8")
+
+    assert "messagebox.askyesno(" in source
+    assert '"Executar diagnóstico multiagente"' in source
+    assert "register_multi_agent(goal)" in source
+    assert "target=self._start_multi_agent_execution" in source
+    assert "_poll_automation_panel" in source
+    assert "Resultado multiagente" in source
+    assert "Nenhum comando de alteração foi executado" in source
+
+
 def test_gui_uses_readable_conversation_typography() -> None:
     assert gui_app.FONT_BODY == ("Sans", 12)
     assert gui_app.FONT_BODY_BOLD == ("Sans", 12, "bold")

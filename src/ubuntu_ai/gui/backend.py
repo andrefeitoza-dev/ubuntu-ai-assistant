@@ -1,8 +1,14 @@
 from __future__ import annotations
 
+from dataclasses import dataclass
+
 from ubuntu_ai.agent_loop.models import LoopSnapshot
+from ubuntu_ai.agents.orchestration import OrchestrationGoal
+from ubuntu_ai.agents.selection import OrchestrationPlanner, build_specialist_orchestrator
+from ubuntu_ai.agents.specialists import AgentEnvironment
+from ubuntu_ai.autonomy.control import TaskCancelledError
 from ubuntu_ai.autonomy.long_tasks import LongTask
-from ubuntu_ai.autonomy.observability import AutomationMetrics
+from ubuntu_ai.autonomy.observability import AutomationEvent, AutomationMetrics
 from ubuntu_ai.container.bootstrap import container
 from ubuntu_ai.fast_path import CapabilityCatalog, CapabilityTopic, SystemFactResponder
 from ubuntu_ai.interaction import ChatResponse, InteractionDecision, InteractionRoute
@@ -10,7 +16,20 @@ from ubuntu_ai.remote.audit import RemoteAuditRecord
 from ubuntu_ai.remote.diagnostics import RemoteDiagnosticService, RemoteSystemContext
 from ubuntu_ai.remote.health import RemoteHealth, RemoteHealthService
 from ubuntu_ai.remote.inventory import RemoteInventoryService
-from ubuntu_ai.remote.models import RemoteHost
+from ubuntu_ai.remote.models import RemoteCommand, RemoteExecutionResult, RemoteHost
+
+
+@dataclass(frozen=True, slots=True)
+class MultiAgentExecutionReport:
+    task_id: str
+    goal_id: str
+    target: str
+    results: tuple[RemoteExecutionResult, ...]
+    cancelled: bool = False
+
+    @property
+    def successful(self) -> bool:
+        return not self.cancelled and all(result.success for result in self.results)
 
 
 class GUIBackend:
@@ -152,3 +171,110 @@ class GUIBackend:
 
     def automation_metrics(self) -> AutomationMetrics:
         return container.autonomous_runtime().telemetry.metrics()
+
+    def automation_events(self) -> tuple[AutomationEvent, ...]:
+        return container.autonomous_runtime().telemetry.events()
+
+    def pause_automation(self, task_id: str) -> LongTask:
+        return container.autonomous_runtime().long_tasks.pause(task_id)
+
+    def resume_automation(self, task_id: str) -> LongTask:
+        return container.autonomous_runtime().long_tasks.resume(task_id)
+
+    def cancel_automation(self, task_id: str) -> LongTask:
+        return container.autonomous_runtime().long_tasks.cancel(task_id)
+
+    def plan_multi_agent(self, request: str, *, goal_id: str) -> OrchestrationGoal:
+        """Cria uma prévia somente leitura para o destino explicitamente selecionado."""
+
+        environment = AgentEnvironment.REMOTE if self.is_remote_selected else AgentEnvironment.LOCAL
+        target = self._selected_target if self.is_remote_selected else None
+        return OrchestrationPlanner().plan(
+            request,
+            goal_id=goal_id,
+            environment=environment,
+            target=target,
+        )
+
+    @staticmethod
+    def multi_agent_task_id(goal: OrchestrationGoal) -> str:
+        return f"multi-agent-{goal.goal_id}"
+
+    def register_multi_agent(self, goal: OrchestrationGoal) -> LongTask:
+        """Registra a execução antes de iniciar a thread, tornando-a observável."""
+
+        task = LongTask(
+            task_id=self.multi_agent_task_id(goal),
+            goal_id=goal.goal_id,
+            description=goal.description,
+            total_steps=len(goal.tasks),
+            max_duration=300.0,
+        )
+        return container.autonomous_runtime().register_long_task(task)
+
+    def execute_multi_agent(
+        self,
+        goal: OrchestrationGoal,
+        *,
+        confirmed: bool,
+    ) -> MultiAgentExecutionReport:
+        """Valida especialistas e executa apenas seus comandos limitados pela engine."""
+
+        if not confirmed:
+            raise PermissionError("A execução multiagente exige confirmação explícita.")
+
+        validation = build_specialist_orchestrator().run(goal)
+        if validation.status.value != "completed":
+            raise PermissionError("O plano multiagente foi bloqueado pela política.")
+
+        runtime = container.autonomous_runtime()
+        task_id = self.multi_agent_task_id(goal)
+        manager = runtime.long_tasks
+        manager.start(task_id, "Especialistas iniciados.")
+        control = manager.control(task_id)
+        target = str(goal.context["target"])
+        results: list[RemoteExecutionResult] = []
+
+        try:
+            for step, task in enumerate(goal.tasks, start=1):
+                control.checkpoint()
+                action = task.payload.actions[0]
+                result = self._remote.execute(
+                    target,
+                    RemoteCommand(action.argv, timeout=30.0),
+                    confirmed=confirmed,
+                )
+                control.checkpoint()
+                results.append(result)
+                if not result.success:
+                    manager.fail(task_id, f"O agente {task.specialist.value} falhou.")
+                    return MultiAgentExecutionReport(
+                        task_id,
+                        goal.goal_id,
+                        target,
+                        tuple(results),
+                    )
+                manager.advance(
+                    task_id,
+                    completed_steps=step,
+                    message=f"Agente {task.specialist.value} concluído.",
+                )
+        except TaskCancelledError:
+            manager.cancel(task_id)
+            return MultiAgentExecutionReport(
+                task_id,
+                goal.goal_id,
+                target,
+                tuple(results),
+                cancelled=True,
+            )
+        except Exception as exc:
+            manager.fail(task_id, str(exc))
+            raise
+
+        return MultiAgentExecutionReport(
+            task_id,
+            goal.goal_id,
+            target,
+            tuple(results),
+        )

@@ -378,10 +378,10 @@ explícito, limites operacionais e confirmação humana continuarão centralizad
 
 ### V2-P4 — Experiência integrada e release v2.0.0
 
-- [ ] integrar plano, agentes, progresso e controles à GUI;
-- [ ] permitir pausa, retomada e cancelamento;
-- [ ] manter computador e ambiente de destino sempre visíveis;
-- [ ] consolidar eventos, métricas, histórico e auditoria;
+- [x] integrar plano, agentes, progresso e controles à GUI;
+- [x] permitir pausa, retomada e cancelamento;
+- [x] manter computador e ambiente de destino sempre visíveis;
+- [x] consolidar eventos, métricas, histórico e auditoria;
 - [ ] validar operação local, remota e multiagente;
 - [ ] atualizar documentação e evidências;
 - [ ] executar auditoria, build e instalação limpa;

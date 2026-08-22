@@ -7,7 +7,7 @@ from time import perf_counter
 from tkinter import messagebox, simpledialog
 
 from ubuntu_ai.agent_loop.models import LoopSnapshot, LoopState
-from ubuntu_ai.gui.backend import GUIBackend
+from ubuntu_ai.gui.backend import GUIBackend, MultiAgentExecutionReport
 from ubuntu_ai.interaction import ChatResponse, InteractionRoute
 from ubuntu_ai.remote.diagnostics import RemoteSystemContext
 
@@ -65,6 +65,11 @@ class UbuntuAIApp:
         self._resource_hover_after_id: str | None = None
         self._resource_hover_index: int | None = None
         self._resource_topics = ()
+        self._automation_panel: tk.Frame | None = None
+        self._automation_listbox: tk.Listbox | None = None
+        self._automation_summary_label: tk.Label | None = None
+        self._automation_tasks = ()
+        self._active_automation_task_id: str | None = None
 
         self.root = tk.Tk()
         self.root.title("Ubuntu AI Assistant")
@@ -82,11 +87,13 @@ class UbuntuAIApp:
             self._hide_capabilities_panel,
             add="+",
         )
+        self.root.bind("<Unmap>", self._hide_automation_panel, add="+")
         self.root.bind(
             "<Escape>",
             self._hide_capabilities_panel,
             add="+",
         )
+        self.root.bind("<Escape>", self._hide_automation_panel, add="+")
         self.root.bind(
             "<Button-1>",
             self._close_capabilities_on_outside_click,
@@ -187,6 +194,24 @@ class UbuntuAIApp:
             pady=4,
         )
         self.resources_button.pack(side=tk.RIGHT, padx=(0, 10))
+
+        self.automation_button = tk.Button(
+            header,
+            text="Agentes e progresso  ▾",
+            command=self._show_automation_panel,
+            bg=BACKGROUND,
+            fg=TEXT_MUTED,
+            activebackground=SURFACE_HOVER,
+            activeforeground=TEXT,
+            relief=tk.FLAT,
+            borderwidth=0,
+            cursor="hand2",
+            takefocus=True,
+            font=FONT_TINY,
+            padx=8,
+            pady=4,
+        )
+        self.automation_button.pack(side=tk.RIGHT, padx=(0, 10))
 
         self._remote_controls_visible = False
         self.remote_controls_button = tk.Button(
@@ -455,6 +480,7 @@ class UbuntuAIApp:
 
     def _toggle_remote_controls(self) -> None:
         self._hide_capabilities_panel()
+        self._hide_automation_panel()
         if self._remote_controls_visible:
             self._hide_remote_controls()
             return
@@ -618,6 +644,11 @@ class UbuntuAIApp:
 
         self._add_user_message(request)
 
+        multi_agent_request = self._multi_agent_request(request)
+        if multi_agent_request is not None:
+            self._show_multi_agent_plan(multi_agent_request)
+            return
+
         if self._backend.is_remote_selected and self._backend.is_system_fact_request(request):
             target = self._backend.selected_target
             operation = self._begin_operation(f"Consultando {target}")
@@ -665,6 +696,7 @@ class UbuntuAIApp:
         ).start()
 
     def _show_capabilities(self) -> None:
+        self._hide_automation_panel()
         panel = getattr(self, "_resources_panel", None)
         if panel is not None and panel.winfo_ismapped():
             self._hide_capabilities_panel()
@@ -886,13 +918,297 @@ class UbuntuAIApp:
         if button is not None and button.winfo_exists():
             button.configure(text="Recursos e ajuda  ▾")
 
+    @staticmethod
+    def _multi_agent_request(request: str) -> str | None:
+        normalized = request.strip()
+        for prefix in ("agentes:", "multiagente:"):
+            if normalized.lower().startswith(prefix):
+                return normalized[len(prefix) :].strip()
+        return None
+
+    def _show_multi_agent_plan(self, request: str) -> None:
+        try:
+            goal = self._backend.plan_multi_agent(
+                request,
+                goal_id=f"gui-{int(perf_counter() * 1_000_000)}",
+            )
+        except ValueError as exc:
+            self._add_system_message(str(exc), color=WARNING)
+            self.request_entry.focus_set()
+            return
+
+        target = goal.context["target"]
+        lines = [
+            f"Plano multiagente · {target}",
+            f"Objetivo: {goal.description}",
+            "",
+        ]
+        for task in goal.tasks:
+            command = " ".join(task.payload.actions[0].argv)
+            lines.append(f"• {task.specialist.value}: {command} (somente leitura)")
+        lines.extend(
+            (
+                "",
+                "Prévia criada sem executar comandos. Confirmação e política de risco ",
+                "continuam centralizadas antes de qualquer execução.",
+            )
+        )
+        self._add_system_message("\n".join(lines), color=TEXT)
+        confirmed = messagebox.askyesno(
+            "Executar diagnóstico multiagente",
+            "Executar agora os comandos de consulta exibidos?\n\n"
+            "Eles são somente leitura e usarão o computador selecionado. Você poderá "
+            "acompanhar, pausar ou cancelar pelo painel Agentes e progresso.",
+            parent=self.root,
+        )
+        if not confirmed:
+            self._add_system_message(
+                "Prévia mantida sem execução. Nenhum comando foi iniciado.",
+                color=TEXT_MUTED,
+            )
+            self.request_entry.focus_set()
+            return
+
+        try:
+            task = self._backend.register_multi_agent(goal)
+        except ValueError as exc:
+            self._add_system_message(str(exc), color=WARNING)
+            self.request_entry.focus_set()
+            return
+        self._active_automation_task_id = task.task_id
+        operation = self._begin_operation("Executando agentes")
+        self._poll_automation_panel(operation)
+        threading.Thread(
+            target=self._start_multi_agent_execution,
+            args=(goal, operation),
+            daemon=True,
+        ).start()
+
+    def _start_multi_agent_execution(self, goal: object, operation: int) -> None:
+        try:
+            report = self._backend.execute_multi_agent(goal, confirmed=True)
+        except Exception as exc:
+            self.root.after(0, self._deliver_error, operation, str(exc))
+            return
+        self.root.after(0, self._deliver_multi_agent_report, operation, report)
+
+    def _poll_automation_panel(self, operation: int) -> None:
+        if operation != self._operation_generation or not self._busy:
+            return
+        self._refresh_automation_panel()
+        self.root.after(350, self._poll_automation_panel, operation)
+
+    def _deliver_multi_agent_report(
+        self,
+        operation: int,
+        report: MultiAgentExecutionReport,
+    ) -> None:
+        if operation != self._operation_generation:
+            return
+        self._active_automation_task_id = None
+        self._set_busy(False)
+        self._refresh_automation_panel()
+        self._hide_automation_panel()
+        if report.cancelled:
+            self._add_system_message(
+                "Diagnóstico multiagente cancelado pelo usuário.",
+                color=WARNING,
+            )
+            return
+
+        lines = [f"Resultado multiagente · {report.target}", ""]
+        for result in report.results:
+            command = " ".join(result.command)
+            output = (result.stdout or result.stderr or "Sem saída.").strip()
+            if len(output) > 3000:
+                output = output[:3000] + "\n… saída resumida"
+            status = "OK" if result.success else "FALHA"
+            lines.append(f"[{status}] $ {command}\n{output}\n")
+        lines.append(
+            "Diagnóstico concluído e registrado na auditoria. "
+            "Nenhum comando de alteração foi executado."
+        )
+        self._add_system_message(
+            "\n".join(lines),
+            color=TEXT if report.successful else WARNING,
+        )
+        self.request_entry.focus_set()
+
+    def _show_automation_panel(self) -> None:
+        self._hide_capabilities_panel()
+        panel = getattr(self, "_automation_panel", None)
+        if panel is not None and panel.winfo_ismapped():
+            self._hide_automation_panel()
+            return
+        if panel is None or not panel.winfo_exists():
+            panel = self._build_automation_panel()
+            self._automation_panel = panel
+
+        self._refresh_automation_panel()
+        self.root.update_idletasks()
+        button_right = (
+            self.automation_button.winfo_rootx()
+            - self.root.winfo_rootx()
+            + self.automation_button.winfo_width()
+        )
+        button_bottom = (
+            self.automation_button.winfo_rooty()
+            - self.root.winfo_rooty()
+            + self.automation_button.winfo_height()
+        )
+        panel.place(x=button_right, y=button_bottom + 6, width=540, anchor=tk.NE)
+        panel.lift()
+        self.automation_button.configure(text="Agentes e progresso  ▴")
+
+    def _build_automation_panel(self) -> tk.Frame:
+        panel = tk.Frame(self.root, bg=BORDER, highlightthickness=1)
+        surface = tk.Frame(panel, bg=SURFACE_ALT)
+        surface.pack(fill=tk.BOTH, expand=True, padx=1, pady=1)
+        heading = tk.Frame(surface, bg=SURFACE_ALT)
+        heading.pack(fill=tk.X, padx=12, pady=(10, 6))
+        tk.Label(
+            heading,
+            text="Agentes, tarefas e auditoria",
+            bg=SURFACE_ALT,
+            fg=TEXT,
+            font=FONT_SMALL_BOLD,
+        ).pack(side=tk.LEFT)
+        tk.Button(
+            heading,
+            text="Fechar",
+            command=self._hide_automation_panel,
+            bg=SURFACE_ALT,
+            fg=TEXT_MUTED,
+            relief=tk.FLAT,
+            font=FONT_TINY,
+        ).pack(side=tk.RIGHT)
+
+        summary = tk.Label(
+            surface,
+            text="",
+            bg=SURFACE_ALT,
+            fg=TEXT,
+            justify=tk.LEFT,
+            anchor=tk.W,
+            font=FONT_TINY,
+        )
+        summary.pack(fill=tk.X, padx=12, pady=(0, 8))
+        tasks = tk.Listbox(
+            surface,
+            height=8,
+            bg=SURFACE,
+            fg=TEXT,
+            selectbackground=ACCENT,
+            selectforeground="#101318",
+            activestyle="none",
+            relief=tk.FLAT,
+            borderwidth=0,
+            highlightthickness=0,
+            exportselection=False,
+            font=FONT_SMALL,
+        )
+        tasks.pack(fill=tk.X, padx=12)
+
+        controls = tk.Frame(surface, bg=SURFACE_ALT)
+        controls.pack(fill=tk.X, padx=12, pady=10)
+        for label, action in (
+            ("Atualizar", "refresh"),
+            ("Pausar", "pause"),
+            ("Retomar", "resume"),
+            ("Cancelar", "cancel"),
+        ):
+            tk.Button(
+                controls,
+                text=label,
+                command=lambda selected=action: self._automation_action(selected),
+                bg=SURFACE,
+                fg=TEXT,
+                activebackground=SURFACE_HOVER,
+                activeforeground=TEXT,
+                relief=tk.FLAT,
+                font=FONT_TINY,
+                padx=9,
+                pady=5,
+            ).pack(side=tk.LEFT, padx=(0, 6))
+        tk.Label(
+            surface,
+            text="Dica: use “agentes: diagnóstico completo” para criar uma prévia segura.",
+            bg=SURFACE_ALT,
+            fg=TEXT_MUTED,
+            font=FONT_TINY,
+        ).pack(fill=tk.X, padx=12, pady=(0, 10))
+        self._automation_listbox = tasks
+        self._automation_summary_label = summary
+        return panel
+
+    def _refresh_automation_panel(self) -> None:
+        tasks = self._backend.automation_tasks()
+        metrics = self._backend.automation_metrics()
+        events = self._backend.automation_events()
+        self._automation_tasks = tasks
+        listbox = self._automation_listbox
+        summary = self._automation_summary_label
+        if listbox is None or summary is None:
+            return
+        listbox.delete(0, tk.END)
+        for task in tasks:
+            progress = round(task.progress * 100)
+            listbox.insert(
+                tk.END,
+                f"{task.task_id} · {task.status.value} · {progress}% · {task.description}",
+            )
+        if not tasks:
+            listbox.insert(tk.END, "Nenhuma tarefa automatizada registrada.")
+        summary.configure(
+            text=(
+                f"Destino: {self._backend.selected_target} · "
+                f"Ativas: {metrics.active_tasks} · Concluídas: {metrics.completed_tasks} · "
+                f"Falhas: {metrics.failed_tasks} · Eventos auditáveis: {len(events)}"
+            )
+        )
+
+    def _automation_action(self, action: str) -> None:
+        if action == "refresh":
+            self._refresh_automation_panel()
+            return
+        listbox = self._automation_listbox
+        if listbox is None or not listbox.curselection() or not self._automation_tasks:
+            messagebox.showinfo(
+                "Tarefa necessária",
+                "Selecione uma tarefa para aplicar o controle.",
+                parent=self.root,
+            )
+            return
+        task = self._automation_tasks[listbox.curselection()[0]]
+        handlers = {
+            "pause": self._backend.pause_automation,
+            "resume": self._backend.resume_automation,
+            "cancel": self._backend.cancel_automation,
+        }
+        try:
+            handlers[action](task.task_id)
+        except (KeyError, ValueError) as exc:
+            messagebox.showerror("Controle não aplicado", str(exc), parent=self.root)
+        self._refresh_automation_panel()
+
+    def _hide_automation_panel(self, _event: tk.Event | None = None) -> None:
+        panel = getattr(self, "_automation_panel", None)
+        if panel is not None and panel.winfo_exists():
+            panel.place_forget()
+        button = getattr(self, "automation_button", None)
+        if button is not None and button.winfo_exists():
+            button.configure(text="Agentes e progresso  ▾")
+
     def _close_capabilities_on_outside_click(self, event: tk.Event) -> None:
         panel = getattr(self, "_resources_panel", None)
+        automation_panel = getattr(self, "_automation_panel", None)
+        automation_button = getattr(self, "automation_button", None)
         remote_controls = getattr(self, "remote_controls", None)
         remote_button = getattr(self, "remote_controls_button", None)
 
         inside_resources = False
         inside_remote_controls = False
+        inside_automation = False
 
         widget = event.widget
         while widget is not None:
@@ -900,6 +1216,8 @@ class UbuntuAIApp:
                 inside_resources = True
             if widget is remote_controls or widget is remote_button:
                 inside_remote_controls = True
+            if widget is automation_panel or widget is automation_button:
+                inside_automation = True
             widget = getattr(widget, "master", None)
 
         if panel is not None and panel.winfo_ismapped() and not inside_resources:
@@ -907,6 +1225,13 @@ class UbuntuAIApp:
 
         if self._remote_controls_visible and not inside_remote_controls:
             self._hide_remote_controls()
+
+        if (
+            automation_panel is not None
+            and automation_panel.winfo_ismapped()
+            and not inside_automation
+        ):
+            self._hide_automation_panel()
 
     def _send_resource_to_conversation(self, code: str) -> None:
         self._hide_capabilities_panel()
@@ -1566,6 +1891,14 @@ class UbuntuAIApp:
         self._operation_generation += 1
         getattr(self, "_operation_started_at", {}).clear()
 
+        automation_task_id = getattr(self, "_active_automation_task_id", None)
+        if automation_task_id is not None:
+            try:
+                self._backend.cancel_automation(automation_task_id)
+            except (KeyError, ValueError):
+                pass
+            self._active_automation_task_id = None
+
         try:
             self._backend.cancel()
         except RuntimeError:
@@ -1817,6 +2150,9 @@ class UbuntuAIApp:
         self,
         _event: tk.Event | None = None,
     ) -> str:
+        self._hide_capabilities_panel()
+        self._hide_automation_panel()
+        self._hide_remote_controls()
         if self._busy:
             self.cancel_current_operation()
         else:
