@@ -20,6 +20,11 @@ from ubuntu_ai.agents.profiles import (
     default_agent_profiles,
 )
 from ubuntu_ai.agents.registry import AgentRegistry
+from ubuntu_ai.agents.replanning import (
+    OrchestrationReplanner,
+    ReplanningDecision,
+    ReplanningReport,
+)
 from ubuntu_ai.agents.selection import (
     OrchestrationPlanner,
     SpecialistSelection,
@@ -51,6 +56,9 @@ __all__ = [
     "OrchestrationStatus",
     "OrchestrationTask",
     "OrchestrationTaskResult",
+    "OrchestrationReplanner",
+    "ReplanningDecision",
+    "ReplanningReport",
     "OrchestrationPlanner",
     "SpecialistSelection",
     "SpecialistSelector",

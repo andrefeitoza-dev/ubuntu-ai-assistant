@@ -368,11 +368,11 @@ explícito, limites operacionais e confirmação humana continuarão centralizad
 
 ### V2-P3 — Replanejamento, memória e recuperação
 
-- [ ] analisar falhas e resultados parciais;
-- [ ] gerar alternativas seguras sem ampliar silenciosamente o escopo;
+- [x] analisar falhas e resultados parciais;
+- [x] gerar alternativas seguras sem ampliar silenciosamente o escopo;
 - [ ] retomar tarefas usando checkpoints persistidos;
 - [ ] incorporar histórico e conhecimento local às decisões;
-- [ ] registrar justificativas para seleção e replanejamento;
+- [x] registrar justificativas para seleção e replanejamento;
 - [ ] medir qualidade, tentativas, duração e taxa de sucesso;
 - [ ] impedir aprendizado automático não aprovado.
 
