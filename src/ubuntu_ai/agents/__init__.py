@@ -19,6 +19,14 @@ from ubuntu_ai.agents.profiles import (
     AgentProfileRepository,
     default_agent_profiles,
 )
+from ubuntu_ai.agents.recovery_runtime import (
+    ApprovedRecoveryMemory,
+    OrchestrationRecoveryManager,
+    RecoveryCheckpoint,
+    RecoveryMetrics,
+    RecoveryTelemetry,
+    SQLiteRecoveryRepository,
+)
 from ubuntu_ai.agents.registry import AgentRegistry
 from ubuntu_ai.agents.replanning import (
     OrchestrationReplanner,
@@ -59,6 +67,12 @@ __all__ = [
     "OrchestrationReplanner",
     "ReplanningDecision",
     "ReplanningReport",
+    "ApprovedRecoveryMemory",
+    "OrchestrationRecoveryManager",
+    "RecoveryCheckpoint",
+    "RecoveryMetrics",
+    "RecoveryTelemetry",
+    "SQLiteRecoveryRepository",
     "OrchestrationPlanner",
     "SpecialistSelection",
     "SpecialistSelector",

@@ -370,11 +370,11 @@ explícito, limites operacionais e confirmação humana continuarão centralizad
 
 - [x] analisar falhas e resultados parciais;
 - [x] gerar alternativas seguras sem ampliar silenciosamente o escopo;
-- [ ] retomar tarefas usando checkpoints persistidos;
-- [ ] incorporar histórico e conhecimento local às decisões;
+- [x] retomar tarefas usando checkpoints persistidos;
+- [x] incorporar histórico e conhecimento local às decisões;
 - [x] registrar justificativas para seleção e replanejamento;
-- [ ] medir qualidade, tentativas, duração e taxa de sucesso;
-- [ ] impedir aprendizado automático não aprovado.
+- [x] medir qualidade, tentativas, duração e taxa de sucesso;
+- [x] impedir aprendizado automático não aprovado.
 
 ### V2-P4 — Experiência integrada e release v2.0.0
 
