@@ -24,6 +24,8 @@ def test_write_launcher_creates_portable_executable(
     content = launcher.read_text(encoding="utf-8")
     assert content.startswith("#!/usr/bin/env bash")
     assert 'exec "$GUI" "$@"' in content
+    assert 'kill -USR1 "$PID"' in content
+    assert "ubuntu-ai-assistant.lock" in content
     assert str(executable) in content
     assert "PROJECT=" not in content
     assert launcher.stat().st_mode & 0o111
@@ -41,7 +43,8 @@ def test_write_desktop_creates_valid_entry(tmp_path: Path) -> None:
     assert "Icon=ubuntu-ai-assistant" in content
     assert f"Exec={launcher}" in content
     assert "Terminal=false" in content
-    assert "StartupWMClass=Ubuntu AI Assistant" in content
+    assert "StartupWMClass=UbuntuAIAssistant" in content
+    assert "StartupNotify=false" in content
 
 
 def test_install_creates_all_launcher_files(

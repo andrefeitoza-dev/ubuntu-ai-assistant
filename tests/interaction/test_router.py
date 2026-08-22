@@ -23,6 +23,10 @@ def router() -> InteractionRouter:
     ("phrase", "expected"),
     [
         ("que dia é hoje?", InteractionRoute.LOCAL),
+        ("que mês estamos?", InteractionRoute.LOCAL),
+        ("mostre o dia e mês atuais", InteractionRoute.LOCAL),
+        ("qual é o ano atual?", InteractionRoute.LOCAL),
+        ("mostre as horas", InteractionRoute.LOCAL),
         ("como está este computador?", InteractionRoute.LOCAL),
         ("qual a versão do Ubuntu?", InteractionRoute.LOCAL),
         ("qual é o kernel deste computador?", InteractionRoute.LOCAL),

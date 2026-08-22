@@ -55,6 +55,20 @@ class LocalResponder:
         "hoje e que dia",
         "data de hoje",
     }
+    _MONTH_REQUESTS = {
+        "que mes estamos",
+        "qual e o mes atual",
+        "qual o mes atual",
+        "em que mes estamos",
+        "mes atual",
+    }
+    _YEAR_REQUESTS = {
+        "que ano estamos",
+        "qual e o ano atual",
+        "qual o ano atual",
+        "em que ano estamos",
+        "ano atual",
+    }
     _TIME_REQUESTS = {
         "que horas sao",
         "qual e a hora",
@@ -94,16 +108,97 @@ class LocalResponder:
         self._capabilities = capabilities or CapabilityCatalog()
         self._software = software or InstalledSoftwareResponder()
 
+    @classmethod
+    def _is_date_request(cls, normalized: str) -> bool:
+        if normalized in cls._DATE_REQUESTS:
+            return True
+
+        words = set(normalized.split())
+        current = {"atual", "atuais", "hoje", "agora", "estamos"}
+        request = {"mostre", "mostrar", "exiba", "exibir", "informe", "qual", "que"}
+
+        if "data" in words and (words & current or words & request):
+            return True
+
+        return {"dia", "mes"} <= words and bool(words & (current | request))
+
+    @classmethod
+    def _is_month_request(cls, normalized: str) -> bool:
+        if normalized in cls._MONTH_REQUESTS:
+            return True
+
+        words = set(normalized.split())
+        context = {
+            "atual",
+            "atuais",
+            "hoje",
+            "agora",
+            "estamos",
+            "mostre",
+            "mostrar",
+            "informe",
+            "qual",
+            "que",
+        }
+        return "mes" in words and bool(words & context)
+
+    @classmethod
+    def _is_year_request(cls, normalized: str) -> bool:
+        if normalized in cls._YEAR_REQUESTS:
+            return True
+
+        words = set(normalized.split())
+        context = {
+            "atual",
+            "atuais",
+            "hoje",
+            "agora",
+            "estamos",
+            "mostre",
+            "mostrar",
+            "informe",
+            "qual",
+            "que",
+        }
+        return "ano" in words and bool(words & context)
+
+    @classmethod
+    def _is_time_request(cls, normalized: str) -> bool:
+        if normalized in cls._TIME_REQUESTS:
+            return True
+
+        words = set(normalized.split())
+        context = {
+            "atual",
+            "atuais",
+            "agora",
+            "mostre",
+            "mostrar",
+            "informe",
+            "qual",
+            "que",
+        }
+        return bool(words & {"hora", "horas", "horario"}) and bool(words & context)
+
     def respond(self, request: str) -> LocalResponse | None:
         normalized = self._normalize(request)
 
-        if normalized in self._DATE_REQUESTS:
+        if self._is_date_request(normalized):
             current = self._now()
             weekday = self._WEEKDAYS[current.weekday()]
             month = self._MONTHS[current.month - 1]
             return LocalResponse(f"Hoje é {weekday}, {current.day} de {month} de {current.year}.")
 
-        if normalized in self._TIME_REQUESTS:
+        if self._is_month_request(normalized):
+            current = self._now()
+            month = self._MONTHS[current.month - 1]
+            return LocalResponse(f"Estamos em {month} de {current.year}.")
+
+        if self._is_year_request(normalized):
+            current = self._now()
+            return LocalResponse(f"Estamos em {current.year}.")
+
+        if self._is_time_request(normalized):
             current = self._now()
             return LocalResponse(f"Agora são {current:%H:%M}.")
 

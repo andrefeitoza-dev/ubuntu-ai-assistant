@@ -40,6 +40,39 @@ def test_window_icon_uses_first_valid_candidate(
     assert application.root.calls == [(True, loaded)]
 
 
+def test_gui_declares_stable_window_class() -> None:
+    source = Path(gui_app.__file__).read_text(encoding="utf-8")
+
+    assert gui_app.WINDOW_CLASS == "UbuntuAIAssistant"
+    assert "tk.Tk(className=WINDOW_CLASS)" in source
+    assert "SingleInstance()" in source
+    assert "instance.acquire_or_activate()" in source
+    assert "instance.start(application.request_activation)" in source
+
+
+def test_activate_window_restores_and_focuses_existing_window() -> None:
+    calls: list[object] = []
+    application = gui_app.UbuntuAIApp.__new__(gui_app.UbuntuAIApp)
+    application.root = SimpleNamespace(
+        deiconify=lambda: calls.append("deiconify"),
+        lift=lambda: calls.append("lift"),
+        attributes=lambda *args: calls.append(args),
+        after=lambda delay, callback: (calls.append(("after", delay)), callback()),
+        focus_force=lambda: calls.append("focus"),
+    )
+
+    application._activate_window()
+
+    assert calls == [
+        "deiconify",
+        "lift",
+        ("-topmost", True),
+        ("after", 150),
+        ("-topmost", False),
+        "focus",
+    ]
+
+
 def test_window_icon_skips_corrupt_candidate(
     tmp_path: Path,
     monkeypatch,

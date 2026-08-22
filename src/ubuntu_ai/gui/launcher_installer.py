@@ -8,7 +8,10 @@ import subprocess
 import sys
 from pathlib import Path
 
+from ubuntu_ai.gui.single_instance import APP_LOCK_NAME
+
 APP_ID = "ubuntu-ai-assistant"
+WINDOW_CLASS = "UbuntuAIAssistant"
 ICON_SOURCE = Path(__file__).resolve().parent / "assets" / f"{APP_ID}.png"
 
 
@@ -38,6 +41,16 @@ def write_launcher(path: Path, executable: Path) -> None:
 set -euo pipefail
 
 GUI={executable}
+LOCK_ROOT="${{XDG_RUNTIME_DIR:-/tmp/ubuntu-ai-$(id -u)}}"
+LOCK="$LOCK_ROOT/{APP_LOCK_NAME}"
+
+if [[ -r "$LOCK" ]]; then
+    PID="$(tr -d '[:space:]' < "$LOCK")"
+    if [[ "$PID" =~ ^[0-9]+$ ]] && kill -0 "$PID" 2>/dev/null; then
+        kill -USR1 "$PID"
+        exit 0
+    fi
+fi
 
 exec "$GUI" "$@"
 """
@@ -56,8 +69,8 @@ Comment=Assistente inteligente para Ubuntu
 Exec={launcher}
 Terminal=false
 Categories=Utility;System;
-StartupNotify=true
-StartupWMClass=Ubuntu AI Assistant
+StartupNotify=false
+StartupWMClass={WINDOW_CLASS}
 Keywords=Ubuntu;AI;Assistant;Linux;
 """
     path.parent.mkdir(parents=True, exist_ok=True)

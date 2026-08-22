@@ -8,6 +8,7 @@ from tkinter import messagebox, simpledialog
 
 from ubuntu_ai.agent_loop.models import LoopSnapshot, LoopState
 from ubuntu_ai.gui.backend import GUIBackend, MultiAgentExecutionReport
+from ubuntu_ai.gui.single_instance import SingleInstance
 from ubuntu_ai.interaction import ChatResponse, InteractionRoute
 from ubuntu_ai.remote.diagnostics import RemoteSystemContext
 
@@ -48,6 +49,8 @@ FONT_TINY = ("Sans", 10)
 FONT_MONO = ("Monospace", 11)
 FONT_MONO_SMALL = ("Monospace", 10)
 
+WINDOW_CLASS = "UbuntuAIAssistant"
+
 
 class UbuntuAIApp:
     """Interface desktop do Ubuntu AI Assistant."""
@@ -71,7 +74,7 @@ class UbuntuAIApp:
         self._automation_tasks = ()
         self._active_automation_task_id: str | None = None
 
-        self.root = tk.Tk()
+        self.root = tk.Tk(className=WINDOW_CLASS)
         self.root.title("Ubuntu AI Assistant")
         self.root.geometry("1040x760")
         self.root.minsize(780, 580)
@@ -2178,9 +2181,32 @@ class UbuntuAIApp:
     def run(self) -> None:
         self.root.mainloop()
 
+    def request_activation(self) -> None:
+        """Agenda a restauração da janela a partir do listener de instância única."""
+
+        self.root.after(0, self._activate_window)
+
+    def _activate_window(self) -> None:
+        """Restaura, eleva e focaliza a janela já aberta."""
+
+        self.root.deiconify()
+        self.root.lift()
+        self.root.attributes("-topmost", True)
+        self.root.after(150, lambda: self.root.attributes("-topmost", False))
+        self.root.focus_force()
+
 
 def main() -> None:
-    UbuntuAIApp().run()
+    instance = SingleInstance()
+    if not instance.acquire_or_activate():
+        return
+
+    try:
+        application = UbuntuAIApp()
+        instance.start(application.request_activation)
+        application.run()
+    finally:
+        instance.close()
 
 
 if __name__ == "__main__":

@@ -17,6 +17,9 @@ def responder() -> LocalResponder:
         "que dia é hoje?",
         "Qual a data de hoje?",
         "hoje é que dia",
+        "mostre o dia e mês atuais",
+        "informe o dia e o mês atual",
+        "qual a data atual?",
     ],
 )
 def test_date_is_answered_locally(
@@ -32,7 +35,52 @@ def test_date_is_answered_locally(
 
 @pytest.mark.parametrize(
     "phrase",
-    ["que horas são?", "hora atual", "HORÁRIO ATUAL"],
+    [
+        "que mês estamos?",
+        "qual é o mês atual?",
+        "em que mes estamos?",
+        "mês atual",
+    ],
+)
+def test_current_month_is_answered_locally(
+    responder: LocalResponder,
+    phrase: str,
+) -> None:
+    response = responder.respond(phrase)
+
+    assert response is not None
+    assert response.route == "local"
+    assert response.text == "Estamos em agosto de 2026."
+
+
+@pytest.mark.parametrize(
+    "phrase",
+    [
+        "que ano estamos?",
+        "qual é o ano atual?",
+        "mostre o ano atual",
+    ],
+)
+def test_current_year_is_answered_locally(
+    responder: LocalResponder,
+    phrase: str,
+) -> None:
+    response = responder.respond(phrase)
+
+    assert response is not None
+    assert response.route == "local"
+    assert response.text == "Estamos em 2026."
+
+
+@pytest.mark.parametrize(
+    "phrase",
+    [
+        "que horas são?",
+        "hora atual",
+        "HORÁRIO ATUAL",
+        "mostre as horas",
+        "informe o horário atual",
+    ],
 )
 def test_time_is_answered_locally(
     responder: LocalResponder,
