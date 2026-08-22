@@ -330,37 +330,59 @@ reprodutibilidade.
 
 ## v2.0 — Plataforma inteligente multiagente
 
-### Visão futura
+### Objetivo
 
-- colaboração entre múltiplos agentes especializados;
-- gerenciamento de infraestrutura local e remota;
-- memória semântica evoluída;
-- busca de código e configuração;
-- interface gráfica extensível;
-- interface web opcional;
-- políticas organizacionais;
-- execução distribuída;
-- painel de observabilidade;
-- ecossistema público de plugins;
-- suporte a múltiplas distribuições Linux.
+Transformar o Ubuntu AI Assistant em uma plataforma multiagente capaz de
+compreender objetivos, consultar o contexto real do computador, orientar o
+usuário, coordenar especialistas e executar tarefas locais ou remotas com
+segurança, confirmação proporcional ao risco e auditoria completa.
 
----
+A v2.0 não fornecerá autonomia irrestrita. Políticas de risco, destino
+explícito, limites operacionais e confirmação humana continuarão centralizados.
 
-## Próximos passos imediatos
+### V2-P1 — Contexto, comandos e descoberta de recursos
 
-1. validar conversa geral e roteamento na GUI real;
-2. ampliar o Fast Path com correspondências específicas;
-3. integrar recomendações do aprendizado sem autoexecutar novos comandos;
-4. medir a redução do uso do Ollama e a latência percebida;
-5. preparar os cenários e evidências da apresentação do TCC.
+- [ ] responder com dados reais do computador selecionado;
+- [ ] consultar Ubuntu, kernel, arquitetura, hostname, CPU e memória;
+- [ ] consultar discos, rede, bateria, processos e serviços;
+- [ ] separar explicitamente contexto local e contexto SSH;
+- [ ] impedir que perguntas factuais do sistema sejam enviadas à conversa;
+- [ ] listar os principais comandos Linux por categoria;
+- [ ] explicar comandos, argumentos e exemplos seguros;
+- [ ] localizar comandos pela finalidade informada pelo usuário;
+- [ ] listar ou pesquisar comandos instalados no computador selecionado;
+- [ ] sinalizar comandos destrutivos ou dependentes de privilégios;
+- [ ] apresentar um catálogo completo das capacidades do assistente;
+- [ ] adicionar acesso visível a recursos, ajuda e exemplos na GUI;
+- [ ] validar roteamento, segurança e respostas com testes automatizados.
 
-## Princípios permanentes
+### V2-P2 — Orquestração multiagente
 
-- segurança antes da autonomia;
-- confirmação proporcional ao risco;
-- nenhuma tentativa de contornar bloqueios;
-- execução auditável;
-- funcionamento local por padrão;
-- baixo consumo de recursos;
-- arquitetura incremental;
-- testes obrigatórios para cada evolução.
+- [ ] formalizar objetivos, tarefas, dependências e resultados;
+- [ ] selecionar agentes especializados conforme a solicitação;
+- [ ] coordenar agentes de sistema, rede, armazenamento e serviços;
+- [ ] compartilhar somente o contexto necessário entre agentes;
+- [ ] impedir ciclos, duplicações e execução fora do escopo;
+- [ ] manter confirmação e política de risco centralizadas;
+- [ ] acompanhar progresso e resultados de cada agente.
+
+### V2-P3 — Replanejamento, memória e recuperação
+
+- [ ] analisar falhas e resultados parciais;
+- [ ] gerar alternativas seguras sem ampliar silenciosamente o escopo;
+- [ ] retomar tarefas usando checkpoints persistidos;
+- [ ] incorporar histórico e conhecimento local às decisões;
+- [ ] registrar justificativas para seleção e replanejamento;
+- [ ] medir qualidade, tentativas, duração e taxa de sucesso;
+- [ ] impedir aprendizado automático não aprovado.
+
+### V2-P4 — Experiência integrada e release v2.0.0
+
+- [ ] integrar plano, agentes, progresso e controles à GUI;
+- [ ] permitir pausa, retomada e cancelamento;
+- [ ] manter computador e ambiente de destino sempre visíveis;
+- [ ] consolidar eventos, métricas, histórico e auditoria;
+- [ ] validar operação local, remota e multiagente;
+- [ ] atualizar documentação e evidências;
+- [ ] executar auditoria, build e instalação limpa;
+- [ ] preparar e criar a tag `v2.0.0`.
