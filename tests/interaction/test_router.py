@@ -36,7 +36,7 @@ def router() -> InteractionRouter:
         ("mostre a configuração desse computador", InteractionRoute.ACTION),
         ("mostre os discos e partições", InteractionRoute.ACTION),
         ("quais serviços estão ativos?", InteractionRoute.ACTION),
-        ("existem serviços com falha?", InteractionRoute.ACTION),
+        ("existem serviços com falha?", InteractionRoute.LOCAL),
         ("mostre o gateway padrão", InteractionRoute.ACTION),
         ("mostre os arquivos ocultos", InteractionRoute.ACTION),
         ("encontre o arquivo pyproject.toml", InteractionRoute.ACTION),

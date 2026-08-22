@@ -606,6 +606,16 @@ class UbuntuAIApp:
 
         self._add_user_message(request)
 
+        if self._backend.is_remote_selected and self._backend.is_system_fact_request(request):
+            target = self._backend.selected_target
+            operation = self._begin_operation(f"Consultando {target}")
+            threading.Thread(
+                target=self._start_selected_system_fact,
+                args=(request, target, operation),
+                daemon=True,
+            ).start()
+            return
+
         decision = self._backend.route(request)
         if decision.route is InteractionRoute.LOCAL:
             self._add_system_message(
@@ -890,6 +900,45 @@ class UbuntuAIApp:
         self._hide_capabilities_panel()
         detail = self._backend.capability_detail(code)
         self._add_system_message(f"{detail}\n\nRota local · recursos", color=TEXT)
+        self.request_entry.focus_set()
+
+    def _start_selected_system_fact(
+        self,
+        request: str,
+        target: str,
+        operation: int,
+    ) -> None:
+        try:
+            response = self._backend.selected_system_fact(
+                request,
+                target_name=target,
+            )
+        except Exception as exc:
+            self.root.after(0, self._deliver_error, operation, str(exc))
+            return
+
+        self.root.after(
+            0,
+            self._deliver_selected_system_fact,
+            operation,
+            response,
+            target,
+        )
+
+    def _deliver_selected_system_fact(
+        self,
+        operation: int,
+        response: str,
+        target: str,
+    ) -> None:
+        if operation != self._operation_generation:
+            return
+
+        self._set_busy(False)
+        self._add_system_message(
+            f"{response}\n\nRota SSH somente leitura · {target}",
+            color=TEXT,
+        )
         self.request_entry.focus_set()
 
     def _start_request(

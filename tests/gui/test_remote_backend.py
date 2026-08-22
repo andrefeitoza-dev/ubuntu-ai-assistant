@@ -66,6 +66,40 @@ def test_backend_never_answers_remote_fact_with_local_data(backend) -> None:
     assert "nenhuma informação do computador local" in decision.response
 
 
+def test_backend_collects_fact_from_explicit_selected_target(
+    backend,
+    monkeypatch,
+) -> None:
+    backend.register_remote_host(
+        name="production",
+        hostname="server.local",
+        user="ubuntu",
+        port=22,
+        identity_file=None,
+        known_hosts_file=None,
+    )
+    backend.select_target("production")
+    calls: list[tuple[str, str]] = []
+
+    def answer(_service, host_name: str, topic: str) -> str:
+        calls.append((host_name, topic))
+        return f"Computador remoto: {host_name}\nSistema: Ubuntu"
+
+    monkeypatch.setattr(gui_backend.RemoteDiagnosticService, "answer_fact", answer)
+
+    response = backend.selected_system_fact(
+        "qual a versão do Ubuntu?",
+        target_name="production",
+    )
+
+    assert "Computador remoto: production" in response
+    assert calls == [("production", "operating_system")]
+
+
+def test_backend_recognizes_selected_target_fact_without_collecting_it(backend) -> None:
+    assert backend.is_system_fact_request("quanto espaço livre tenho no disco?")
+
+
 def test_backend_exposes_twenty_capability_topics(backend) -> None:
     topics = backend.capability_topics()
 

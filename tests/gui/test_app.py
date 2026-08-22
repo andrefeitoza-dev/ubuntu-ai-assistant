@@ -145,6 +145,15 @@ def test_selected_resource_is_added_to_conversation() -> None:
     assert focused == [True]
 
 
+def test_remote_system_fact_runs_outside_the_gui_thread() -> None:
+    source = Path(gui_app.__file__).read_text(encoding="utf-8")
+
+    assert "_backend.is_system_fact_request(request)" in source
+    assert "target=self._start_selected_system_fact" in source
+    assert "target_name=target" in source
+    assert "Rota SSH somente leitura" in source
+
+
 def test_stale_snapshot_is_ignored() -> None:
     application = gui_app.UbuntuAIApp.__new__(gui_app.UbuntuAIApp)
     application._operation_generation = 2

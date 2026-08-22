@@ -342,10 +342,10 @@ explícito, limites operacionais e confirmação humana continuarão centralizad
 
 ### V2-P1 — Contexto, comandos e descoberta de recursos
 
-- [ ] responder com dados reais do computador selecionado;
+- [x] responder com dados reais do computador selecionado;
 - [x] consultar Ubuntu, kernel, arquitetura, hostname, CPU e memória;
-- [ ] consultar discos, rede, bateria, processos e serviços;
-- [ ] separar explicitamente contexto local e contexto SSH;
+- [x] consultar discos, rede, bateria, processos e serviços;
+- [x] separar explicitamente contexto local e contexto SSH;
 - [x] impedir que perguntas factuais do sistema sejam enviadas à conversa;
 - [x] listar os principais comandos Linux por categoria;
 - [x] explicar comandos, argumentos e exemplos seguros;

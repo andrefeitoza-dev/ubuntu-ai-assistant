@@ -96,6 +96,27 @@ class GUIBackend:
             )
         return self._router.route(request)
 
+    @staticmethod
+    def is_system_fact_request(request: str) -> bool:
+        return SystemFactResponder.matches(request)
+
+    def selected_system_fact(self, request: str, *, target_name: str | None = None) -> str:
+        """Consulta o destino selecionado sem misturar contexto local e remoto."""
+
+        topic = SystemFactResponder.topic_for(request)
+        if topic is None:
+            raise ValueError("A solicitação não corresponde a um dado do computador.")
+
+        target = (target_name or self._selected_target).strip().lower()
+        if target == "local":
+            decision = self._router.route(request)
+            if decision.route is not InteractionRoute.LOCAL or decision.response is None:
+                raise ValueError("Não foi possível consultar o computador local.")
+            return decision.response
+
+        host = self._remote.registry.get(target)
+        return RemoteDiagnosticService(self._remote).answer_fact(host.name, topic)
+
     def capability_topics(self) -> tuple[CapabilityTopic, ...]:
         return self._capabilities.topics
 

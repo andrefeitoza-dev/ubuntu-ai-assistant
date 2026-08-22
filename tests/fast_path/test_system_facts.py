@@ -27,6 +27,8 @@ def responder() -> SystemFactResponder:
         cpu=Detector("Intel CPU"),  # type: ignore[arg-type]
         memory=Detector(8192),  # type: ignore[arg-type]
         health=SimpleNamespace(snapshot=lambda: health),
+        battery_provider=lambda: 78.0,
+        failed_services_provider=lambda: 0,
     )
 
 
@@ -37,6 +39,10 @@ def responder() -> SystemFactResponder:
         "qual é o kernel deste computador?",
         "quanto tenho de memória?",
         "quanto espaço livre tenho no disco?",
+        "quantos processos estão em execução?",
+        "mostre o estado da rede",
+        "qual o nível da bateria?",
+        "existem serviços em falha?",
         "mostre um resumo deste computador",
     ),
 )
@@ -65,6 +71,17 @@ def test_summary_identifies_local_target(responder: SystemFactResponder) -> None
     assert "Computador: local" in response
     assert "Ubuntu 24.04.3 LTS" in response
     assert "notebook" in response
+    assert "Bateria: 78%" in response
+    assert "Serviços em falha: 0" in response
+
+
+def test_battery_and_services_use_read_only_providers(
+    responder: SystemFactResponder,
+) -> None:
+    assert responder.respond("qual o nivel da bateria") == ("Bateria deste computador: 78%.")
+    assert responder.respond("existem servicos em falha") == (
+        "Não existem serviços do sistema em estado de falha."
+    )
 
 
 def test_conceptual_question_is_not_treated_as_machine_fact() -> None:
