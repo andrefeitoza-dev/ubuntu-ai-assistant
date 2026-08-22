@@ -20,6 +20,12 @@ from ubuntu_ai.agents.profiles import (
     default_agent_profiles,
 )
 from ubuntu_ai.agents.registry import AgentRegistry
+from ubuntu_ai.agents.selection import (
+    OrchestrationPlanner,
+    SpecialistSelection,
+    SpecialistSelector,
+    build_specialist_orchestrator,
+)
 from ubuntu_ai.agents.specialists import (
     AgentEnvironment,
     NetworkAgent,
@@ -45,6 +51,10 @@ __all__ = [
     "OrchestrationStatus",
     "OrchestrationTask",
     "OrchestrationTaskResult",
+    "OrchestrationPlanner",
+    "SpecialistSelection",
+    "SpecialistSelector",
+    "build_specialist_orchestrator",
     "AgentProfile",
     "AgentProfilePolicy",
     "AgentProfileRepository",

@@ -36,6 +36,18 @@ BORDER = "#2b3039"
 
 CONTENT_PAD = 105
 
+# Escala de leitura próxima a interfaces modernas de conversa. Os tamanhos
+# menores continuam reservados a metadados, sem reduzir o texto principal.
+FONT_HERO = ("Sans", 32, "bold")
+FONT_TITLE = ("Sans", 17, "bold")
+FONT_BODY = ("Sans", 12)
+FONT_BODY_BOLD = ("Sans", 12, "bold")
+FONT_SMALL = ("Sans", 11)
+FONT_SMALL_BOLD = ("Sans", 11, "bold")
+FONT_TINY = ("Sans", 10)
+FONT_MONO = ("Monospace", 11)
+FONT_MONO_SMALL = ("Monospace", 10)
+
 
 class UbuntuAIApp:
     """Interface desktop do Ubuntu AI Assistant."""
@@ -138,7 +150,7 @@ class UbuntuAIApp:
             text="Ubuntu AI",
             bg=BACKGROUND,
             fg=TEXT,
-            font=("Sans", 15, "bold"),
+            font=FONT_TITLE,
         ).pack(side=tk.LEFT)
 
         tk.Label(
@@ -146,7 +158,7 @@ class UbuntuAIApp:
             text="  Assistant",
             bg=BACKGROUND,
             fg=TEXT_MUTED,
-            font=("Sans", 11),
+            font=FONT_BODY,
         ).pack(side=tk.LEFT)
 
         self.status_label = tk.Label(
@@ -154,7 +166,7 @@ class UbuntuAIApp:
             text="●  Pronto",
             bg=BACKGROUND,
             fg=SUCCESS,
-            font=("Sans", 10),
+            font=FONT_SMALL,
         )
         self.status_label.pack(side=tk.RIGHT)
 
@@ -170,7 +182,7 @@ class UbuntuAIApp:
             borderwidth=0,
             cursor="hand2",
             takefocus=True,
-            font=("Sans", 9),
+            font=FONT_TINY,
             padx=8,
             pady=4,
         )
@@ -189,7 +201,7 @@ class UbuntuAIApp:
             borderwidth=0,
             cursor="hand2",
             takefocus=True,
-            font=("Sans", 9),
+            font=FONT_TINY,
             padx=9,
             pady=4,
         )
@@ -203,7 +215,7 @@ class UbuntuAIApp:
             text="Destino:",
             bg=BACKGROUND,
             fg=TEXT_MUTED,
-            font=("Sans", 9),
+            font=FONT_TINY,
         ).pack(side=tk.LEFT, padx=(0, 6))
 
         self.target_variable = tk.StringVar(value="local")
@@ -220,7 +232,7 @@ class UbuntuAIApp:
             activeforeground=TEXT,
             highlightthickness=0,
             borderwidth=0,
-            font=("Sans", 9),
+            font=FONT_TINY,
             cursor="hand2",
         )
         self.target_menu["menu"].configure(bg=SURFACE_ALT, fg=TEXT)
@@ -243,7 +255,7 @@ class UbuntuAIApp:
                 borderwidth=0,
                 cursor="hand2",
                 takefocus=True,
-                font=("Sans", 9),
+                font=FONT_TINY,
             ).pack(side=tk.LEFT, padx=(5, 0))
 
         self.content = tk.Frame(
@@ -342,7 +354,7 @@ class UbuntuAIApp:
             disabledforeground=TEXT_DIM,
             relief=tk.FLAT,
             borderwidth=0,
-            font=("Sans", 12),
+            font=FONT_BODY,
         )
         self.request_entry.pack(
             side=tk.LEFT,
@@ -371,7 +383,7 @@ class UbuntuAIApp:
             pady=9,
             cursor="hand2",
             takefocus=True,
-            font=("Sans", 10, "bold"),
+            font=FONT_SMALL_BOLD,
         )
         self.send_button.pack(
             side=tk.RIGHT,
@@ -582,7 +594,7 @@ class UbuntuAIApp:
             text="Como posso ajudar?",
             bg=BACKGROUND,
             fg=TEXT,
-            font=("Sans", 30, "bold"),
+            font=FONT_HERO,
         ).pack()
 
     # ------------------------------------------------------------------
@@ -719,7 +731,7 @@ class UbuntuAIApp:
             text="Recursos e ajuda",
             bg=SURFACE_ALT,
             fg=TEXT,
-            font=("Sans", 10, "bold"),
+            font=FONT_SMALL_BOLD,
         ).pack(side=tk.LEFT)
 
         tk.Button(
@@ -733,7 +745,7 @@ class UbuntuAIApp:
             relief=tk.FLAT,
             borderwidth=0,
             cursor="hand2",
-            font=("Sans", 9),
+            font=FONT_TINY,
         ).pack(side=tk.RIGHT)
 
         list_frame = tk.Frame(surface, bg=SURFACE_ALT)
@@ -756,7 +768,7 @@ class UbuntuAIApp:
             relief=tk.FLAT,
             borderwidth=0,
             highlightthickness=0,
-            font=("Sans", 10),
+            font=FONT_SMALL,
             exportselection=False,
             yscrollcommand=scrollbar.set,
         )
@@ -773,7 +785,7 @@ class UbuntuAIApp:
             wraplength=440,
             padx=12,
             pady=10,
-            font=("Sans", 9),
+            font=FONT_TINY,
         )
         detail.pack(fill=tk.X)
 
@@ -1064,7 +1076,7 @@ class UbuntuAIApp:
             text=message,
             bg=SURFACE_ALT,
             fg=TEXT,
-            font=("Sans", 11),
+            font=FONT_BODY,
             justify=tk.LEFT,
             wraplength=560,
             padx=17,
@@ -1095,7 +1107,7 @@ class UbuntuAIApp:
             text=message,
             bg=BACKGROUND,
             fg=color,
-            font=("Sans", 11),
+            font=FONT_BODY,
             justify=tk.LEFT,
             wraplength=650,
         ).pack(anchor="w")
@@ -1153,7 +1165,7 @@ class UbuntuAIApp:
             ),
             bg=SURFACE,
             fg=TEXT,
-            font=("Sans", 15, "bold"),
+            font=FONT_TITLE,
         ).pack(side=tk.LEFT)
 
         tk.Label(
@@ -1161,7 +1173,7 @@ class UbuntuAIApp:
             text=self._risk_label(risk_value),
             bg=SURFACE,
             fg=self._risk_color(risk_value),
-            font=("Sans", 10, "bold"),
+            font=FONT_SMALL_BOLD,
         ).pack(side=tk.RIGHT)
 
         planner = getattr(plan, "planner", None)
@@ -1172,7 +1184,7 @@ class UbuntuAIApp:
                 text=f"Planejador · {planner}",
                 bg=SURFACE,
                 fg=TEXT_MUTED,
-                font=("Sans", 9),
+                font=FONT_TINY,
             ).pack(
                 anchor="w",
                 pady=(6, 15),
@@ -1195,7 +1207,7 @@ class UbuntuAIApp:
                 text=f"{index}. {title}",
                 bg=SURFACE,
                 fg=TEXT,
-                font=("Sans", 11, "bold"),
+                font=FONT_BODY_BOLD,
             ).pack(
                 anchor="w",
                 pady=(8, 3),
@@ -1215,7 +1227,7 @@ class UbuntuAIApp:
                     fg=TEXT_MUTED,
                     justify=tk.LEFT,
                     wraplength=640,
-                    font=("Sans", 10),
+                    font=FONT_SMALL,
                 ).pack(anchor="w")
 
             command = getattr(
@@ -1234,7 +1246,7 @@ class UbuntuAIApp:
                     fg=SUCCESS,
                     justify=tk.LEFT,
                     anchor="w",
-                    font=("Monospace", 10),
+                    font=FONT_MONO,
                     padx=14,
                     pady=11,
                 )
@@ -1269,7 +1281,7 @@ class UbuntuAIApp:
                 pady=9,
                 cursor="hand2",
                 takefocus=True,
-                font=("Sans", 10),
+                font=FONT_SMALL,
             )
             cancel_button.pack(
                 side=tk.RIGHT,
@@ -1290,7 +1302,7 @@ class UbuntuAIApp:
                 pady=9,
                 cursor="hand2",
                 takefocus=True,
-                font=("Sans", 10, "bold"),
+                font=FONT_SMALL_BOLD,
             )
             confirm_button.pack(side=tk.RIGHT)
 
@@ -1452,7 +1464,7 @@ class UbuntuAIApp:
             text=("✓ Execução concluída" if successful else "⚠ Execução não concluída"),
             bg=SURFACE,
             fg=(SUCCESS if successful else ERROR),
-            font=("Sans", 12, "bold"),
+            font=FONT_BODY_BOLD,
         ).pack(anchor="w")
 
         if command:
@@ -1461,7 +1473,7 @@ class UbuntuAIApp:
                 text=f"$ {command}",
                 bg=TERMINAL,
                 fg=SUCCESS,
-                font=("Monospace", 10),
+                font=FONT_MONO,
                 anchor="w",
                 padx=14,
                 pady=11,
@@ -1478,7 +1490,7 @@ class UbuntuAIApp:
                 fg=TEXT_MUTED,
                 justify=tk.LEFT,
                 wraplength=640,
-                font=("Sans", 10),
+                font=FONT_SMALL,
             ).pack(anchor="w")
 
         output = stdout or stderr
@@ -1504,7 +1516,7 @@ class UbuntuAIApp:
                 relief=tk.FLAT,
                 borderwidth=0,
                 highlightthickness=0,
-                font=("Monospace", 9),
+                font=FONT_MONO_SMALL,
                 height=min(
                     max(
                         len(str(output).splitlines()),
@@ -1535,7 +1547,7 @@ class UbuntuAIApp:
                 text=(f"Concluído · código de saída {return_code}"),
                 bg=SURFACE,
                 fg=(SUCCESS if return_code == 0 else ERROR),
-                font=("Sans", 8),
+                font=FONT_TINY,
             ).pack(
                 anchor="e",
                 pady=(9, 0),
@@ -1662,7 +1674,7 @@ class UbuntuAIApp:
             text=message,
             bg=SURFACE,
             fg=TEXT_MUTED,
-            font=("Sans", 9),
+            font=FONT_TINY,
         ).pack(side=tk.RIGHT)
 
         self._active_actions = None

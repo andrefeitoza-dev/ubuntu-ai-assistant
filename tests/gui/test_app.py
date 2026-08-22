@@ -109,6 +109,19 @@ def test_gui_exposes_capability_catalog_button() -> None:
     assert "tk.Toplevel(" not in source
 
 
+def test_gui_uses_readable_conversation_typography() -> None:
+    assert gui_app.FONT_BODY == ("Sans", 12)
+    assert gui_app.FONT_BODY_BOLD == ("Sans", 12, "bold")
+    assert gui_app.FONT_SMALL == ("Sans", 11)
+    assert gui_app.FONT_TINY == ("Sans", 10)
+    assert gui_app.FONT_MONO == ("Monospace", 11)
+
+    source = Path(gui_app.__file__).read_text(encoding="utf-8")
+    assert "font=FONT_BODY" in source
+    assert "font=FONT_TITLE" in source
+    assert "font=FONT_HERO" in source
+
+
 def test_capability_panel_closes_without_blocking_computer_controls() -> None:
     source = Path(gui_app.__file__).read_text(encoding="utf-8")
 
