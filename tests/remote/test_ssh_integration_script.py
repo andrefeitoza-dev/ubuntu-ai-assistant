@@ -21,3 +21,15 @@ def test_isolated_ssh_validation_covers_security_failures() -> None:
     assert "wrong_known_hosts" in source
     assert "wrong_identity" in source
     assert "TimeoutError" in source
+
+
+def test_isolated_ssh_validation_covers_multi_agent_execution() -> None:
+    source = SCRIPT.read_text(encoding="utf-8")
+
+    assert '"uptime"' in source
+    assert '"ip route"' in source
+    assert '"df -h"' in source
+    assert '"systemctl --failed --no-legend --plain"' in source
+    assert 'name="isolated-multi-agent"' in source
+    assert 'validate_multi_agent, "isolated-multi-agent"' in source
+    assert 'os.environ["HOME"] = str(isolated_home)' in source

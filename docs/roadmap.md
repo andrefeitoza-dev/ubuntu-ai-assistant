@@ -382,7 +382,7 @@ explícito, limites operacionais e confirmação humana continuarão centralizad
 - [x] permitir pausa, retomada e cancelamento;
 - [x] manter computador e ambiente de destino sempre visíveis;
 - [x] consolidar eventos, métricas, histórico e auditoria;
-- [ ] validar operação local, remota e multiagente;
-- [ ] atualizar documentação e evidências;
-- [ ] executar auditoria, build e instalação limpa;
-- [ ] preparar e criar a tag `v2.0.0`.
+- [x] validar operação local, remota e multiagente;
+- [x] atualizar documentação e evidências;
+- [x] executar auditoria, build e instalação limpa;
+- [x] preparar e criar a tag `v2.0.0`.

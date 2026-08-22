@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """Valida OpenSSH real contra um servidor efêmero limitado a 127.0.0.1."""
 
 from __future__ import annotations
@@ -9,7 +8,9 @@ import tempfile
 from pathlib import Path
 
 import asyncssh
+from validate_multi_agent_ssh import validate as validate_multi_agent
 
+from ubuntu_ai.gui.backend import GUIBackend
 from ubuntu_ai.remote.models import RemoteCommand, RemoteHost, RemoteHostKind
 from ubuntu_ai.remote.ssh_executor import SSHExecutor
 
@@ -18,6 +19,10 @@ RESPONSES = {
     "true": "",
     "uname -srmo": "Linux ubuntu-ai-test 6.8.0 x86_64 GNU/Linux\n",
     "free -m": "Mem: 1024 256 768\n",
+    "uptime": " 17:44:00 up 2 days, 1 user, load average: 0.10, 0.20, 0.30\n",
+    "ip route": "default via 192.0.2.1 dev eth0\n",
+    "df -h": "Filesystem Size Used Avail Use% Mounted on\n/dev/vda1 20G 5G 15G 25% /\n",
+    "systemctl --failed --no-legend --plain": "",
 }
 
 
@@ -53,6 +58,10 @@ async def execute(executor: SSHExecutor, host: RemoteHost, command: RemoteComman
 async def validate() -> None:
     with tempfile.TemporaryDirectory(prefix="ubuntu-ai-ssh-") as directory:
         root = Path(directory)
+        isolated_home = root / "home"
+        isolated_home.mkdir(mode=0o700)
+        previous_home = os.environ.get("HOME")
+        os.environ["HOME"] = str(isolated_home)
         server_key = asyncssh.generate_private_key("ssh-ed25519")
         client_key = asyncssh.generate_private_key("ssh-ed25519")
         wrong_key = asyncssh.generate_private_key("ssh-ed25519")
@@ -142,9 +151,24 @@ async def validate() -> None:
                 pass
             else:
                 raise AssertionError("O timeout SSH não encerrou a execução.")
+
+            backend = GUIBackend()
+            backend.register_remote_host(
+                name="isolated-multi-agent",
+                hostname="127.0.0.1",
+                user=USERNAME,
+                port=port,
+                identity_file=str(client_identity),
+                known_hosts_file=str(known_hosts),
+            )
+            await asyncio.to_thread(validate_multi_agent, "isolated-multi-agent")
         finally:
             server.close()
             await server.wait_closed()
+            if previous_home is None:
+                os.environ.pop("HOME", None)
+            else:
+                os.environ["HOME"] = previous_home
 
 
 def main() -> int:
@@ -154,6 +178,8 @@ def main() -> int:
     print("- known_hosts obrigatório: OK")
     print("- chave não autorizada recusada: OK")
     print("- timeout com encerramento: OK")
+    print("- diagnóstico multiagente SSH: OK")
+    print("- auditoria dos quatro especialistas: OK")
     return 0
 
 

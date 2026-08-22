@@ -1,7 +1,7 @@
 # Ubuntu AI Assistant Architecture
 
-**Versão:** 1.6.0
-**Status:** Estável — v1.2.0
+**Versão:** 2.0.0
+**Status:** Candidata à release — v2.0.0
 **Arquitetura:** Clean Architecture + SOLID + Strategy + Dependency Injection
 
 ---
@@ -13,6 +13,11 @@ O Ubuntu AI Assistant é um assistente inteligente para administração de siste
 Seu objetivo é permitir que o usuário interaja com o sistema operacional utilizando linguagem natural, mantendo segurança, previsibilidade e transparência durante todo o processo.
 
 A arquitetura foi projetada para ser modular, extensível e independente da tecnologia utilizada pelo modelo de IA.
+
+Na v2.0, objetivos explícitos podem ser decompostos entre agentes de sistema,
+rede, armazenamento e serviços. O coordenador compartilha somente o contexto
+necessário e a execução continua submetida ao destino selecionado, à política
+de risco e à confirmação humana.
 
 ---
 

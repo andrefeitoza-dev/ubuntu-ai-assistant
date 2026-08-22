@@ -2,6 +2,32 @@
 
 Todas as mudanças relevantes deste projeto são registradas neste arquivo.
 
+## [2.0.0] - 2026-08-22
+
+### Added
+
+- Respostas factuais usando o computador local ou SSH selecionado.
+- Catálogo completo de capacidades e comandos Linux na GUI.
+- Orquestração coordenada de agentes de sistema, rede, armazenamento e serviços.
+- Prévia multiagente com confirmação humana antes da execução.
+- Progresso, pausa, retomada, cancelamento, métricas e auditoria na GUI.
+- Replanejamento limitado, checkpoints persistentes e recuperação segura.
+- Memória aprovada sem aprendizado automático implícito.
+
+### Security
+
+- Destino local ou remoto permanece explícito em todo o fluxo.
+- Especialistas não podem elevar privilégios nem delegar ações críticas.
+- Replanejamento não amplia silenciosamente o escopo original.
+- Contexto compartilhado é limitado às chaves declaradas por tarefa.
+- Execução multiagente reutiliza a política e a auditoria remotas centrais.
+
+### Validation
+
+- Operação multiagente local validada visual e funcionalmente.
+- Seleção, orquestração, recuperação e controles cobertos por testes.
+- Validação SSH real, auditoria final e instalação limpa executadas antes da tag.
+
 ## [1.6.0] - 2026-08-21
 
 ### Added

@@ -40,6 +40,12 @@ O Ubuntu AI transforma solicitações em linguagem natural em planos auditáveis
 - perfis restritivos de agentes;
 - catálogo local com confiança explícita de plugins;
 - integração opcional e segura com VS Code;
+- catálogo visível de recursos e comandos Linux;
+- contexto factual do computador local ou SSH selecionado;
+- orquestração multiagente de sistema, rede, armazenamento e serviços;
+- prévia e confirmação antes da execução multiagente;
+- progresso, pausa, retomada, cancelamento e auditoria na GUI;
+- replanejamento limitado e recuperação por checkpoints;
 
 ## Requisitos
 
@@ -130,10 +136,9 @@ print(result.rendered_preview)
 
 ## Estado do projeto
 
-A linha `1.x` consolida aplicação desktop, contexto local, administração SSH,
-automação, agentes especializados e distribuição segura. A v1.6 prepara o
-produto para instalação pública e integrações opcionais, mantendo execução e
-confirmação sob as mesmas políticas centrais.
+A versão `2.0` consolida o Ubuntu AI Assistant como plataforma multiagente para
+operações locais e SSH. Contexto, destino, confirmação, política de risco,
+progresso e auditoria permanecem explícitos; não existe autonomia irrestrita.
 
 ## Licença
 
