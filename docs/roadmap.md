@@ -343,18 +343,18 @@ explícito, limites operacionais e confirmação humana continuarão centralizad
 ### V2-P1 — Contexto, comandos e descoberta de recursos
 
 - [ ] responder com dados reais do computador selecionado;
-- [ ] consultar Ubuntu, kernel, arquitetura, hostname, CPU e memória;
+- [x] consultar Ubuntu, kernel, arquitetura, hostname, CPU e memória;
 - [ ] consultar discos, rede, bateria, processos e serviços;
 - [ ] separar explicitamente contexto local e contexto SSH;
-- [ ] impedir que perguntas factuais do sistema sejam enviadas à conversa;
-- [ ] listar os principais comandos Linux por categoria;
-- [ ] explicar comandos, argumentos e exemplos seguros;
-- [ ] localizar comandos pela finalidade informada pelo usuário;
-- [ ] listar ou pesquisar comandos instalados no computador selecionado;
-- [ ] sinalizar comandos destrutivos ou dependentes de privilégios;
-- [ ] apresentar um catálogo completo das capacidades do assistente;
-- [ ] adicionar acesso visível a recursos, ajuda e exemplos na GUI;
-- [ ] validar roteamento, segurança e respostas com testes automatizados.
+- [x] impedir que perguntas factuais do sistema sejam enviadas à conversa;
+- [x] listar os principais comandos Linux por categoria;
+- [x] explicar comandos, argumentos e exemplos seguros;
+- [x] localizar comandos pela finalidade informada pelo usuário;
+- [x] listar ou pesquisar comandos instalados no computador selecionado;
+- [x] sinalizar comandos destrutivos ou dependentes de privilégios;
+- [x] apresentar um catálogo completo das capacidades do assistente;
+- [x] adicionar acesso visível a recursos, ajuda e exemplos na GUI;
+- [x] validar roteamento, segurança e respostas com testes automatizados.
 
 ### V2-P2 — Orquestração multiagente
 

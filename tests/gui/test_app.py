@@ -95,6 +95,56 @@ def test_remote_button_keeps_selected_target_visible() -> None:
     )
 
 
+def test_gui_exposes_capability_catalog_button() -> None:
+    source = Path(gui_app.__file__).read_text(encoding="utf-8")
+
+    assert 'text="Recursos e ajuda  ▾"' in source
+    assert "tk.Listbox(" in source
+    assert "_build_capabilities_panel" in source
+    assert "_schedule_capability_detail" in source
+    assert "_send_resource_to_conversation" in source
+    assert "panel.place(" in source
+    assert "panel.place_forget()" in source
+    assert "tk.Menu(" not in source
+    assert "tk.Toplevel(" not in source
+
+
+def test_capability_panel_closes_without_blocking_computer_controls() -> None:
+    source = Path(gui_app.__file__).read_text(encoding="utf-8")
+
+    toggle_start = source.index("    def _toggle_remote_controls")
+    toggle_end = source.index("\n    def ", toggle_start + 5)
+    toggle_source = source[toggle_start:toggle_end]
+
+    assert "_hide_capabilities_panel()" in toggle_source
+    assert '"<Escape>"' in source
+    assert '"<Unmap>"' in source
+    assert "_close_capabilities_on_outside_click" in source
+    assert "140," in source
+
+
+def test_selected_resource_is_added_to_conversation() -> None:
+    application = gui_app.UbuntuAIApp.__new__(gui_app.UbuntuAIApp)
+    messages: list[tuple[str, str]] = []
+    focused: list[bool] = []
+
+    application._backend = SimpleNamespace(
+        capability_detail=lambda code: f"Detalhes de {code}",
+    )
+    application._resources_panel = None
+    application._resource_hover_after_id = None
+    application._add_system_message = lambda message, color: messages.append((message, color))
+    application.request_entry = SimpleNamespace(
+        focus_set=lambda: focused.append(True),
+        winfo_exists=lambda: True,
+    )
+
+    application._send_resource_to_conversation("08")
+
+    assert messages == [("Detalhes de 08\n\nRota local · recursos", gui_app.TEXT)]
+    assert focused == [True]
+
+
 def test_stale_snapshot_is_ignored() -> None:
     application = gui_app.UbuntuAIApp.__new__(gui_app.UbuntuAIApp)
     application._operation_generation = 2
@@ -194,7 +244,34 @@ def test_duration_format_adapts_to_latency_scale() -> None:
     assert gui_app.UbuntuAIApp._format_duration(2.5) == "2.50 s"
 
 
-def test_automation_status_text_is_compact() -> None:
-    assert (
-        gui_app.UbuntuAIApp._automation_status_text(2, 5) == "Automações: 2 ativas · 5 concluídas"
+def test_mousewheel_supports_linux_buttons() -> None:
+    assert gui_app.UbuntuAIApp._mousewheel_units(delta=0, button=4) == -3
+    assert gui_app.UbuntuAIApp._mousewheel_units(delta=0, button=5) == 3
+
+
+def test_mousewheel_supports_delta_events() -> None:
+    assert gui_app.UbuntuAIApp._mousewheel_units(delta=120, button=0) == -1
+    assert gui_app.UbuntuAIApp._mousewheel_units(delta=-120, button=0) == 1
+    assert gui_app.UbuntuAIApp._mousewheel_units(delta=0, button=0) == 0
+
+
+def test_mousewheel_scrolls_conversation_canvas() -> None:
+    application = gui_app.UbuntuAIApp.__new__(gui_app.UbuntuAIApp)
+    calls: list[tuple[int, str]] = []
+    application.canvas = SimpleNamespace(
+        yview_scroll=lambda units, mode: calls.append((units, mode))
     )
+
+    result = application._on_mousewheel(SimpleNamespace(delta=0, num=5))
+
+    assert result == "break"
+    assert calls == [(3, "units")]
+
+
+def test_computer_controls_close_when_user_clicks_outside() -> None:
+    source = Path(gui_app.__file__).read_text(encoding="utf-8")
+
+    assert "def _hide_remote_controls" in source
+    assert "inside_remote_controls" in source
+    assert "if self._remote_controls_visible and not inside_remote_controls:" in source
+    assert "self._hide_remote_controls()" in source

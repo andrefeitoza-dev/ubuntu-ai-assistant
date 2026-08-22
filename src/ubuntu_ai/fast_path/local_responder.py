@@ -9,6 +9,10 @@ from dataclasses import dataclass
 from datetime import datetime
 
 from ubuntu_ai.context.health import SystemHealthService
+from ubuntu_ai.fast_path.capabilities import CapabilityCatalog
+from ubuntu_ai.fast_path.linux_commands import LinuxCommandCatalog
+from ubuntu_ai.fast_path.software import InstalledSoftwareResponder
+from ubuntu_ai.fast_path.system_facts import SystemFactResponder
 
 
 @dataclass(frozen=True, slots=True)
@@ -58,14 +62,6 @@ class LocalResponder:
         "hora atual",
         "horario atual",
     }
-    _HELP_REQUESTS = {
-        "help",
-        "ajuda",
-        "me ajude",
-        "o que voce faz",
-        "o que posso pedir",
-        "como voce pode ajudar",
-    }
     _CANCEL_REQUESTS = {
         "cancelar",
         "cancele",
@@ -86,9 +82,17 @@ class LocalResponder:
         self,
         now: Callable[[], datetime] | None = None,
         health_service: SystemHealthService | None = None,
+        system_facts: SystemFactResponder | None = None,
+        commands: LinuxCommandCatalog | None = None,
+        capabilities: CapabilityCatalog | None = None,
+        software: InstalledSoftwareResponder | None = None,
     ) -> None:
         self._now = now or datetime.now
         self._health_service = health_service or SystemHealthService()
+        self._system_facts = system_facts or SystemFactResponder(health=self._health_service)
+        self._commands = commands or LinuxCommandCatalog()
+        self._capabilities = capabilities or CapabilityCatalog()
+        self._software = software or InstalledSoftwareResponder()
 
     def respond(self, request: str) -> LocalResponse | None:
         normalized = self._normalize(request)
@@ -103,12 +107,21 @@ class LocalResponder:
             current = self._now()
             return LocalResponse(f"Agora são {current:%H:%M}.")
 
-        if normalized in self._HELP_REQUESTS:
-            return LocalResponse(
-                "Posso consultar arquivos, pastas, disco, memória, processos, "
-                "rede, serviços, Docker e Git. Também respondo data e hora "
-                "instantaneamente. Ações de risco exigem sua confirmação."
-            )
+        capability_response = self._capabilities.respond(normalized)
+        if capability_response is not None:
+            return LocalResponse(capability_response)
+
+        command_response = self._commands.respond(normalized)
+        if command_response is not None:
+            return LocalResponse(command_response)
+
+        software_response = self._software.respond(normalized)
+        if software_response is not None:
+            return LocalResponse(software_response)
+
+        system_response = self._system_facts.respond(normalized)
+        if system_response is not None:
+            return LocalResponse(system_response)
 
         if normalized in self._CANCEL_REQUESTS:
             return LocalResponse("Não há nenhuma operação em andamento para cancelar.")

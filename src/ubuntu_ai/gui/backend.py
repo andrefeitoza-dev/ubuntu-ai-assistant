@@ -4,7 +4,8 @@ from ubuntu_ai.agent_loop.models import LoopSnapshot
 from ubuntu_ai.autonomy.long_tasks import LongTask
 from ubuntu_ai.autonomy.observability import AutomationMetrics
 from ubuntu_ai.container.bootstrap import container
-from ubuntu_ai.interaction import ChatResponse, InteractionDecision
+from ubuntu_ai.fast_path import CapabilityCatalog, CapabilityTopic, SystemFactResponder
+from ubuntu_ai.interaction import ChatResponse, InteractionDecision, InteractionRoute
 from ubuntu_ai.remote.audit import RemoteAuditRecord
 from ubuntu_ai.remote.diagnostics import RemoteDiagnosticService, RemoteSystemContext
 from ubuntu_ai.remote.health import RemoteHealth, RemoteHealthService
@@ -22,6 +23,7 @@ class GUIBackend:
         self._remote = self._runtime.remote
         self._inventory = RemoteInventoryService(self._remote.registry)
         self._selected_target = "local"
+        self._capabilities = CapabilityCatalog()
 
     @property
     def selected_target(self) -> str:
@@ -85,7 +87,20 @@ class GUIBackend:
     def route(self, request: str) -> InteractionDecision:
         """Classifica a solicitação antes de acionar qualquer executor."""
 
+        if self.is_remote_selected and SystemFactResponder.matches(request):
+            return InteractionDecision(
+                InteractionRoute.LOCAL,
+                "A consulta se refere ao computador remoto "
+                f"“{self._selected_target}”. Use Diagnosticar para coletar os "
+                "dados por SSH; nenhuma informação do computador local foi exibida.",
+            )
         return self._router.route(request)
+
+    def capability_topics(self) -> tuple[CapabilityTopic, ...]:
+        return self._capabilities.topics
+
+    def capability_detail(self, query: str) -> str:
+        return self._capabilities.detail(query)
 
     def chat(self, request: str) -> ChatResponse:
         """Responde sem criar plano nem executar comandos."""

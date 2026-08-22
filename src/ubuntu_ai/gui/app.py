@@ -47,6 +47,12 @@ class UbuntuAIApp:
         self._operation_started_at: dict[int, float] = {}
         self._active_actions: tk.Frame | None = None
         self._active_plan_card: tk.Frame | None = None
+        self._resources_panel: tk.Frame | None = None
+        self._resources_listbox: tk.Listbox | None = None
+        self._resources_detail_label: tk.Label | None = None
+        self._resource_hover_after_id: str | None = None
+        self._resource_hover_index: int | None = None
+        self._resource_topics = ()
 
         self.root = tk.Tk()
         self.root.title("Ubuntu AI Assistant")
@@ -58,22 +64,23 @@ class UbuntuAIApp:
         self._build_interface()
         self._refresh_remote_targets()
         self._bind_accessibility_shortcuts()
-        self._show_welcome()
-        self._refresh_automation_status()
-
-    def _refresh_automation_status(self) -> None:
-        metrics = self._backend.automation_metrics()
-        self.automation_label.configure(
-            text=self._automation_status_text(
-                metrics.active_tasks,
-                metrics.completed_tasks,
-            ),
-            fg=ACCENT if metrics.active_tasks else TEXT_DIM,
+        self._bind_mousewheel()
+        self.root.bind(
+            "<Unmap>",
+            self._hide_capabilities_panel,
+            add="+",
         )
-
-    @staticmethod
-    def _automation_status_text(active: int, completed: int) -> str:
-        return f"Automações: {active} ativas · {completed} concluídas"
+        self.root.bind(
+            "<Escape>",
+            self._hide_capabilities_panel,
+            add="+",
+        )
+        self.root.bind(
+            "<Button-1>",
+            self._close_capabilities_on_outside_click,
+            add="+",
+        )
+        self._show_welcome()
 
     @staticmethod
     def _icon_candidates() -> tuple[Path, ...]:
@@ -151,14 +158,23 @@ class UbuntuAIApp:
         )
         self.status_label.pack(side=tk.RIGHT)
 
-        self.automation_label = tk.Label(
+        self.resources_button = tk.Button(
             header,
-            text="Automações: 0 ativas · 0 concluídas",
+            text="Recursos e ajuda  ▾",
+            command=self._show_capabilities,
             bg=BACKGROUND,
-            fg=TEXT_DIM,
+            fg=TEXT_MUTED,
+            activebackground=SURFACE_HOVER,
+            activeforeground=TEXT,
+            relief=tk.FLAT,
+            borderwidth=0,
+            cursor="hand2",
+            takefocus=True,
             font=("Sans", 9),
+            padx=8,
+            pady=4,
         )
-        self.automation_label.pack(side=tk.RIGHT, padx=(0, 16))
+        self.resources_button.pack(side=tk.RIGHT, padx=(0, 10))
 
         self._remote_controls_visible = False
         self.remote_controls_button = tk.Button(
@@ -364,6 +380,33 @@ class UbuntuAIApp:
 
         self.request_entry.focus_set()
 
+    def _bind_mousewheel(self) -> None:
+        """Habilita roda do mouse e touchpad no histórico da conversa."""
+
+        self.root.bind_all("<MouseWheel>", self._on_mousewheel, add="+")
+        self.root.bind_all("<Button-4>", self._on_mousewheel, add="+")
+        self.root.bind_all("<Button-5>", self._on_mousewheel, add="+")
+
+    def _on_mousewheel(self, event: tk.Event) -> str:
+        units = self._mousewheel_units(
+            delta=getattr(event, "delta", 0),
+            button=getattr(event, "num", 0),
+        )
+        if units:
+            self.canvas.yview_scroll(units, "units")
+        return "break"
+
+    @staticmethod
+    def _mousewheel_units(*, delta: int, button: int) -> int:
+        if button == 4:
+            return -3
+        if button == 5:
+            return 3
+        if delta == 0:
+            return 0
+        steps = max(1, abs(delta) // 120)
+        return -steps if delta > 0 else steps
+
     def _refresh_remote_targets(self) -> None:
         names = ("local", *(host.name for host in self._backend.remote_hosts()))
         menu = self.target_menu["menu"]
@@ -399,15 +442,30 @@ class UbuntuAIApp:
         return f"Computador: {target}  {indicator}"
 
     def _toggle_remote_controls(self) -> None:
-        self._remote_controls_visible = not self._remote_controls_visible
+        self._hide_capabilities_panel()
         if self._remote_controls_visible:
-            self.remote_controls.pack(side=tk.RIGHT, padx=(0, 10))
-        else:
-            self.remote_controls.pack_forget()
+            self._hide_remote_controls()
+            return
+
+        self._remote_controls_visible = True
+        self.remote_controls.pack(side=tk.RIGHT, padx=(0, 10))
         self.remote_controls_button.configure(
             text=self._remote_button_text(
                 self.target_variable.get(),
-                expanded=self._remote_controls_visible,
+                expanded=True,
+            )
+        )
+
+    def _hide_remote_controls(self) -> None:
+        if not self._remote_controls_visible:
+            return
+
+        self._remote_controls_visible = False
+        self.remote_controls.pack_forget()
+        self.remote_controls_button.configure(
+            text=self._remote_button_text(
+                self.target_variable.get(),
+                expanded=False,
             )
         )
 
@@ -583,6 +641,256 @@ class UbuntuAIApp:
             args=(request, operation),
             daemon=True,
         ).start()
+
+    def _show_capabilities(self) -> None:
+        panel = getattr(self, "_resources_panel", None)
+        if panel is not None and panel.winfo_ismapped():
+            self._hide_capabilities_panel()
+            return
+
+        topics = self._backend.capability_topics()
+        self._resource_topics = topics
+        if not topics:
+            return
+
+        if panel is None or not panel.winfo_exists():
+            panel = self._build_capabilities_panel()
+            self._resources_panel = panel
+
+        listbox = self._resources_listbox
+        if listbox is None:
+            return
+
+        listbox.delete(0, tk.END)
+        for topic in topics:
+            listbox.insert(tk.END, f"{topic.code}. {topic.title}")
+
+        self.root.update_idletasks()
+        button_right = (
+            self.resources_button.winfo_rootx()
+            - self.root.winfo_rootx()
+            + self.resources_button.winfo_width()
+        )
+        button_bottom = (
+            self.resources_button.winfo_rooty()
+            - self.root.winfo_rooty()
+            + self.resources_button.winfo_height()
+        )
+
+        panel.place(
+            x=button_right,
+            y=button_bottom + 6,
+            width=480,
+            anchor=tk.NE,
+        )
+        panel.lift()
+
+        self.resources_button.configure(text="Recursos e ajuda  ▴")
+        self._display_capability_detail(0)
+        listbox.focus_set()
+
+    def _build_capabilities_panel(self) -> tk.Frame:
+        panel = tk.Frame(
+            self.root,
+            bg=BORDER,
+            highlightbackground=BORDER,
+            highlightthickness=1,
+            borderwidth=0,
+        )
+
+        surface = tk.Frame(panel, bg=SURFACE_ALT)
+        surface.pack(fill=tk.BOTH, expand=True, padx=1, pady=1)
+
+        heading = tk.Frame(surface, bg=SURFACE_ALT)
+        heading.pack(fill=tk.X, padx=12, pady=(10, 6))
+
+        tk.Label(
+            heading,
+            text="Recursos e ajuda",
+            bg=SURFACE_ALT,
+            fg=TEXT,
+            font=("Sans", 10, "bold"),
+        ).pack(side=tk.LEFT)
+
+        tk.Button(
+            heading,
+            text="Fechar",
+            command=self._hide_capabilities_panel,
+            bg=SURFACE_ALT,
+            fg=TEXT_MUTED,
+            activebackground=SURFACE_HOVER,
+            activeforeground=TEXT,
+            relief=tk.FLAT,
+            borderwidth=0,
+            cursor="hand2",
+            font=("Sans", 9),
+        ).pack(side=tk.RIGHT)
+
+        list_frame = tk.Frame(surface, bg=SURFACE_ALT)
+        list_frame.pack(fill=tk.X, padx=12)
+
+        scrollbar = tk.Scrollbar(
+            list_frame,
+            orient=tk.VERTICAL,
+        )
+        scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+
+        listbox = tk.Listbox(
+            list_frame,
+            height=11,
+            bg=SURFACE,
+            fg=TEXT,
+            selectbackground=ACCENT,
+            selectforeground="#101318",
+            activestyle="none",
+            relief=tk.FLAT,
+            borderwidth=0,
+            highlightthickness=0,
+            font=("Sans", 10),
+            exportselection=False,
+            yscrollcommand=scrollbar.set,
+        )
+        listbox.pack(side=tk.LEFT, fill=tk.X, expand=True)
+        scrollbar.configure(command=listbox.yview)
+
+        detail = tk.Label(
+            surface,
+            text="",
+            bg=SURFACE_ALT,
+            fg=TEXT,
+            justify=tk.LEFT,
+            anchor=tk.NW,
+            wraplength=440,
+            padx=12,
+            pady=10,
+            font=("Sans", 9),
+        )
+        detail.pack(fill=tk.X)
+
+        listbox.bind("<Motion>", self._schedule_capability_detail)
+        listbox.bind("<Leave>", self._cancel_capability_detail)
+        listbox.bind("<ButtonRelease-1>", self._activate_capability)
+        listbox.bind("<Return>", self._activate_capability)
+
+        self._resources_listbox = listbox
+        self._resources_detail_label = detail
+        return panel
+
+    def _schedule_capability_detail(self, event: tk.Event) -> None:
+        listbox = self._resources_listbox
+        if listbox is None or not self._resource_topics:
+            return
+
+        index = listbox.nearest(event.y)
+        bounds = listbox.bbox(index)
+        if bounds is None or event.y > bounds[1] + bounds[3]:
+            self._cancel_capability_detail()
+            return
+
+        if index == self._resource_hover_index:
+            return
+
+        self._cancel_capability_detail()
+        self._resource_hover_index = index
+        self._resource_hover_after_id = self.root.after(
+            140,
+            lambda selected=index: self._display_capability_detail(selected),
+        )
+
+    def _cancel_capability_detail(self, _event: tk.Event | None = None) -> None:
+        after_id = getattr(self, "_resource_hover_after_id", None)
+        if after_id is not None:
+            try:
+                self.root.after_cancel(after_id)
+            except tk.TclError:
+                pass
+
+        self._resource_hover_after_id = None
+        self._resource_hover_index = None
+
+    def _display_capability_detail(self, index: int) -> None:
+        self._resource_hover_after_id = None
+        if index >= len(self._resource_topics):
+            return
+
+        listbox = self._resources_listbox
+        detail = self._resources_detail_label
+        if listbox is None or detail is None:
+            return
+
+        topic = self._resource_topics[index]
+        summary = (
+            f"{topic.title}\n\n"
+            f"• {topic.capabilities[0]}\n"
+            f"Exemplo: {topic.examples[0]}\n\n"
+            f"Risco: {topic.risk} · Disponibilidade: {topic.availability}"
+        )
+
+        listbox.selection_clear(0, tk.END)
+        listbox.selection_set(index)
+        listbox.activate(index)
+        listbox.see(index)
+        detail.configure(text=summary)
+
+    def _activate_capability(self, event: tk.Event | None = None) -> str:
+        listbox = self._resources_listbox
+        if listbox is None:
+            return "break"
+
+        if event is not None and getattr(event, "y", None) is not None:
+            index = listbox.nearest(event.y)
+        else:
+            selected = listbox.curselection()
+            if not selected:
+                return "break"
+            index = selected[0]
+
+        if index >= len(self._resource_topics):
+            return "break"
+
+        code = self._resource_topics[index].code
+        self._hide_capabilities_panel()
+        self._send_resource_to_conversation(code)
+        return "break"
+
+    def _hide_capabilities_panel(self, _event: tk.Event | None = None) -> None:
+        self._cancel_capability_detail()
+
+        panel = getattr(self, "_resources_panel", None)
+        if panel is not None and panel.winfo_exists():
+            panel.place_forget()
+
+        button = getattr(self, "resources_button", None)
+        if button is not None and button.winfo_exists():
+            button.configure(text="Recursos e ajuda  ▾")
+
+    def _close_capabilities_on_outside_click(self, event: tk.Event) -> None:
+        panel = getattr(self, "_resources_panel", None)
+        remote_controls = getattr(self, "remote_controls", None)
+        remote_button = getattr(self, "remote_controls_button", None)
+
+        inside_resources = False
+        inside_remote_controls = False
+
+        widget = event.widget
+        while widget is not None:
+            if widget is panel or widget is self.resources_button:
+                inside_resources = True
+            if widget is remote_controls or widget is remote_button:
+                inside_remote_controls = True
+            widget = getattr(widget, "master", None)
+
+        if panel is not None and panel.winfo_ismapped() and not inside_resources:
+            self._hide_capabilities_panel()
+
+        if self._remote_controls_visible and not inside_remote_controls:
+            self._hide_remote_controls()
+
+    def _send_resource_to_conversation(self, code: str) -> None:
+        self._hide_capabilities_panel()
+        detail = self._backend.capability_detail(code)
+        self._add_system_message(f"{detail}\n\nRota local · recursos", color=TEXT)
+        self.request_entry.focus_set()
 
     def _start_request(
         self,
@@ -1362,7 +1670,6 @@ class UbuntuAIApp:
                 state=tk.NORMAL,
             )
             self.request_entry.focus_set()
-            self._refresh_automation_status()
 
     @staticmethod
     def _command_text(

@@ -3,7 +3,7 @@ from datetime import datetime
 import pytest
 
 from ubuntu_ai.context import SystemHealthService, SystemMetrics
-from ubuntu_ai.fast_path import LocalResponder
+from ubuntu_ai.fast_path import InstalledSoftwareResponder, LocalResponder
 
 
 @pytest.fixture
@@ -48,8 +48,33 @@ def test_help_is_answered_locally(responder: LocalResponder) -> None:
     response = responder.respond("help")
 
     assert response is not None
-    assert "arquivos" in response.text
+    assert "Informações do computador" in response.text
+    assert "Comandos Linux" in response.text
     assert "confirmação" in response.text
+
+
+def test_ubuntu_version_is_answered_locally(responder: LocalResponder) -> None:
+    response = responder.respond("qual a versão do Ubuntu?")
+
+    assert response is not None
+    assert response.route == "local"
+    assert "Sistema deste computador:" in response.text
+
+
+def test_linux_command_help_is_answered_locally(responder: LocalResponder) -> None:
+    response = responder.respond("explique o comando chmod")
+
+    assert response is not None
+    assert "chmod u+x script.sh" in response.text
+
+
+def test_installed_programs_are_answered_locally() -> None:
+    responder = LocalResponder(software=InstalledSoftwareResponder(lambda: (("firefox", "141.0"),)))
+
+    response = responder.respond("quais programas tenho instalados?")
+
+    assert response is not None
+    assert "firefox" in response.text
 
 
 def test_unknown_request_continues_to_planners(
