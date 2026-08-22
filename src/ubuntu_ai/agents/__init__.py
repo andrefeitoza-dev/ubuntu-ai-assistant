@@ -5,6 +5,14 @@ from ubuntu_ai.agents.models import (
     AgentResult,
     AgentTask,
 )
+from ubuntu_ai.agents.orchestration import (
+    MultiAgentOrchestrator,
+    OrchestrationGoal,
+    OrchestrationResult,
+    OrchestrationStatus,
+    OrchestrationTask,
+    OrchestrationTaskResult,
+)
 from ubuntu_ai.agents.profiles import (
     AgentProfile,
     AgentProfilePolicy,
@@ -31,6 +39,12 @@ __all__ = [
     "AgentRegistry",
     "AgentResult",
     "AgentTask",
+    "MultiAgentOrchestrator",
+    "OrchestrationGoal",
+    "OrchestrationResult",
+    "OrchestrationStatus",
+    "OrchestrationTask",
+    "OrchestrationTaskResult",
     "AgentProfile",
     "AgentProfilePolicy",
     "AgentProfileRepository",

@@ -358,13 +358,13 @@ explícito, limites operacionais e confirmação humana continuarão centralizad
 
 ### V2-P2 — Orquestração multiagente
 
-- [ ] formalizar objetivos, tarefas, dependências e resultados;
+- [x] formalizar objetivos, tarefas, dependências e resultados;
 - [ ] selecionar agentes especializados conforme a solicitação;
 - [ ] coordenar agentes de sistema, rede, armazenamento e serviços;
-- [ ] compartilhar somente o contexto necessário entre agentes;
-- [ ] impedir ciclos, duplicações e execução fora do escopo;
-- [ ] manter confirmação e política de risco centralizadas;
-- [ ] acompanhar progresso e resultados de cada agente.
+- [x] compartilhar somente o contexto necessário entre agentes;
+- [x] impedir ciclos, duplicações e execução fora do escopo;
+- [x] manter confirmação e política de risco centralizadas;
+- [x] acompanhar progresso e resultados de cada agente.
 
 ### V2-P3 — Replanejamento, memória e recuperação
 
