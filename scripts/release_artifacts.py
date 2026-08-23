@@ -85,15 +85,18 @@ def validate_sdist(path: Path, version: str) -> None:
             raise ValueError("Source archive incompleto: " + ", ".join(missing))
 
 
-def release_artifacts(directory: Path) -> tuple[Path, Path]:
+def release_artifacts(directory: Path) -> tuple[Path, Path, Path]:
     version = project_version()
     wheel = directory / f"ubuntu_ai_assistant-{version}-py3-none-any.whl"
     sdist = directory / f"ubuntu_ai_assistant-{version}.tar.gz"
-    if not wheel.is_file() or not sdist.is_file():
-        raise ValueError("Wheel e source archive da versão atual são obrigatórios.")
+    debs = sorted(directory.glob(f"ubuntu-ai-assistant_{version}_*.deb"))
+    if not wheel.is_file() or not sdist.is_file() or len(debs) != 1:
+        raise ValueError(
+            "Wheel, source archive e um pacote Debian da versão atual são obrigatórios."
+        )
     validate_wheel(wheel, version)
     validate_sdist(sdist, version)
-    return wheel, sdist
+    return wheel, sdist, debs[0]
 
 
 def write_checksums(paths: tuple[Path, ...], output: Path) -> None:

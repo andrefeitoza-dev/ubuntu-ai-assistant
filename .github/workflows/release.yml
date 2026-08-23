@@ -45,6 +45,10 @@ jobs:
       - name: Build and audit distribution
         run: |
           uv build
+          WHEEL="$(find dist -maxdepth 1 -name '*.whl' -print -quit)"
+          uv run python scripts/build_deb.py "$WHEEL"
+          DEB="$(find dist -maxdepth 1 -name '*.deb' -print -quit)"
+          uv run python scripts/validate_deb.py "$DEB"
           uv run python scripts/release_artifacts.py validate dist
           uv run python scripts/release_artifacts.py checksums dist
           uv run python scripts/release_artifacts.py verify dist
@@ -61,9 +65,10 @@ jobs:
       - name: Publish GitHub release
         uses: softprops/action-gh-release@v2
         with:
-          body_path: docs/releases/v2.0.0.md
+          body_path: docs/releases/v2.0.1.md
           files: |
             dist/*.whl
             dist/*.tar.gz
+            dist/*.deb
             dist/SHA256SUMS
           fail_on_unmatched_files: true

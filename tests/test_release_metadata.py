@@ -9,8 +9,8 @@ ROOT = Path(__file__).resolve().parents[1]
 def test_release_versions_are_consistent() -> None:
     pyproject = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))
 
-    assert pyproject["project"]["version"] == "2.0.0"
-    assert FALLBACK_VERSION == "2.0.0"
+    assert pyproject["project"]["version"] == "2.0.1"
+    assert FALLBACK_VERSION == "2.0.1"
 
 
 def test_release_documentation_exists() -> None:

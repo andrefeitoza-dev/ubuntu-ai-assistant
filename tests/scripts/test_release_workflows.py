@@ -27,7 +27,10 @@ def test_release_requires_matching_tag_checksums_and_keyless_attestation() -> No
     assert "actions/attest-build-provenance@v2" in source
     assert "id-token: write" in source
     assert "dist/SHA256SUMS" in source
-    assert "body_path: docs/releases/v2.0.0.md" in source
+    assert "build_deb.py" in source
+    assert "validate_deb.py" in source
+    assert "dist/*.deb" in source
+    assert "body_path: docs/releases/v2.0.1.md" in source
     assert "PRIVATE_KEY" not in source
 
 

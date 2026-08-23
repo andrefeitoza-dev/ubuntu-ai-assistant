@@ -386,3 +386,15 @@ explícito, limites operacionais e confirmação humana continuarão centralizad
 - [x] atualizar documentação e evidências;
 - [x] executar auditoria, build e instalação limpa;
 - [x] preparar e criar a tag `v2.0.0`.
+
+### V2-P5 — Distribuição simplificada e release v2.0.1
+
+- [x] incorporar os hotfixes de desktop e roteamento temporal;
+- [x] construir um pacote Debian único para Ubuntu `amd64`;
+- [x] incluir aplicação, dependências Python, comandos, ícone e entrada no menu;
+- [x] orientar a configuração inicial do Ollama e do modelo local;
+- [x] auditar conteúdo, metadados e dependências do pacote;
+- [x] publicar o `.deb` junto aos demais artefatos da release;
+- [x] validar instalação e funcionamento em um segundo notebook Ubuntu;
+- [x] validar remoção preservando configurações e dados;
+- [ ] preparar e criar a tag `v2.0.1`.

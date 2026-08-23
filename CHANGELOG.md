@@ -2,6 +2,24 @@
 
 Todas as mudanças relevantes deste projeto são registradas neste arquivo.
 
+## [2.0.1] - 2026-08-22
+
+### Added
+
+- Pacote Debian único com aplicação, dependências Python, comandos e integração desktop.
+- Assistente de primeira configuração para verificar o Ollama e baixar o modelo padrão.
+- Auditoria estrutural do `.deb` e publicação automática no GitHub Release.
+
+### Fixed
+
+- Identidade da janela e controle de instância única no desktop.
+- Roteamento local de perguntas sobre data, hora, mês e ano sem alucinação do modelo.
+
+### Security
+
+- Nenhum instalador remoto é executado automaticamente pela aplicação.
+- Download do modelo usa argumentos fixos e execução sem shell.
+
 ## [2.0.0] - 2026-08-22
 
 ### Added
