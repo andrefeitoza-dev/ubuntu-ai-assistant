@@ -2,6 +2,26 @@
 
 Todas as mudanças relevantes deste projeto são registradas neste arquivo.
 
+## [2.0.2] - 2026-08-25
+
+### Fixed
+
+- Roteamento local das consultas de endereço IP.
+- Lançadores Debian sem uso de `python -c`.
+- Entry points sem caminhos temporários do build.
+- Limpeza de runtimes obsoletos durante atualizações do pacote.
+
+### Security
+
+- Consulta de IP sem shell e com timeout limitado.
+- Auditoria do pacote rejeita lançadores inconsistentes.
+
+### Validation
+
+- 884 testes aprovados na candidata final.
+- Quatro variações de consulta de IP validadas pela rota da GUI.
+
+
 ## [2.0.1] - 2026-08-22
 
 ### Added

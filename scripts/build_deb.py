@@ -47,6 +47,15 @@ Description: Assistente local e seguro para administração do Ubuntu
 """
 
 
+def pre_install_text() -> str:
+    return f"""#!/usr/bin/env bash
+set -e
+if [ "${{1:-}}" = "upgrade" ] && [ -d "/opt/{APP_ID}" ]; then
+    rm -rf -- "/opt/{APP_ID}"
+fi
+"""
+
+
 def wrapper(command: str, interpreter: str) -> str:
     return f"""#!/usr/bin/env bash
 set -euo pipefail
@@ -156,6 +165,9 @@ def build_package(wheel: Path, output: Path, architecture: str) -> Path:
         control = staging / "DEBIAN" / "control"
         control.parent.mkdir(parents=True)
         control.write_text(control_text(version, architecture), encoding="utf-8")
+
+        preinst = staging / "DEBIAN" / "preinst"
+        write_executable(preinst, pre_install_text())
 
         postinst = staging / "DEBIAN" / "postinst"
         post_install_script = """#!/usr/bin/env bash

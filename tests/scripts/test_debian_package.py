@@ -94,3 +94,37 @@ def test_debian_validator_rejects_temporary_entrypoint_shebang(tmp_path: Path) -
 
     with pytest.raises(ValueError, match="caminho temporário"):
         validate_deb.validate_launcher_tree(tmp_path)
+
+
+def test_preinstall_cleans_only_the_package_root_during_upgrade() -> None:
+    build_deb = load_script("build_deb")
+
+    script = build_deb.pre_install_text()
+
+    assert '"${1:-}" = "upgrade"' in script
+    assert '[ -d "/opt/ubuntu-ai-assistant" ]' in script
+    assert 'rm -rf -- "/opt/ubuntu-ai-assistant"' in script
+    assert "$HOME" not in script
+    assert ".config" not in script
+
+
+def test_validator_accepts_restricted_upgrade_cleanup(tmp_path: Path) -> None:
+    build_deb = load_script("build_deb")
+    validate_deb = load_script("validate_deb")
+
+    preinst = tmp_path / "preinst"
+    preinst.write_text(build_deb.pre_install_text(), encoding="utf-8")
+
+    validate_deb.validate_preinstall_tree(tmp_path)
+
+
+def test_validator_rejects_cleanup_of_user_data(tmp_path: Path) -> None:
+    build_deb = load_script("build_deb")
+    validate_deb = load_script("validate_deb")
+
+    preinst = tmp_path / "preinst"
+    source = build_deb.pre_install_text() + '\nrm -rf "$HOME/.config"\n'
+    preinst.write_text(source, encoding="utf-8")
+
+    with pytest.raises(ValueError, match="dados do usuário"):
+        validate_deb.validate_preinstall_tree(tmp_path)

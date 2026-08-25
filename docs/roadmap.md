@@ -406,6 +406,6 @@ explícito, limites operacionais e confirmação humana continuarão centralizad
 - [x] remover `python -c` dos lançadores do pacote Debian;
 - [x] impedir caminhos temporários nos entry points empacotados;
 - [x] adicionar testes de roteamento e auditoria dos lançadores;
-- [ ] executar suíte, arquitetura, build e instalação limpa;
-- [ ] validar a candidata no segundo notebook;
-- [ ] atualizar metadados e criar a tag `v2.0.2`.
+- [x] executar suíte, arquitetura, build e instalação limpa;
+- [x] validar a candidata no segundo notebook;
+- [x] atualizar metadados e criar a tag `v2.0.2`.

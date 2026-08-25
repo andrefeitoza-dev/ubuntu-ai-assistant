@@ -67,6 +67,34 @@ def validate_launcher_tree(root: Path) -> None:
             raise ValueError(f"Shebang final inválido: {command}")
 
 
+def validate_preinstall_tree(root: Path) -> None:
+    preinst = root / "preinst"
+    if not preinst.is_file():
+        raise ValueError("Script Debian preinst ausente.")
+
+    source = preinst.read_text(encoding="utf-8")
+    required = (
+        '"${1:-}" = "upgrade"',
+        '[ -d "/opt/ubuntu-ai-assistant" ]',
+        'rm -rf -- "/opt/ubuntu-ai-assistant"',
+    )
+    if not all(item in source for item in required):
+        raise ValueError("Script Debian preinst inválido.")
+    if "$HOME" in source or ".config" in source:
+        raise ValueError("Script Debian preinst alcança dados do usuário.")
+
+
+def validate_preinstall(package: Path) -> None:
+    with tempfile.TemporaryDirectory(prefix="ubuntu-ai-deb-control-") as temporary:
+        root = Path(temporary)
+        subprocess.run(
+            ("dpkg-deb", "--control", str(package), str(root)),
+            check=True,
+            shell=False,
+        )
+        validate_preinstall_tree(root)
+
+
 def validate_launchers(package: Path) -> None:
     with tempfile.TemporaryDirectory(prefix="ubuntu-ai-deb-audit-") as temporary:
         root = Path(temporary)
@@ -94,6 +122,7 @@ def validate(package: Path) -> None:
         raise ValueError("Pacote Debian incompleto: " + ", ".join(missing))
     if not any(path.endswith("/bin/python3.12") for path in packaged_paths):
         raise ValueError("Runtime Python 3.12 incorporado não encontrado.")
+    validate_preinstall(package)
     validate_launchers(package)
 
 
