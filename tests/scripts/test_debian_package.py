@@ -3,6 +3,8 @@ from __future__ import annotations
 import importlib.util
 from pathlib import Path
 
+import pytest
+
 ROOT = Path(__file__).resolve().parents[2]
 
 
@@ -32,13 +34,27 @@ def test_wrappers_use_fixed_installation_root_without_shell_input() -> None:
     build_deb = load_script("build_deb")
 
     interpreter = "/opt/ubuntu-ai-assistant/runtime/cpython-3.12/bin/python3.12"
-    script = build_deb.wrapper("ubuntu_ai.gui.app", "main", interpreter)
+    script = build_deb.wrapper("ubuntu-ai-gui", interpreter)
 
     assert 'PYTHONPATH="/opt/ubuntu-ai-assistant/lib' in script
-    assert "from ubuntu_ai.gui.app import main; main()" in script
+    assert '"/opt/ubuntu-ai-assistant/lib/bin/ubuntu-ai-gui"' in script
     assert interpreter in script
     assert "/usr/bin/python3" not in script
+    assert " -c " not in script
     assert '"$@"' in script
+
+
+def test_entrypoint_shebangs_are_rewritten_to_final_runtime(tmp_path: Path) -> None:
+    build_deb = load_script("build_deb")
+    entrypoints = tmp_path / "bin"
+    entrypoints.mkdir()
+    command = entrypoints / "ubuntu-ai"
+    command.write_text("#!/tmp/build/python3.12\nprint('ok')\n", encoding="utf-8")
+
+    interpreter = "/opt/ubuntu-ai-assistant/runtime/cpython-3.12/bin/python3.12"
+    build_deb.rewrite_entrypoint_shebangs(entrypoints, interpreter)
+
+    assert command.read_text(encoding="utf-8").startswith(f"#!{interpreter}\n")
 
 
 def test_desktop_entry_is_visible_and_uses_packaged_command() -> None:
@@ -57,3 +73,24 @@ def test_debian_validator_requires_user_commands_and_desktop_assets() -> None:
     assert "./usr/bin/ubuntu-ai" in validate_deb.REQUIRED_PATHS
     assert "./usr/bin/ubuntu-ai-setup" in validate_deb.REQUIRED_PATHS
     assert "./usr/share/applications/ubuntu-ai-assistant.desktop" in (validate_deb.REQUIRED_PATHS)
+
+
+def test_debian_validator_rejects_temporary_entrypoint_shebang(tmp_path: Path) -> None:
+    validate_deb = load_script("validate_deb")
+    for command in validate_deb.PUBLIC_COMMANDS:
+        public = tmp_path / "usr" / "bin" / command
+        public.parent.mkdir(parents=True, exist_ok=True)
+        public.write_text(
+            "#!/bin/sh\n"
+            f'exec /opt/runtime/python /opt/ubuntu-ai-assistant/lib/bin/{command} "$@"\n',
+            encoding="utf-8",
+        )
+        internal = tmp_path / "opt" / "ubuntu-ai-assistant" / "lib" / "bin" / command
+        internal.parent.mkdir(parents=True, exist_ok=True)
+        internal.write_text(
+            "#!/tmp/ubuntu-ai-deb-build/package/runtime/python3.12\n",
+            encoding="utf-8",
+        )
+
+    with pytest.raises(ValueError, match="caminho temporário"):
+        validate_deb.validate_launcher_tree(tmp_path)

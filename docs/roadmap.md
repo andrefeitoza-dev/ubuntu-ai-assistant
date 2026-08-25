@@ -397,4 +397,15 @@ explícito, limites operacionais e confirmação humana continuarão centralizad
 - [x] publicar o `.deb` junto aos demais artefatos da release;
 - [x] validar instalação e funcionamento em um segundo notebook Ubuntu;
 - [x] validar remoção preservando configurações e dados;
-- [ ] preparar e criar a tag `v2.0.1`.
+- [x] preparar e criar a tag `v2.0.1`.
+
+### V2-P6 — Portabilidade e hotfix v2.0.2
+
+- [x] reproduzir a consulta de IP encaminhada incorretamente ao Ollama;
+- [x] responder variações de IP pela rota local somente leitura;
+- [x] remover `python -c` dos lançadores do pacote Debian;
+- [x] impedir caminhos temporários nos entry points empacotados;
+- [x] adicionar testes de roteamento e auditoria dos lançadores;
+- [ ] executar suíte, arquitetura, build e instalação limpa;
+- [ ] validar a candidata no segundo notebook;
+- [ ] atualizar metadados e criar a tag `v2.0.2`.

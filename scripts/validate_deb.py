@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import subprocess
+import tempfile
 import tomllib
 from pathlib import Path
 
@@ -13,6 +14,12 @@ REQUIRED_PATHS = {
     "./usr/share/applications/ubuntu-ai-assistant.desktop",
     "./usr/share/icons/hicolor/512x512/apps/ubuntu-ai-assistant.png",
 }
+PUBLIC_COMMANDS = (
+    "ubuntu-ai",
+    "ubuntu-ai-gui",
+    "ubuntu-ai-setup",
+    "ubuntu-ai-install-launcher",
+)
 
 
 def project_version() -> str:
@@ -42,6 +49,35 @@ def contents(package: Path) -> set[str]:
     return {line.split(maxsplit=5)[-1] for line in result.stdout.splitlines() if line.strip()}
 
 
+def validate_launcher_tree(root: Path) -> None:
+    for command in PUBLIC_COMMANDS:
+        public = root / "usr" / "bin" / command
+        internal = root / "opt" / "ubuntu-ai-assistant" / "lib" / "bin" / command
+        if not public.is_file() or not internal.is_file():
+            raise ValueError(f"Lançador ausente: {command}")
+
+        public_text = public.read_text(encoding="utf-8")
+        if " -c " in public_text or f"/lib/bin/{command}" not in public_text:
+            raise ValueError(f"Lançador público inválido: {command}")
+
+        first_line = internal.read_text(encoding="utf-8").splitlines()[0]
+        if "/tmp/ubuntu-ai-deb-" in first_line:
+            raise ValueError(f"Entry point contém caminho temporário: {command}")
+        if not first_line.startswith("#!/opt/ubuntu-ai-assistant/runtime/"):
+            raise ValueError(f"Shebang final inválido: {command}")
+
+
+def validate_launchers(package: Path) -> None:
+    with tempfile.TemporaryDirectory(prefix="ubuntu-ai-deb-audit-") as temporary:
+        root = Path(temporary)
+        subprocess.run(
+            ("dpkg-deb", "--extract", str(package), str(root)),
+            check=True,
+            shell=False,
+        )
+        validate_launcher_tree(root)
+
+
 def validate(package: Path) -> None:
     if not package.is_file():
         raise ValueError(f"Pacote ausente: {package}")
@@ -58,6 +94,7 @@ def validate(package: Path) -> None:
         raise ValueError("Pacote Debian incompleto: " + ", ".join(missing))
     if not any(path.endswith("/bin/python3.12") for path in packaged_paths):
         raise ValueError("Runtime Python 3.12 incorporado não encontrado.")
+    validate_launchers(package)
 
 
 def main() -> None:

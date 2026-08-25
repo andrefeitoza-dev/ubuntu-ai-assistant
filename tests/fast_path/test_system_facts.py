@@ -29,6 +29,7 @@ def responder() -> SystemFactResponder:
         health=SimpleNamespace(snapshot=lambda: health),
         battery_provider=lambda: 78.0,
         failed_services_provider=lambda: 0,
+        local_ipv4_provider=lambda: "10.192.50.24",
     )
 
 
@@ -44,6 +45,10 @@ def responder() -> SystemFactResponder:
         "qual o nível da bateria?",
         "existem serviços em falha?",
         "mostre um resumo deste computador",
+        "qual é o IP local deste computador?",
+        "qual é meu IP?",
+        "mostre meu endereço IP",
+        "informe o IP deste computador",
     ),
 )
 def test_factual_requests_are_detected(phrase: str) -> None:
@@ -82,6 +87,22 @@ def test_battery_and_services_use_read_only_providers(
     assert responder.respond("existem servicos em falha") == (
         "Não existem serviços do sistema em estado de falha."
     )
+
+
+@pytest.mark.parametrize(
+    "phrase",
+    (
+        "qual é o IP local deste computador?",
+        "qual é meu IP?",
+        "mostre meu endereço IP",
+        "informe o IP deste computador",
+    ),
+)
+def test_local_ip_uses_read_only_provider(
+    responder: SystemFactResponder,
+    phrase: str,
+) -> None:
+    assert responder.respond(phrase) == "IP local deste computador: 10.192.50.24."
 
 
 def test_conceptual_question_is_not_treated_as_machine_fact() -> None:

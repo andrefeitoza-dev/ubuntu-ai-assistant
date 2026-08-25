@@ -47,12 +47,33 @@ Description: Assistente local e seguro para administração do Ubuntu
 """
 
 
-def wrapper(module: str, callable_name: str, interpreter: str) -> str:
+def wrapper(command: str, interpreter: str) -> str:
     return f"""#!/usr/bin/env bash
 set -euo pipefail
 export PYTHONPATH="/opt/{APP_ID}/lib${{PYTHONPATH:+:$PYTHONPATH}}"
-exec "{interpreter}" -c 'from {module} import {callable_name}; {callable_name}()' "$@"
+exec "{interpreter}" "/opt/{APP_ID}/lib/bin/{command}" "$@"
 """
+
+
+def rewrite_entrypoint_shebangs(directory: Path, interpreter: str) -> None:
+    """Substitui caminhos temporários pelos caminhos finais do pacote."""
+
+    if not directory.is_dir():
+        raise RuntimeError("Diretório de entry points Python não encontrado.")
+    for entrypoint in directory.iterdir():
+        if not entrypoint.is_file():
+            continue
+        try:
+            text = entrypoint.read_text(encoding="utf-8")
+        except UnicodeDecodeError:
+            continue
+        if not text.startswith("#!"):
+            continue
+        _first_line, separator, remainder = text.partition("\n")
+        entrypoint.write_text(
+            f"#!{interpreter}{separator}{remainder}",
+            encoding="utf-8",
+        )
 
 
 def desktop_text() -> str:
@@ -130,6 +151,7 @@ def build_package(wheel: Path, output: Path, architecture: str) -> Path:
             check=True,
             shell=False,
         )
+        rewrite_entrypoint_shebangs(library / "bin", installed_python)
 
         control = staging / "DEBIAN" / "control"
         control.parent.mkdir(parents=True)
@@ -152,16 +174,18 @@ printf '%s\n' 'Execute ubuntu-ai-setup para configurar o modelo local.'
             post_install_script,
         )
 
-        commands = {
-            "ubuntu-ai": ("ubuntu_ai.cli.app", "app"),
-            "ubuntu-ai-gui": ("ubuntu_ai.gui.app", "main"),
-            "ubuntu-ai-setup": ("ubuntu_ai.cli.setup", "main"),
-            "ubuntu-ai-install-launcher": ("ubuntu_ai.gui.launcher_installer", "main"),
-        }
-        for name, (module, callable_name) in commands.items():
+        commands = (
+            "ubuntu-ai",
+            "ubuntu-ai-gui",
+            "ubuntu-ai-setup",
+            "ubuntu-ai-install-launcher",
+        )
+        for name in commands:
+            if not (library / "bin" / name).is_file():
+                raise RuntimeError(f"Entry point empacotado não encontrado: {name}")
             write_executable(
                 staging / "usr" / "bin" / name,
-                wrapper(module, callable_name, installed_python),
+                wrapper(name, installed_python),
             )
 
         desktop = staging / "usr" / "share" / "applications" / f"{APP_ID}.desktop"

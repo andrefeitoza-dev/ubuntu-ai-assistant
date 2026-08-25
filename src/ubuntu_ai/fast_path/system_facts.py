@@ -46,6 +46,7 @@ class SystemFactResponder:
         health: SystemHealthService | None = None,
         battery_provider: Callable[[], float | None] | None = None,
         failed_services_provider: Callable[[], int | None] | None = None,
+        local_ipv4_provider: Callable[[], str | None] | None = None,
     ) -> None:
         self._operating_system = operating_system or OperatingSystemDetector()
         self._kernel = kernel or KernelDetector()
@@ -55,11 +56,18 @@ class SystemFactResponder:
         self._health = health or SystemHealthService()
         self._battery_provider = battery_provider or self._battery_percent
         self._failed_services_provider = failed_services_provider or self._failed_services
+        self._local_ipv4_provider = local_ipv4_provider or self._local_ipv4
 
     def respond(self, request: str) -> str | None:
         topic = self.topic_for(request)
         if topic is None:
             return None
+
+        if topic == "ip":
+            address = self._safe_optional(self._local_ipv4_provider)
+            if address is None:
+                return "Não foi possível identificar o IP local deste computador."
+            return f"IP local deste computador: {address}."
 
         facts = self._collect(topic)
         if topic == "operating_system":
@@ -155,7 +163,7 @@ class SystemFactResponder:
         return " ".join(normalized.split())
 
     @staticmethod
-    def _safe_optional(provider: Callable[[], float | int | None]):
+    def _safe_optional(provider: Callable[[], float | int | str | None]):
         try:
             return provider()
         except (OSError, RuntimeError, ValueError, subprocess.SubprocessError):
@@ -181,6 +189,42 @@ class SystemFactResponder:
         return sum(bool(line.strip()) for line in result.stdout.splitlines())
 
     @staticmethod
+    def _local_ipv4() -> str | None:
+        commands = (
+            ("ip", "-4", "route", "get", "1.1.1.1"),
+            ("hostname", "-I"),
+        )
+        for command in commands:
+            try:
+                result = subprocess.run(
+                    command,
+                    check=False,
+                    capture_output=True,
+                    text=True,
+                    timeout=3,
+                    shell=False,
+                )
+            except (OSError, subprocess.SubprocessError):
+                continue
+            if result.returncode != 0:
+                continue
+            if command[0] == "ip":
+                match = re.search(
+                    r"\bsrc\s+(\d{1,3}(?:\.\d{1,3}){3})\b",
+                    result.stdout,
+                )
+                if match:
+                    return match.group(1)
+                continue
+            for candidate in result.stdout.split():
+                if re.fullmatch(
+                    r"\d{1,3}(?:\.\d{1,3}){3}",
+                    candidate,
+                ) and not candidate.startswith("127."):
+                    return candidate
+        return None
+
+    @staticmethod
     def _topic(request: str) -> str | None:
         if request.startswith(("o que e ", "explique ", "como funciona ")):
             return None
@@ -197,6 +241,22 @@ class SystemFactResponder:
             )
         ):
             return "summary"
+        words = set(request.split())
+        if "ip" in words and any(
+            phrase in request
+            for phrase in (
+                "meu ip",
+                "ip local",
+                "endereco ip",
+                "ip deste computador",
+                "ip do computador",
+                "qual e o ip",
+                "qual o ip",
+                "mostre o ip",
+                "informe o ip",
+            )
+        ):
+            return "ip"
         if "versao" in request and ("ubuntu" in request or "sistema operacional" in request):
             return "operating_system"
         if "qual" in request and "sistema operacional" in request:
