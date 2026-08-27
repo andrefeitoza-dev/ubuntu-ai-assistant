@@ -130,16 +130,20 @@ def test_remote_button_keeps_selected_target_visible() -> None:
 
 def test_gui_exposes_capability_catalog_button() -> None:
     source = Path(gui_app.__file__).read_text(encoding="utf-8")
+    component_source = (
+        Path(gui_app.__file__).with_name("capabilities_panel.py").read_text(encoding="utf-8")
+    )
+    complete_source = source + component_source
 
     assert 'text="Recursos e ajuda  ▾"' in source
-    assert "tk.Listbox(" in source
+    assert "tk.Listbox(" in component_source
     assert "_build_capabilities_panel" in source
     assert "_schedule_capability_detail" in source
     assert "_send_resource_to_conversation" in source
     assert "panel.place(" in source
     assert "panel.place_forget()" in source
-    assert "tk.Menu(" not in source
-    assert "tk.Toplevel(" not in source
+    assert "tk.Menu(" not in complete_source
+    assert "tk.Toplevel(" not in complete_source
 
 
 def test_gui_exposes_integrated_multi_agent_progress_panel() -> None:

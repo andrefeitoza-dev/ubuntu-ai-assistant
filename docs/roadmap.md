@@ -434,6 +434,8 @@ as capacidades, políticas de risco ou compatibilidade pública da v2.0.2.
 
 - [x] mapear responsabilidades de `gui/app.py`;
 - [x] extrair funções puras de apresentação;
+- [x] centralizar tokens visuais em módulo de tema;
+- [x] extrair a construção visual do painel de capacidades;
 - [ ] extrair componentes sem alterar comportamento visual;
 - [ ] reduzir acoplamento entre GUI, backend e execução;
 - [ ] adicionar testes de regressão da composição da interface.

@@ -8,6 +8,7 @@ from tkinter import messagebox, simpledialog
 
 from ubuntu_ai.agent_loop.models import LoopSnapshot, LoopState
 from ubuntu_ai.gui.backend import GUIBackend, MultiAgentExecutionReport
+from ubuntu_ai.gui.capabilities_panel import build_capabilities_panel
 from ubuntu_ai.gui.presentation import (
     command_text,
     format_duration,
@@ -17,47 +18,35 @@ from ubuntu_ai.gui.presentation import (
     state_message,
 )
 from ubuntu_ai.gui.single_instance import SingleInstance
+from ubuntu_ai.gui.theme import (
+    ACCENT,
+    ACCENT_HOVER,
+    BACKGROUND,
+    BORDER,
+    CONTENT_PAD,
+    ERROR,
+    FONT_BODY,
+    FONT_BODY_BOLD,
+    FONT_HERO,
+    FONT_MONO,
+    FONT_MONO_SMALL,
+    FONT_SMALL,
+    FONT_SMALL_BOLD,
+    FONT_TINY,
+    FONT_TITLE,
+    SUCCESS,
+    SURFACE,
+    SURFACE_ALT,
+    SURFACE_HOVER,
+    TERMINAL,
+    TEXT,
+    TEXT_DIM,
+    TEXT_MUTED,
+    WARNING,
+    WINDOW_CLASS,
+)
 from ubuntu_ai.interaction import ChatResponse, InteractionRoute
 from ubuntu_ai.remote.diagnostics import RemoteSystemContext
-
-# ---------------------------------------------------------------------------
-# Theme
-# ---------------------------------------------------------------------------
-
-BACKGROUND = "#0d0f14"
-SURFACE = "#171a21"
-SURFACE_HOVER = "#1d2129"
-SURFACE_ALT = "#20242d"
-TERMINAL = "#0b0e13"
-
-TEXT = "#f3f4f6"
-TEXT_MUTED = "#9da4b3"
-TEXT_DIM = "#707786"
-
-ACCENT = "#8ab4f8"
-ACCENT_HOVER = "#a8c7fa"
-
-SUCCESS = "#81c995"
-WARNING = "#fdd663"
-ERROR = "#f28b82"
-
-BORDER = "#2b3039"
-
-CONTENT_PAD = 105
-
-# Escala de leitura próxima a interfaces modernas de conversa. Os tamanhos
-# menores continuam reservados a metadados, sem reduzir o texto principal.
-FONT_HERO = ("Sans", 32, "bold")
-FONT_TITLE = ("Sans", 17, "bold")
-FONT_BODY = ("Sans", 12)
-FONT_BODY_BOLD = ("Sans", 12, "bold")
-FONT_SMALL = ("Sans", 11)
-FONT_SMALL_BOLD = ("Sans", 11, "bold")
-FONT_TINY = ("Sans", 10)
-FONT_MONO = ("Monospace", 11)
-FONT_MONO_SMALL = ("Monospace", 10)
-
-WINDOW_CLASS = "UbuntuAIAssistant"
 
 
 class UbuntuAIApp:
@@ -755,91 +744,16 @@ class UbuntuAIApp:
         listbox.focus_set()
 
     def _build_capabilities_panel(self) -> tk.Frame:
-        panel = tk.Frame(
+        widgets = build_capabilities_panel(
             self.root,
-            bg=BORDER,
-            highlightbackground=BORDER,
-            highlightthickness=1,
-            borderwidth=0,
+            on_close=self._hide_capabilities_panel,
+            on_motion=self._schedule_capability_detail,
+            on_leave=self._cancel_capability_detail,
+            on_activate=self._activate_capability,
         )
-
-        surface = tk.Frame(panel, bg=SURFACE_ALT)
-        surface.pack(fill=tk.BOTH, expand=True, padx=1, pady=1)
-
-        heading = tk.Frame(surface, bg=SURFACE_ALT)
-        heading.pack(fill=tk.X, padx=12, pady=(10, 6))
-
-        tk.Label(
-            heading,
-            text="Recursos e ajuda",
-            bg=SURFACE_ALT,
-            fg=TEXT,
-            font=FONT_SMALL_BOLD,
-        ).pack(side=tk.LEFT)
-
-        tk.Button(
-            heading,
-            text="Fechar",
-            command=self._hide_capabilities_panel,
-            bg=SURFACE_ALT,
-            fg=TEXT_MUTED,
-            activebackground=SURFACE_HOVER,
-            activeforeground=TEXT,
-            relief=tk.FLAT,
-            borderwidth=0,
-            cursor="hand2",
-            font=FONT_TINY,
-        ).pack(side=tk.RIGHT)
-
-        list_frame = tk.Frame(surface, bg=SURFACE_ALT)
-        list_frame.pack(fill=tk.X, padx=12)
-
-        scrollbar = tk.Scrollbar(
-            list_frame,
-            orient=tk.VERTICAL,
-        )
-        scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
-
-        listbox = tk.Listbox(
-            list_frame,
-            height=11,
-            bg=SURFACE,
-            fg=TEXT,
-            selectbackground=ACCENT,
-            selectforeground="#101318",
-            activestyle="none",
-            relief=tk.FLAT,
-            borderwidth=0,
-            highlightthickness=0,
-            font=FONT_SMALL,
-            exportselection=False,
-            yscrollcommand=scrollbar.set,
-        )
-        listbox.pack(side=tk.LEFT, fill=tk.X, expand=True)
-        scrollbar.configure(command=listbox.yview)
-
-        detail = tk.Label(
-            surface,
-            text="",
-            bg=SURFACE_ALT,
-            fg=TEXT,
-            justify=tk.LEFT,
-            anchor=tk.NW,
-            wraplength=440,
-            padx=12,
-            pady=10,
-            font=FONT_TINY,
-        )
-        detail.pack(fill=tk.X)
-
-        listbox.bind("<Motion>", self._schedule_capability_detail)
-        listbox.bind("<Leave>", self._cancel_capability_detail)
-        listbox.bind("<ButtonRelease-1>", self._activate_capability)
-        listbox.bind("<Return>", self._activate_capability)
-
-        self._resources_listbox = listbox
-        self._resources_detail_label = detail
-        return panel
+        self._resources_listbox = widgets.listbox
+        self._resources_detail_label = widgets.detail
+        return widgets.panel
 
     def _schedule_capability_detail(self, event: tk.Event) -> None:
         listbox = self._resources_listbox

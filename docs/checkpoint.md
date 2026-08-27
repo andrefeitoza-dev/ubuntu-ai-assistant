@@ -54,8 +54,19 @@ comportamento, políticas de segurança ou compatibilidade da versão estável.
 - comportamento visual e contratos do backend preservados;
 - zero ciclos entre pacotes de alto nível.
 
+## Resultado do V2.1-P2-R2
+
+- tokens visuais centralizados em `gui/theme.py`;
+- construção do painel extraída para `gui/capabilities_panel.py`;
+- 57 testes específicos aprovados;
+- suíte completa com 911 testes aprovados;
+- `gui/app.py` reduzido de 2.151 para 2.065 linhas;
+- redução acumulada de 2.213 para 2.065 linhas;
+- zero ciclos entre pacotes de alto nível;
+- layout, callbacks e backend preservados.
+
 ## Próximo incremento
 
-- selecionar o primeiro componente visual para extração;
-- proteger sua composição com testes;
-- reduzir `gui/app.py` sem alterar layout ou interação.
+- selecionar o próximo componente visual independente;
+- manter coordenação e políticas em `UbuntuAIApp`;
+- ampliar testes antes de cada nova extração.
