@@ -296,6 +296,7 @@ BUILTIN_COMMANDS: tuple[BuiltinCommand, ...] = (
             "mostre as particoes",
             "dispositivos de bloco",
             "discos conectados",
+            "mostre meus discos",
             "lsblk",
         ),
     ),

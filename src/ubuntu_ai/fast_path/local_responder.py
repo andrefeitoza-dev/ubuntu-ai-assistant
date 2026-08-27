@@ -11,6 +11,7 @@ from datetime import datetime
 from ubuntu_ai.context.health import SystemHealthService
 from ubuntu_ai.fast_path.capabilities import CapabilityCatalog
 from ubuntu_ai.fast_path.linux_commands import LinuxCommandCatalog
+from ubuntu_ai.fast_path.runtime_status import RuntimeStatusResponder
 from ubuntu_ai.fast_path.software import InstalledSoftwareResponder
 from ubuntu_ai.fast_path.system_facts import SystemFactResponder
 
@@ -100,6 +101,7 @@ class LocalResponder:
         commands: LinuxCommandCatalog | None = None,
         capabilities: CapabilityCatalog | None = None,
         software: InstalledSoftwareResponder | None = None,
+        runtime_status: RuntimeStatusResponder | None = None,
     ) -> None:
         self._now = now or datetime.now
         self._health_service = health_service or SystemHealthService()
@@ -107,6 +109,7 @@ class LocalResponder:
         self._commands = commands or LinuxCommandCatalog()
         self._capabilities = capabilities or CapabilityCatalog()
         self._software = software or InstalledSoftwareResponder()
+        self._runtime_status = runtime_status or RuntimeStatusResponder()
 
     @classmethod
     def _is_date_request(cls, normalized: str) -> bool:
@@ -213,6 +216,10 @@ class LocalResponder:
         software_response = self._software.respond(normalized)
         if software_response is not None:
             return LocalResponse(software_response)
+
+        runtime_response = self._runtime_status.respond(normalized)
+        if runtime_response is not None:
+            return LocalResponse(runtime_response)
 
         system_response = self._system_facts.respond(normalized)
         if system_response is not None:

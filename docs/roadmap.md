@@ -459,6 +459,7 @@ as capacidades, políticas de risco ou compatibilidade pública da v2.0.2.
 - [x] inventariar todas as perguntas exibidas em Recursos e ajuda;
 - [x] criar matriz rastreável para os 39 exemplos e 8 casos negativos;
 - [x] corrigir os cinco casos anunciados de abertura segura do desktop;
+- [x] responder localmente consultas anunciadas de runtime e instalação;
 - [ ] testar os 20 recursos anunciados e suas principais variações;
 - [ ] validar rotas locais, Ollama, automação e execução controlada;
 - [ ] validar operação local e em computador remoto por SSH;

@@ -193,3 +193,10 @@ def test_builtin_does_not_fall_back_after_rejected_file_search() -> None:
 
     assert planner.try_create_plan(request) is None
     assert planner.rejection_reason(request) is not None
+
+
+def test_catalog_disks_example_ignores_sentence_punctuation() -> None:
+    plan = BuiltinPlanner().try_create_plan("Mostre meus discos.")
+
+    assert plan is not None
+    assert plan.steps[0].command[0] == "lsblk"

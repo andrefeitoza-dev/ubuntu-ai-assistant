@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import re
 import unicodedata
 from dataclasses import dataclass
 from difflib import SequenceMatcher
@@ -169,7 +170,9 @@ class BuiltinPlanner:
     @classmethod
     def _normalize(cls, value: str) -> str:
 
-        value = unicodedata.normalize("NFKD", value).encode("ascii", "ignore").decode().lower()
+        value = unicodedata.normalize("NFKD", value)
+        value = value.encode("ascii", "ignore").decode().lower()
+        value = re.sub(r"[^a-z0-9_./\s-]", " ", value)
 
         words = [word for word in value.split() if word not in _STOP_WORDS]
 
