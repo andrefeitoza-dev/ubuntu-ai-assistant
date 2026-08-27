@@ -468,13 +468,13 @@ as capacidades, políticas de risco ou compatibilidade pública da v2.0.2.
 - [x] responder localmente consultas anunciadas de runtime e instalação;
 - [x] corrigir diagnóstico de lentidão e conhecimento Linux anunciado;
 - [ ] testar os 20 recursos anunciados e suas principais variações;
-- [ ] validar rotas locais, Ollama, automação e execução controlada;
+- [x] validar rotas locais, Ollama, automação e execução controlada;
 - [ ] validar operação local e em computador remoto por SSH;
-- [ ] testar confirmações, cancelamentos e bloqueios por risco;
-- [ ] testar entradas inválidas e indisponibilidade de dependências;
+- [x] testar confirmações, cancelamentos e bloqueios por risco;
+- [x] testar entradas inválidas e indisponibilidade de dependências;
 - [ ] executar homologação visual completa da GUI;
-- [ ] registrar resultados em uma matriz de evidências;
-- [ ] corrigir falhas ou documentar limitações conhecidas;
+- [x] registrar resultados em uma matriz de evidências;
+- [x] corrigir falhas ou documentar limitações conhecidas;
 - [ ] validar pacote Debian em instalação e atualização reais;
 - [ ] executar suíte, arquitetura, CI e auditoria dos artefatos;
 - [ ] preparar changelog, documentação e tag `v2.1.0`.

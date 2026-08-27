@@ -1,0 +1,190 @@
+{
+  "H01": {
+    "evidence": "GUI local: respostas rápidas, corretas e sem execução sensível.",
+    "status": "APROVADO"
+  },
+  "H02": {
+    "evidence": "GUI local: respostas rápidas, corretas e sem execução sensível.",
+    "status": "APROVADO"
+  },
+  "H03": {
+    "evidence": "GUI local: respostas rápidas, corretas e sem execução sensível.",
+    "status": "APROVADO"
+  },
+  "H04": {
+    "evidence": "GUI local: respostas rápidas, corretas e sem execução sensível.",
+    "status": "APROVADO"
+  },
+  "H05": {
+    "evidence": "GUI local: respostas rápidas, corretas e sem execução sensível.",
+    "status": "APROVADO"
+  },
+  "H06": {
+    "evidence": "GUI local: respostas rápidas, corretas e sem execução sensível.",
+    "status": "APROVADO"
+  },
+  "H07": {
+    "evidence": "GUI local: respostas rápidas, corretas e sem execução sensível.",
+    "status": "APROVADO"
+  },
+  "H08": {
+    "evidence": "GUI local: respostas rápidas, corretas e sem execução sensível.",
+    "status": "APROVADO"
+  },
+  "H09": {
+    "evidence": "GUI e R6: plano somente leitura, cartão exibido e retorno ao estado Pronto.",
+    "status": "APROVADO"
+  },
+  "H10": {
+    "evidence": "GUI e R6: plano somente leitura, cartão exibido e retorno ao estado Pronto.",
+    "status": "APROVADO"
+  },
+  "H11": {
+    "evidence": "GUI e R6: plano somente leitura, cartão exibido e retorno ao estado Pronto.",
+    "status": "APROVADO"
+  },
+  "H12": {
+    "evidence": "GUI e R6: plano somente leitura, cartão exibido e retorno ao estado Pronto.",
+    "status": "APROVADO"
+  },
+  "H13": {
+    "evidence": "GUI e R6: plano somente leitura, cartão exibido e retorno ao estado Pronto.",
+    "status": "APROVADO"
+  },
+  "H14": {
+    "evidence": "GUI local: disco e endereço IP apresentados corretamente.",
+    "status": "APROVADO"
+  },
+  "H15": {
+    "evidence": "GUI local: disco e endereço IP apresentados corretamente.",
+    "status": "APROVADO"
+  },
+  "H16": {
+    "evidence": "Segundo computador SSH indisponível durante a homologação local.",
+    "status": "PENDENTE"
+  },
+  "H17": {
+    "evidence": "GUI local: runtime, APT, programas e dependências refletiram o ambiente real.",
+    "status": "APROVADO"
+  },
+  "H18": {
+    "evidence": "GUI e R6: plano somente leitura, cartão exibido e retorno ao estado Pronto.",
+    "status": "APROVADO"
+  },
+  "H19": {
+    "evidence": "GUI local: runtime, APT, programas e dependências refletiram o ambiente real.",
+    "status": "APROVADO"
+  },
+  "H20": {
+    "evidence": "GUI local: runtime, APT, programas e dependências refletiram o ambiente real.",
+    "status": "APROVADO"
+  },
+  "H21": {
+    "evidence": "GUI local: runtime, APT, programas e dependências refletiram o ambiente real.",
+    "status": "APROVADO"
+  },
+  "H22": {
+    "evidence": "GUI local: runtime, APT, programas e dependências refletiram o ambiente real.",
+    "status": "APROVADO"
+  },
+  "H23": {
+    "evidence": "GUI local: aplicativo, pasta ou configuração abriu ou focalizou corretamente.",
+    "status": "APROVADO"
+  },
+  "H24": {
+    "evidence": "GUI local: aplicativo, pasta ou configuração abriu ou focalizou corretamente.",
+    "status": "APROVADO"
+  },
+  "H25": {
+    "evidence": "GUI local: aplicativo, pasta ou configuração abriu ou focalizou corretamente.",
+    "status": "APROVADO"
+  },
+  "H26": {
+    "evidence": "GUI local: aplicativo, pasta ou configuração abriu ou focalizou corretamente.",
+    "status": "APROVADO"
+  },
+  "H27": {
+    "evidence": "GUI local: runtime de automação, agendamentos, perfis e plugins reais.",
+    "status": "APROVADO"
+  },
+  "H28": {
+    "evidence": "GUI local: cancelamento por botão e frase, com estado cancelado persistido.",
+    "status": "APROVADO"
+  },
+  "H29": {
+    "evidence": "GUI local: runtime de automação, agendamentos, perfis e plugins reais.",
+    "status": "APROVADO"
+  },
+  "H30": {
+    "evidence": "GUI local: runtime de automação, agendamentos, perfis e plugins reais.",
+    "status": "APROVADO"
+  },
+  "H31": {
+    "evidence": "GUI local: prévia multiagente, confirmação e execução somente leitura.",
+    "status": "APROVADO"
+  },
+  "H32": {
+    "evidence": "GUI local: prévia multiagente, confirmação e execução somente leitura.",
+    "status": "APROVADO"
+  },
+  "H33": {
+    "evidence": "GUI local: conhecimento Linux local correto e imediato.",
+    "status": "APROVADO"
+  },
+  "H34": {
+    "evidence": "GUI local: conhecimento Linux local correto e imediato.",
+    "status": "APROVADO"
+  },
+  "H35": {
+    "evidence": "GUI local: runtime de automação, agendamentos, perfis e plugins reais.",
+    "status": "APROVADO"
+  },
+  "H36": {
+    "evidence": "GUI local: runtime de automação, agendamentos, perfis e plugins reais.",
+    "status": "APROVADO"
+  },
+  "H37": {
+    "evidence": "GUI local: versão e integridade da instalação apresentadas corretamente.",
+    "status": "APROVADO"
+  },
+  "H38": {
+    "evidence": "GUI local: versão e integridade da instalação apresentadas corretamente.",
+    "status": "APROVADO"
+  },
+  "H39": {
+    "evidence": "GUI local: aplicativo, pasta ou configuração abriu ou focalizou corretamente.",
+    "status": "APROVADO"
+  },
+  "N01": {
+    "evidence": "GUI: envio vazio não iniciou operação.",
+    "status": "APROVADO"
+  },
+  "N02": {
+    "evidence": "GUI: categoria inexistente retornou ajuda e categorias válidas.",
+    "status": "APROVADO"
+  },
+  "N03": {
+    "evidence": "GUI: Docker indisponível foi informado sem travamento.",
+    "status": "APROVADO"
+  },
+  "N04": {
+    "evidence": "GUI: tarefas de homologação foram canceladas e persistidas.",
+    "status": "APROVADO"
+  },
+  "N05": {
+    "evidence": "GUI: comando rm foi bloqueado e o arquivo de teste permaneceu intacto.",
+    "status": "APROVADO"
+  },
+  "N06": {
+    "evidence": "GUI local: diagnóstico remoto exigiu seleção de destino SSH.",
+    "status": "APROVADO"
+  },
+  "N07": {
+    "evidence": "Exige segundo computador SSH disponível.",
+    "status": "PENDENTE"
+  },
+  "N08": {
+    "evidence": "Exige falha controlada em destino SSH cadastrado.",
+    "status": "PENDENTE"
+  }
+}

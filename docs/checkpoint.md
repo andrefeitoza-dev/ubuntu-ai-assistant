@@ -162,3 +162,13 @@ diferença entre o comportamento observado e o recurso anunciado.
 - variações naturais mantêm rota segura e independente do Ollama;
 - homologação visual confirmou cartões, resultados e retorno ao estado Pronto;
 - evidência: `docs/releases/v2.1-p4-r6-thread-delivery-actions-validation.md`.
+
+## V2.1-P4-R7 — Homologação funcional local
+
+- 38 casos anunciados aprovados pela GUI;
+- 6 casos negativos complementares aprovados;
+- 44 aprovações, nenhuma falha e três pendências SSH;
+- Ollama, automação, confirmação, cancelamento e bloqueio crítico validados;
+- resultados persistidos separadamente do catálogo;
+- `capability_matrix.py --write` preserva resultados e evidências;
+- evidência: `docs/releases/v2.1-p4-r7-local-homologation-validation.md`.
