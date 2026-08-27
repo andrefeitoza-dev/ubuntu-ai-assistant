@@ -8,6 +8,14 @@ from tkinter import messagebox, simpledialog
 
 from ubuntu_ai.agent_loop.models import LoopSnapshot, LoopState
 from ubuntu_ai.gui.backend import GUIBackend, MultiAgentExecutionReport
+from ubuntu_ai.gui.presentation import (
+    command_text,
+    format_duration,
+    friendly_error,
+    risk_color,
+    risk_label,
+    state_message,
+)
 from ubuntu_ai.gui.single_instance import SingleInstance
 from ubuntu_ai.interaction import ChatResponse, InteractionRoute
 from ubuntu_ai.remote.diagnostics import RemoteSystemContext
@@ -1949,33 +1957,7 @@ class UbuntuAIApp:
 
     @staticmethod
     def _friendly_error(message: str) -> str:
-        normalized = message.strip().lower()
-
-        if not normalized:
-            return "O backend não informou detalhes. Tente novamente."
-
-        if "ollama" in normalized or "connection refused" in normalized:
-            return "Não foi possível conectar ao Ollama. Verifique se o serviço está em execução."
-
-        if "timeout" in normalized or "timed out" in normalized:
-            return (
-                "A operação excedeu o tempo esperado. "
-                "Você pode tentar novamente com uma solicitação mais direta."
-            )
-
-        if "model" in normalized and ("not found" in normalized or "não encontrado" in normalized):
-            return (
-                "O modelo de IA configurado não foi encontrado. "
-                "Confira os modelos disponíveis no Ollama."
-            )
-
-        if "permission denied" in normalized or "permissão negada" in normalized:
-            return (
-                "O Ubuntu negou permissão para essa operação. "
-                "Revise o plano e as permissões necessárias."
-            )
-
-        return message.strip()
+        return friendly_error(message)
 
     # ------------------------------------------------------------------
     # Helpers
@@ -2025,11 +2007,7 @@ class UbuntuAIApp:
 
     @staticmethod
     def _format_duration(duration: float) -> str:
-        if duration < 0.001:
-            return f"{duration * 1_000_000:.0f} µs"
-        if duration < 1.0:
-            return f"{duration * 1000:.1f} ms"
-        return f"{duration:.2f} s"
+        return format_duration(duration)
 
     def _set_busy(
         self,
@@ -2069,65 +2047,25 @@ class UbuntuAIApp:
             self.request_entry.focus_set()
 
     @staticmethod
-    def _command_text(
-        command: object,
-    ) -> str:
-        if isinstance(
-            command,
-            (list, tuple),
-        ):
-            return " ".join(str(item) for item in command)
-
-        return str(command)
+    def _command_text(command: object) -> str:
+        return command_text(command)
 
     @staticmethod
-    def _state_message(
-        snapshot: LoopSnapshot,
-    ) -> str:
-        messages = {
-            LoopState.COMPLETED: "✓ Operação concluída com sucesso.",
-            LoopState.BLOCKED: "A operação foi bloqueada pela política de segurança.",
-            LoopState.FAILED: "Não foi possível concluir a operação.",
-            LoopState.CANCELLED: "Operação cancelada.",
-            LoopState.WAITING_CONFIRMATION: "O plano aguarda sua confirmação.",
-        }
+    def _state_message(snapshot: LoopSnapshot) -> str:
+        return state_message(snapshot)
 
-        return messages.get(
-            snapshot.state,
-            f"Estado: {snapshot.state.value}",
+    @staticmethod
+    def _risk_label(risk: str) -> str:
+        return risk_label(risk)
+
+    @staticmethod
+    def _risk_color(risk: str) -> str:
+        return risk_color(
+            risk,
+            success=SUCCESS,
+            warning=WARNING,
+            error=ERROR,
         )
-
-    @staticmethod
-    def _risk_label(
-        risk: str,
-    ) -> str:
-        labels = {
-            "low": "Risco baixo",
-            "medium": "Risco médio",
-            "high": "Risco alto",
-            "critical": "Risco crítico",
-        }
-
-        normalized = risk.lower()
-
-        return labels.get(
-            normalized,
-            f"Risco {risk}",
-        )
-
-    @staticmethod
-    def _risk_color(
-        risk: str,
-    ) -> str:
-        normalized = risk.lower()
-
-        if normalized == "low":
-            return SUCCESS
-
-        if normalized == "medium":
-            return WARNING
-
-        return ERROR
 
     def _resize_messages(
         self,

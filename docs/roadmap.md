@@ -432,7 +432,8 @@ as capacidades, políticas de risco ou compatibilidade pública da v2.0.2.
 
 ### V2.1-P2 — Decomposição da interface gráfica
 
-- [ ] mapear responsabilidades de `gui/app.py`;
+- [x] mapear responsabilidades de `gui/app.py`;
+- [x] extrair funções puras de apresentação;
 - [ ] extrair componentes sem alterar comportamento visual;
 - [ ] reduzir acoplamento entre GUI, backend e execução;
 - [ ] adicionar testes de regressão da composição da interface.

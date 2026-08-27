@@ -44,8 +44,18 @@ comportamento, políticas de segurança ou compatibilidade da versão estável.
 - 887 testes aprovados;
 - zero ciclos entre pacotes de alto nível.
 
+## Resultado do V2.1-P2-R1
+
+- funções puras extraídas para `gui/presentation.py`;
+- métodos anteriores preservados como fachadas;
+- 50 testes específicos aprovados;
+- suíte completa com 911 testes aprovados;
+- `gui/app.py` reduzido de 2.213 para 2.151 linhas;
+- comportamento visual e contratos do backend preservados;
+- zero ciclos entre pacotes de alto nível.
+
 ## Próximo incremento
 
-- V2.1-P2: decomposição progressiva de `gui/app.py`;
-- preservar comportamento visual e contratos do backend;
-- adicionar testes antes de cada extração.
+- selecionar o primeiro componente visual para extração;
+- proteger sua composição com testes;
+- reduzir `gui/app.py` sem alterar layout ou interação.
