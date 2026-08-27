@@ -1,8 +1,7 @@
 from __future__ import annotations
 
-from ubuntu_ai.decision.models import Decision
+from ubuntu_ai.decision.models import Decision, PlanningProfile
 from ubuntu_ai.decision.rules import choose_execution_mode, choose_strategy, preferred_skills
-from ubuntu_ai.planner.models import PlanningProfile
 
 
 class DecisionEngine:

@@ -3,7 +3,6 @@ from inspect import signature
 from shlex import join
 from uuid import uuid4
 
-from ubuntu_ai.agent.context import AgentContext, ContextProvider
 from ubuntu_ai.agent.lifecycle import AgentLifecycle
 from ubuntu_ai.agent.models import AgentResult, AgentTask
 from ubuntu_ai.agent.session import SessionManager
@@ -11,6 +10,7 @@ from ubuntu_ai.confirmation.engine import ConfirmationEngine
 from ubuntu_ai.confirmation.models import Confirmation
 from ubuntu_ai.context.engine import ContextEngine
 from ubuntu_ai.context.models import ContextSnapshot
+from ubuntu_ai.context.provider import AgentContext, ContextProvider
 from ubuntu_ai.conversation.engine import ConversationEngine
 from ubuntu_ai.execution.controlled_executor import ControlledExecutor
 from ubuntu_ai.execution.default_policy import DefaultExecutionPolicy

@@ -1,7 +1,6 @@
 from __future__ import annotations
 
-from ubuntu_ai.decision.models import DecisionStrategy, ExecutionMode
-from ubuntu_ai.planner.models import PlanningProfile
+from ubuntu_ai.decision.models import DecisionStrategy, ExecutionMode, PlanningProfile
 
 
 def choose_strategy(profile: PlanningProfile) -> DecisionStrategy:

@@ -8,6 +8,8 @@ SOURCE = ROOT / "src" / "ubuntu_ai"
 
 FORBIDDEN_PREFIXES = {
     "domain": ("ubuntu_ai.cli", "ubuntu_ai.tui", "requests", "sqlite3"),
+    "context": ("ubuntu_ai.agent",),
+    "decision": ("ubuntu_ai.planner",),
 }
 
 
@@ -31,9 +33,7 @@ def main() -> int:
         for path in directory.rglob("*.py"):
             for module in imported_modules(path):
                 if module.startswith(prefixes):
-                    violations.append(
-                        f"{path.relative_to(ROOT)} imports forbidden module {module}"
-                    )
+                    violations.append(f"{path.relative_to(ROOT)} imports forbidden module {module}")
 
     if violations:
         print("Architecture violations:")

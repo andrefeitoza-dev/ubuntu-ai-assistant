@@ -1,52 +1,51 @@
 # Ubuntu AI Assistant — Development Checkpoint
 
-> Última atualização: 2026-08-22
+> Última atualização: 2026-08-27
 
 ## Estado atual
 
-- Versão candidata: `2.0.0`;
-- Branch: `develop/v2.0`;
-- V2-P1, V2-P2 e V2-P3: concluídos;
-- V2-P4-R1: experiência multiagente integrada e publicada;
-- V2-P4-R2: validação SSH, artefatos e fechamento da release.
+- Última versão estável: `2.0.2`;
+- Branch de desenvolvimento: `develop/v2.1`;
+- Commit-base: `1ec6df8`;
+- CI e Release da `v2.0.2`: aprovados;
+- Artefatos da `v2.0.2`: publicados e verificados;
+- Ciclo atual: `v2.1 — Qualidade arquitetural e manutenção`.
 
-## Capacidades da v2.0
+## Objetivo da v2.1
 
-- contexto factual real do computador selecionado;
-- catálogo completo de recursos e comandos Linux;
-- seleção de especialistas por domínio explícito;
-- orquestração limitada de sistema, rede, armazenamento e serviços;
-- prévia e confirmação antes da execução multiagente;
-- progresso, pausa, retomada e cancelamento cooperativos;
-- métricas, histórico e auditoria sem payloads secretos;
-- replanejamento seguro sem ampliação silenciosa de escopo;
-- retomada por checkpoints e memória somente após aprovação;
-- operação local ou SSH com destino sempre visível.
+Reduzir dívida técnica e fortalecer a manutenção da plataforma sem alterar
+comportamento, políticas de segurança ou compatibilidade da versão estável.
 
-## Segurança
+## Incremento atual
 
-- nenhuma elevação automática de privilégios;
-- ações críticas não são delegadas a especialistas;
-- confirmação e política de risco permanecem centralizadas;
-- contexto compartilhado é mínimo e declarado;
-- execução SSH exige inventário, chave e `known_hosts` explícitos;
-- aprendizado automático não aprovado permanece bloqueado.
+### V2.1-P1 — Contratos e dependências acíclicas
 
-## Evidências principais
+- separar contratos de contexto do pacote `agent`;
+- eliminar a dependência `context -> agent`;
+- separar `PlanningProfile` do pacote `planner`;
+- eliminar a dependência `decision -> planner`;
+- preservar os caminhos públicos anteriores;
+- impedir regressões com verificações automatizadas.
 
-- `docs/releases/v2-p1-r1-local-assistance-validation.md`;
-- `docs/releases/v2-p1-r2-selected-context-validation.md`;
-- `docs/releases/v2-p2-r1-orchestration-foundation-validation.md`;
-- `docs/releases/v2-p2-r2-specialist-selection-validation.md`;
-- `docs/releases/v2-p3-r1-safe-replanning-validation.md`;
-- `docs/releases/v2-p3-r2-persistent-recovery-validation.md`;
-- `docs/releases/v2-p4-r1-integrated-experience-validation.md`;
-- `docs/releases/v2-p4-r2-release-validation.md`;
-- `docs/releases/v2.0.0.md`.
+## Linha de base
 
-## Fechamento pendente
+- 887 testes aprovados após o V2.1-P1;
+- Ruff aprovado;
+- verificações arquiteturais aprovadas;
+- ciclos de alto nível reduzidos de um para zero;
+- maior arquivo: `src/ubuntu_ai/gui/app.py`, com 2.213 linhas.
 
-- validar diagnóstico multiagente em destino SSH real e isolado;
-- executar suíte, arquitetura, documentação e auditoria dos artefatos;
-- validar instalação, atualização e desinstalação limpas;
-- criar e publicar a tag `v2.0.0`.
+## Resultado do V2.1-P1
+
+- contratos de contexto extraídos para área neutra;
+- dependências `context -> agent` e `decision -> planner` removidas;
+- imports públicos anteriores preservados por fachadas;
+- regras arquiteturais automatizadas;
+- 887 testes aprovados;
+- zero ciclos entre pacotes de alto nível.
+
+## Próximo incremento
+
+- V2.1-P2: decomposição progressiva de `gui/app.py`;
+- preservar comportamento visual e contratos do backend;
+- adicionar testes antes de cada extração.

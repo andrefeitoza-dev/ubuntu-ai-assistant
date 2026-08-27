@@ -1,11 +1,27 @@
 from __future__ import annotations
 
-from ubuntu_ai.agent.context import ContextProvider
-from ubuntu_ai.agent.session import SessionManager
+from dataclasses import dataclass, field
+
+from ubuntu_ai.context.contracts import SessionHistoryReader
 from ubuntu_ai.context.discovery.service import ContextDiscoveryService
 from ubuntu_ai.context.models import ContextSnapshot
+from ubuntu_ai.context.provider import ContextProvider
 from ubuntu_ai.memory.models import ExecutionRecord
 from ubuntu_ai.memory.service import MemoryService
+
+
+@dataclass(slots=True)
+class _EmptySession:
+    history: list[str] = field(default_factory=list)
+
+
+class _EmptySessionHistoryReader:
+    def __init__(self) -> None:
+        self._session = _EmptySession()
+
+    @property
+    def session(self) -> _EmptySession:
+        return self._session
 
 
 class ContextEngine:
@@ -15,7 +31,7 @@ class ContextEngine:
         self,
         *,
         context_provider: ContextProvider | None = None,
-        session_manager: SessionManager | None = None,
+        session_manager: SessionHistoryReader | None = None,
         memory_service: MemoryService | None = None,
         discovery_service: ContextDiscoveryService | None = None,
         history_limit: int = 5,
@@ -24,7 +40,7 @@ class ContextEngine:
             raise ValueError("O limite do histórico deve ser maior que zero.")
 
         self._context_provider = context_provider or ContextProvider()
-        self._session_manager = session_manager or SessionManager()
+        self._session_manager = session_manager or _EmptySessionHistoryReader()
         self._memory_service = memory_service
         self._discovery_service = discovery_service or ContextDiscoveryService()
         self._history_limit = history_limit

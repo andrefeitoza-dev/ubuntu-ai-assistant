@@ -409,3 +409,37 @@ explícito, limites operacionais e confirmação humana continuarão centralizad
 - [x] executar suíte, arquitetura, build e instalação limpa;
 - [x] validar a candidata no segundo notebook;
 - [x] atualizar metadados e criar a tag `v2.0.2`.
+
+---
+
+## v2.1 — Qualidade arquitetural e manutenção
+
+### Objetivo
+
+Reduzir dívida técnica e fortalecer a evolução segura da plataforma sem alterar
+as capacidades, políticas de risco ou compatibilidade pública da v2.0.2.
+
+### V2.1-P1 — Contratos e dependências acíclicas
+
+- [x] criar contratos de contexto independentes do pacote `agent`;
+- [x] remover a dependência `context -> agent`;
+- [x] mover `PlanningProfile` para o domínio de decisão;
+- [x] remover a dependência `decision -> planner`;
+- [x] preservar os imports públicos anteriores por fachadas compatíveis;
+- [x] adicionar teste que rejeita ciclos entre pacotes de alto nível;
+- [x] executar suíte completa e auditoria arquitetural;
+- [x] documentar evidências e criar o commit do incremento.
+
+### V2.1-P2 — Decomposição da interface gráfica
+
+- [ ] mapear responsabilidades de `gui/app.py`;
+- [ ] extrair componentes sem alterar comportamento visual;
+- [ ] reduzir acoplamento entre GUI, backend e execução;
+- [ ] adicionar testes de regressão da composição da interface.
+
+### V2.1-P3 — Pipeline e manutenção da release
+
+- [ ] atualizar actions com avisos de runtime depreciado;
+- [ ] preservar CI, release, attestations e checksums;
+- [ ] executar build e instalação limpa;
+- [ ] preparar a release `v2.1.0`.
