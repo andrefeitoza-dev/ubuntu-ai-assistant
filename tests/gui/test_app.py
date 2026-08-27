@@ -148,6 +148,10 @@ def test_gui_exposes_capability_catalog_button() -> None:
 
 def test_gui_exposes_integrated_multi_agent_progress_panel() -> None:
     source = Path(gui_app.__file__).read_text(encoding="utf-8")
+    component_source = (
+        Path(gui_app.__file__).with_name("automation_panel.py").read_text(encoding="utf-8")
+    )
+    complete_source = source + component_source
 
     assert 'text="Agentes e progresso  ▾"' in source
     assert "_build_automation_panel" in source
@@ -155,8 +159,9 @@ def test_gui_exposes_integrated_multi_agent_progress_panel() -> None:
     assert "pause_automation" in source
     assert "resume_automation" in source
     assert "cancel_automation" in source
-    assert "Eventos auditáveis" in source
+    assert "Eventos auditáveis" in component_source
     assert "self._backend.selected_target" in source
+    assert "tk.Toplevel(" not in complete_source
 
 
 def test_multi_agent_prefix_is_explicit_and_preserves_request() -> None:

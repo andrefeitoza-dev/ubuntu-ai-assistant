@@ -65,8 +65,19 @@ comportamento, políticas de segurança ou compatibilidade da versão estável.
 - zero ciclos entre pacotes de alto nível;
 - layout, callbacks e backend preservados.
 
+## Resultado do V2.1-P2-R3
+
+- painel visual extraído para `gui/automation_panel.py`;
+- apresentação de tarefas e métricas extraída;
+- consultas e controles preservados no coordenador;
+- 31 testes específicos aprovados;
+- suíte completa com 913 testes aprovados;
+- `gui/app.py` reduzido de 2.065 para 1.995 linhas;
+- redução acumulada de 2.213 para 1.995 linhas;
+- zero ciclos entre pacotes de alto nível.
+
 ## Próximo incremento
 
-- selecionar o próximo componente visual independente;
-- manter coordenação e políticas em `UbuntuAIApp`;
-- ampliar testes antes de cada nova extração.
+- mapear controles do computador local e remoto;
+- separar construção visual de seleção e diagnóstico;
+- preservar destino explícito e segurança SSH.

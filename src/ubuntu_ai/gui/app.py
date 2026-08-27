@@ -7,6 +7,11 @@ from time import perf_counter
 from tkinter import messagebox, simpledialog
 
 from ubuntu_ai.agent_loop.models import LoopSnapshot, LoopState
+from ubuntu_ai.gui.automation_panel import (
+    build_automation_panel,
+    summary_text,
+    task_row,
+)
 from ubuntu_ai.gui.backend import GUIBackend, MultiAgentExecutionReport
 from ubuntu_ai.gui.capabilities_panel import build_capabilities_panel
 from ubuntu_ai.gui.presentation import (
@@ -986,85 +991,14 @@ class UbuntuAIApp:
         self.automation_button.configure(text="Agentes e progresso  ▴")
 
     def _build_automation_panel(self) -> tk.Frame:
-        panel = tk.Frame(self.root, bg=BORDER, highlightthickness=1)
-        surface = tk.Frame(panel, bg=SURFACE_ALT)
-        surface.pack(fill=tk.BOTH, expand=True, padx=1, pady=1)
-        heading = tk.Frame(surface, bg=SURFACE_ALT)
-        heading.pack(fill=tk.X, padx=12, pady=(10, 6))
-        tk.Label(
-            heading,
-            text="Agentes, tarefas e auditoria",
-            bg=SURFACE_ALT,
-            fg=TEXT,
-            font=FONT_SMALL_BOLD,
-        ).pack(side=tk.LEFT)
-        tk.Button(
-            heading,
-            text="Fechar",
-            command=self._hide_automation_panel,
-            bg=SURFACE_ALT,
-            fg=TEXT_MUTED,
-            relief=tk.FLAT,
-            font=FONT_TINY,
-        ).pack(side=tk.RIGHT)
-
-        summary = tk.Label(
-            surface,
-            text="",
-            bg=SURFACE_ALT,
-            fg=TEXT,
-            justify=tk.LEFT,
-            anchor=tk.W,
-            font=FONT_TINY,
+        widgets = build_automation_panel(
+            self.root,
+            on_close=self._hide_automation_panel,
+            on_action=self._automation_action,
         )
-        summary.pack(fill=tk.X, padx=12, pady=(0, 8))
-        tasks = tk.Listbox(
-            surface,
-            height=8,
-            bg=SURFACE,
-            fg=TEXT,
-            selectbackground=ACCENT,
-            selectforeground="#101318",
-            activestyle="none",
-            relief=tk.FLAT,
-            borderwidth=0,
-            highlightthickness=0,
-            exportselection=False,
-            font=FONT_SMALL,
-        )
-        tasks.pack(fill=tk.X, padx=12)
-
-        controls = tk.Frame(surface, bg=SURFACE_ALT)
-        controls.pack(fill=tk.X, padx=12, pady=10)
-        for label, action in (
-            ("Atualizar", "refresh"),
-            ("Pausar", "pause"),
-            ("Retomar", "resume"),
-            ("Cancelar", "cancel"),
-        ):
-            tk.Button(
-                controls,
-                text=label,
-                command=lambda selected=action: self._automation_action(selected),
-                bg=SURFACE,
-                fg=TEXT,
-                activebackground=SURFACE_HOVER,
-                activeforeground=TEXT,
-                relief=tk.FLAT,
-                font=FONT_TINY,
-                padx=9,
-                pady=5,
-            ).pack(side=tk.LEFT, padx=(0, 6))
-        tk.Label(
-            surface,
-            text="Dica: use “agentes: diagnóstico completo” para criar uma prévia segura.",
-            bg=SURFACE_ALT,
-            fg=TEXT_MUTED,
-            font=FONT_TINY,
-        ).pack(fill=tk.X, padx=12, pady=(0, 10))
-        self._automation_listbox = tasks
-        self._automation_summary_label = summary
-        return panel
+        self._automation_listbox = widgets.tasks
+        self._automation_summary_label = widgets.summary
+        return widgets.panel
 
     def _refresh_automation_panel(self) -> None:
         tasks = self._backend.automation_tasks()
@@ -1077,18 +1011,14 @@ class UbuntuAIApp:
             return
         listbox.delete(0, tk.END)
         for task in tasks:
-            progress = round(task.progress * 100)
-            listbox.insert(
-                tk.END,
-                f"{task.task_id} · {task.status.value} · {progress}% · {task.description}",
-            )
+            listbox.insert(tk.END, task_row(task))
         if not tasks:
             listbox.insert(tk.END, "Nenhuma tarefa automatizada registrada.")
         summary.configure(
-            text=(
-                f"Destino: {self._backend.selected_target} · "
-                f"Ativas: {metrics.active_tasks} · Concluídas: {metrics.completed_tasks} · "
-                f"Falhas: {metrics.failed_tasks} · Eventos auditáveis: {len(events)}"
+            text=summary_text(
+                target=self._backend.selected_target,
+                metrics=metrics,
+                event_count=len(events),
             )
         )
 
