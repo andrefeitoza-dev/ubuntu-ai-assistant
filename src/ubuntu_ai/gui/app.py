@@ -22,6 +22,10 @@ from ubuntu_ai.gui.presentation import (
     risk_label,
     state_message,
 )
+from ubuntu_ai.gui.remote_controls import (
+    build_remote_controls,
+    remote_button_text,
+)
 from ubuntu_ai.gui.single_instance import SingleInstance
 from ubuntu_ai.gui.theme import (
     ACCENT,
@@ -219,74 +223,18 @@ class UbuntuAIApp:
         self.automation_button.pack(side=tk.RIGHT, padx=(0, 10))
 
         self._remote_controls_visible = False
-        self.remote_controls_button = tk.Button(
+        remote_widgets = build_remote_controls(
             header,
-            text=self._remote_button_text("local", expanded=False),
-            command=self._toggle_remote_controls,
-            bg=SURFACE_ALT,
-            fg=TEXT,
-            activebackground=SURFACE_HOVER,
-            activeforeground=TEXT,
-            relief=tk.FLAT,
-            borderwidth=0,
-            cursor="hand2",
-            takefocus=True,
-            font=FONT_TINY,
-            padx=9,
-            pady=4,
+            on_toggle=self._toggle_remote_controls,
+            on_target_selected=self._on_target_selected,
+            on_add=self._add_remote_host,
+            on_remove=self._remove_remote_host,
+            on_diagnose=self._start_remote_diagnostics,
         )
-        self.remote_controls_button.pack(side=tk.RIGHT, padx=(0, 16))
-
-        self.remote_controls = tk.Frame(header, bg=BACKGROUND)
-        target = self.remote_controls
-
-        tk.Label(
-            target,
-            text="Destino:",
-            bg=BACKGROUND,
-            fg=TEXT_MUTED,
-            font=FONT_TINY,
-        ).pack(side=tk.LEFT, padx=(0, 6))
-
-        self.target_variable = tk.StringVar(value="local")
-        self.target_menu = tk.OptionMenu(
-            target,
-            self.target_variable,
-            "local",
-            command=self._on_target_selected,
-        )
-        self.target_menu.configure(
-            bg=SURFACE_ALT,
-            fg=TEXT,
-            activebackground=SURFACE_HOVER,
-            activeforeground=TEXT,
-            highlightthickness=0,
-            borderwidth=0,
-            font=FONT_TINY,
-            cursor="hand2",
-        )
-        self.target_menu["menu"].configure(bg=SURFACE_ALT, fg=TEXT)
-        self.target_menu.pack(side=tk.LEFT)
-
-        for label, command in (
-            ("+", self._add_remote_host),
-            ("−", self._remove_remote_host),
-            ("Diagnosticar", self._start_remote_diagnostics),
-        ):
-            tk.Button(
-                target,
-                text=label,
-                command=command,
-                bg=BACKGROUND,
-                fg=TEXT_MUTED,
-                activebackground=SURFACE_HOVER,
-                activeforeground=TEXT,
-                relief=tk.FLAT,
-                borderwidth=0,
-                cursor="hand2",
-                takefocus=True,
-                font=FONT_TINY,
-            ).pack(side=tk.LEFT, padx=(5, 0))
+        self.remote_controls_button = remote_widgets.button
+        self.remote_controls = remote_widgets.container
+        self.target_variable = remote_widgets.target_variable
+        self.target_menu = remote_widgets.target_menu
 
         self.content = tk.Frame(
             self.root,
@@ -480,8 +428,7 @@ class UbuntuAIApp:
 
     @staticmethod
     def _remote_button_text(target: str, *, expanded: bool) -> str:
-        indicator = "▴" if expanded else "▾"
-        return f"Computador: {target}  {indicator}"
+        return remote_button_text(target, expanded=expanded)
 
     def _toggle_remote_controls(self) -> None:
         self._hide_capabilities_panel()

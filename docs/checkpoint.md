@@ -76,8 +76,20 @@ comportamento, políticas de segurança ou compatibilidade da versão estável.
 - redução acumulada de 2.213 para 1.995 linhas;
 - zero ciclos entre pacotes de alto nível.
 
+## Resultado do V2.1-P2-R4
+
+- controles visuais extraídos para `gui/remote_controls.py`;
+- destino selecionado permanece sempre visível;
+- cadastro, seleção e diagnóstico preservados no coordenador;
+- validações e segurança preservadas no backend remoto;
+- 35 testes específicos aprovados;
+- suíte completa com 915 testes aprovados;
+- `gui/app.py` reduzido de 1.995 para 1.942 linhas;
+- redução acumulada de 2.213 para 1.942 linhas;
+- zero ciclos entre pacotes de alto nível.
+
 ## Próximo incremento
 
-- mapear controles do computador local e remoto;
-- separar construção visual de seleção e diagnóstico;
-- preservar destino explícito e segurança SSH.
+- mapear cartões de plano e resultado de execução;
+- separar renderização de dados e comandos;
+- preservar confirmação, risco e política no coordenador.

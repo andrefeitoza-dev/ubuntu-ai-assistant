@@ -370,8 +370,13 @@ def test_mousewheel_scrolls_conversation_canvas() -> None:
 
 def test_computer_controls_close_when_user_clicks_outside() -> None:
     source = Path(gui_app.__file__).read_text(encoding="utf-8")
+    component_source = (
+        Path(gui_app.__file__).with_name("remote_controls.py").read_text(encoding="utf-8")
+    )
 
     assert "def _hide_remote_controls" in source
     assert "inside_remote_controls" in source
     assert "if self._remote_controls_visible and not inside_remote_controls:" in source
     assert "self._hide_remote_controls()" in source
+    assert "tk.OptionMenu(" in component_source
+    assert '"Diagnosticar"' in component_source
