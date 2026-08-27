@@ -14,6 +14,10 @@ from ubuntu_ai.gui.automation_panel import (
 )
 from ubuntu_ai.gui.backend import GUIBackend, MultiAgentExecutionReport
 from ubuntu_ai.gui.capabilities_panel import build_capabilities_panel
+from ubuntu_ai.gui.execution_cards import (
+    build_execution_result_card,
+    build_plan_card,
+)
 from ubuntu_ai.gui.presentation import (
     command_text,
     format_duration,
@@ -35,10 +39,7 @@ from ubuntu_ai.gui.theme import (
     CONTENT_PAD,
     ERROR,
     FONT_BODY,
-    FONT_BODY_BOLD,
     FONT_HERO,
-    FONT_MONO,
-    FONT_MONO_SMALL,
     FONT_SMALL,
     FONT_SMALL_BOLD,
     FONT_TINY,
@@ -47,12 +48,23 @@ from ubuntu_ai.gui.theme import (
     SURFACE,
     SURFACE_ALT,
     SURFACE_HOVER,
-    TERMINAL,
     TEXT,
     TEXT_DIM,
     TEXT_MUTED,
     WARNING,
     WINDOW_CLASS,
+)
+from ubuntu_ai.gui.theme import (
+    FONT_BODY_BOLD as FONT_BODY_BOLD,
+)
+from ubuntu_ai.gui.theme import (
+    FONT_MONO as FONT_MONO,
+)
+from ubuntu_ai.gui.theme import (
+    FONT_MONO_SMALL as FONT_MONO_SMALL,
+)
+from ubuntu_ai.gui.theme import (
+    TERMINAL as TERMINAL,
 )
 from ubuntu_ai.interaction import ChatResponse, InteractionRoute
 from ubuntu_ai.remote.diagnostics import RemoteSystemContext
@@ -1245,194 +1257,16 @@ class UbuntuAIApp:
     # Plan
     # ------------------------------------------------------------------
 
-    def _add_plan_card(
-        self,
-        snapshot: LoopSnapshot,
-        plan: object,
-    ) -> None:
-        outer = tk.Frame(
+    def _add_plan_card(self, snapshot: LoopSnapshot, plan: object) -> None:
+        widgets = build_plan_card(
             self.messages,
-            bg=BACKGROUND,
+            snapshot=snapshot,
+            plan=plan,
+            on_confirm=self.confirm,
+            on_cancel=self.cancel,
         )
-        outer.pack(
-            fill=tk.X,
-            padx=CONTENT_PAD,
-            pady=18,
-        )
-
-        self._active_plan_card = outer
-
-        card = tk.Frame(
-            outer,
-            bg=SURFACE,
-            padx=24,
-            pady=21,
-            highlightbackground=BORDER,
-            highlightthickness=1,
-        )
-        card.pack(fill=tk.X)
-
-        risk = getattr(plan, "risk", None)
-        risk_value = str(getattr(risk, "value", risk) or "unknown")
-
-        header = tk.Frame(
-            card,
-            bg=SURFACE,
-        )
-        header.pack(fill=tk.X)
-
-        tk.Label(
-            header,
-            text=str(
-                getattr(
-                    plan,
-                    "goal",
-                    "Plano proposto",
-                )
-            ),
-            bg=SURFACE,
-            fg=TEXT,
-            font=FONT_TITLE,
-        ).pack(side=tk.LEFT)
-
-        tk.Label(
-            header,
-            text=self._risk_label(risk_value),
-            bg=SURFACE,
-            fg=self._risk_color(risk_value),
-            font=FONT_SMALL_BOLD,
-        ).pack(side=tk.RIGHT)
-
-        planner = getattr(plan, "planner", None)
-
-        if planner:
-            tk.Label(
-                card,
-                text=f"Planejador · {planner}",
-                bg=SURFACE,
-                fg=TEXT_MUTED,
-                font=FONT_TINY,
-            ).pack(
-                anchor="w",
-                pady=(6, 15),
-            )
-
-        steps = getattr(plan, "steps", ()) or ()
-
-        for index, step in enumerate(
-            steps,
-            start=1,
-        ):
-            title = getattr(
-                step,
-                "title",
-                f"Etapa {index}",
-            )
-
-            tk.Label(
-                card,
-                text=f"{index}. {title}",
-                bg=SURFACE,
-                fg=TEXT,
-                font=FONT_BODY_BOLD,
-            ).pack(
-                anchor="w",
-                pady=(8, 3),
-            )
-
-            description = getattr(
-                step,
-                "description",
-                "",
-            )
-
-            if description:
-                tk.Label(
-                    card,
-                    text=description,
-                    bg=SURFACE,
-                    fg=TEXT_MUTED,
-                    justify=tk.LEFT,
-                    wraplength=640,
-                    font=FONT_SMALL,
-                ).pack(anchor="w")
-
-            command = getattr(
-                step,
-                "command",
-                (),
-            )
-
-            if command:
-                command_text = self._command_text(command)
-
-                command_box = tk.Label(
-                    card,
-                    text=f"$ {command_text}",
-                    bg=TERMINAL,
-                    fg=SUCCESS,
-                    justify=tk.LEFT,
-                    anchor="w",
-                    font=FONT_MONO,
-                    padx=14,
-                    pady=11,
-                )
-                command_box.pack(
-                    fill=tk.X,
-                    pady=(10, 5),
-                )
-
-        if snapshot.requires_confirmation:
-            actions = tk.Frame(
-                card,
-                bg=SURFACE,
-            )
-            actions.pack(
-                fill=tk.X,
-                pady=(20, 0),
-            )
-
-            self._active_actions = actions
-
-            cancel_button = tk.Button(
-                actions,
-                text="Cancelar",
-                command=self.cancel,
-                bg=SURFACE_ALT,
-                fg=TEXT,
-                activebackground=SURFACE_HOVER,
-                activeforeground=TEXT,
-                relief=tk.FLAT,
-                borderwidth=0,
-                padx=20,
-                pady=9,
-                cursor="hand2",
-                takefocus=True,
-                font=FONT_SMALL,
-            )
-            cancel_button.pack(
-                side=tk.RIGHT,
-                padx=(9, 0),
-            )
-
-            confirm_button = tk.Button(
-                actions,
-                text="Confirmar e executar",
-                command=self.confirm,
-                bg=ACCENT,
-                fg="#101318",
-                activebackground=ACCENT_HOVER,
-                activeforeground="#101318",
-                relief=tk.FLAT,
-                borderwidth=0,
-                padx=20,
-                pady=9,
-                cursor="hand2",
-                takefocus=True,
-                font=FONT_SMALL_BOLD,
-            )
-            confirm_button.pack(side=tk.RIGHT)
-
+        self._active_plan_card = widgets.outer
+        self._active_actions = widgets.actions
         self._scroll_bottom()
 
     # ------------------------------------------------------------------
@@ -1516,170 +1350,8 @@ class UbuntuAIApp:
                 self._state_message(snapshot),
             )
 
-    def _add_execution_result(
-        self,
-        result: object,
-    ) -> None:
-        status = getattr(
-            result,
-            "status",
-            None,
-        )
-        status_value = str(
-            getattr(
-                status,
-                "value",
-                status,
-            )
-        ).lower()
-
-        command = getattr(
-            result,
-            "command",
-            None,
-        )
-        message = getattr(
-            result,
-            "message",
-            "",
-        )
-        stdout = getattr(
-            result,
-            "stdout",
-            "",
-        )
-        stderr = getattr(
-            result,
-            "stderr",
-            "",
-        )
-        return_code = getattr(
-            result,
-            "return_code",
-            None,
-        )
-
-        outer = tk.Frame(
-            self.messages,
-            bg=BACKGROUND,
-        )
-        outer.pack(
-            fill=tk.X,
-            padx=CONTENT_PAD,
-            pady=12,
-        )
-
-        card = tk.Frame(
-            outer,
-            bg=SURFACE,
-            padx=22,
-            pady=18,
-            highlightbackground=BORDER,
-            highlightthickness=1,
-        )
-        card.pack(fill=tk.X)
-
-        successful = status_value in {
-            "approved",
-            "executed",
-            "success",
-            "succeeded",
-        }
-
-        tk.Label(
-            card,
-            text=("✓ Execução concluída" if successful else "⚠ Execução não concluída"),
-            bg=SURFACE,
-            fg=(SUCCESS if successful else ERROR),
-            font=FONT_BODY_BOLD,
-        ).pack(anchor="w")
-
-        if command:
-            tk.Label(
-                card,
-                text=f"$ {command}",
-                bg=TERMINAL,
-                fg=SUCCESS,
-                font=FONT_MONO,
-                anchor="w",
-                padx=14,
-                pady=11,
-            ).pack(
-                fill=tk.X,
-                pady=(14, 9),
-            )
-
-        if message:
-            tk.Label(
-                card,
-                text=str(message),
-                bg=SURFACE,
-                fg=TEXT_MUTED,
-                justify=tk.LEFT,
-                wraplength=640,
-                font=FONT_SMALL,
-            ).pack(anchor="w")
-
-        output = stdout or stderr
-
-        if output:
-            terminal_frame = tk.Frame(
-                card,
-                bg=TERMINAL,
-                padx=1,
-                pady=1,
-            )
-            terminal_frame.pack(
-                fill=tk.X,
-                pady=(13, 0),
-            )
-
-            text = tk.Text(
-                terminal_frame,
-                bg=TERMINAL,
-                fg=TEXT,
-                insertbackground=TEXT,
-                selectbackground=SURFACE_ALT,
-                relief=tk.FLAT,
-                borderwidth=0,
-                highlightthickness=0,
-                font=FONT_MONO_SMALL,
-                height=min(
-                    max(
-                        len(str(output).splitlines()),
-                        3,
-                    ),
-                    14,
-                ),
-                wrap=tk.NONE,
-                padx=12,
-                pady=10,
-            )
-
-            text.insert(
-                "1.0",
-                str(output),
-            )
-            text.configure(
-                state=tk.DISABLED,
-            )
-
-            text.pack(
-                fill=tk.X,
-            )
-
-        if return_code is not None:
-            tk.Label(
-                card,
-                text=(f"Concluído · código de saída {return_code}"),
-                bg=SURFACE,
-                fg=(SUCCESS if return_code == 0 else ERROR),
-                font=FONT_TINY,
-            ).pack(
-                anchor="e",
-                pady=(9, 0),
-            )
-
+    def _add_execution_result(self, result: object) -> None:
+        build_execution_result_card(self.messages, result=result)
         self._scroll_bottom()
 
     # ------------------------------------------------------------------

@@ -438,6 +438,7 @@ as capacidades, políticas de risco ou compatibilidade pública da v2.0.2.
 - [x] extrair a construção visual do painel de capacidades;
 - [x] extrair a construção e apresentação do painel de automação;
 - [x] extrair os controles visuais de destino local e SSH;
+- [x] extrair cartões visuais de plano e resultado da execução;
 - [ ] extrair componentes sem alterar comportamento visual;
 - [ ] reduzir acoplamento entre GUI, backend e execução;
 - [ ] adicionar testes de regressão da composição da interface.
@@ -448,3 +449,18 @@ as capacidades, políticas de risco ou compatibilidade pública da v2.0.2.
 - [ ] preservar CI, release, attestations e checksums;
 - [ ] executar build e instalação limpa;
 - [ ] preparar a release `v2.1.0`.
+
+### V2.1-P4 — Homologação funcional e release v2.1.0
+
+- [ ] inventariar todas as perguntas exibidas em Recursos e ajuda;
+- [ ] testar os 20 recursos anunciados e suas principais variações;
+- [ ] validar rotas locais, Ollama, automação e execução controlada;
+- [ ] validar operação local e em computador remoto por SSH;
+- [ ] testar confirmações, cancelamentos e bloqueios por risco;
+- [ ] testar entradas inválidas e indisponibilidade de dependências;
+- [ ] executar homologação visual completa da GUI;
+- [ ] registrar resultados em uma matriz de evidências;
+- [ ] corrigir falhas ou documentar limitações conhecidas;
+- [ ] validar pacote Debian em instalação e atualização reais;
+- [ ] executar suíte, arquitetura, CI e auditoria dos artefatos;
+- [ ] preparar changelog, documentação e tag `v2.1.0`.

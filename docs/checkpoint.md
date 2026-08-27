@@ -88,8 +88,23 @@ comportamento, políticas de segurança ou compatibilidade da versão estável.
 - redução acumulada de 2.213 para 1.942 linhas;
 - zero ciclos entre pacotes de alto nível.
 
+## Último incremento concluído
+
+### V2.1-P2-R5 — Cartões de plano e execução
+
+- construção visual delegada a `gui/execution_cards.py`;
+- confirmação, cancelamento e coordenação preservados em `UbuntuAIApp`;
+- contrato público das constantes do tema preservado;
+- testes específicos e suíte completa aprovados;
+- auditoria arquitetural permaneceu com zero ciclos;
+- `gui/app.py` reduzido para 1.614 linhas.
+
 ## Próximo incremento
 
-- mapear cartões de plano e resultado de execução;
-- separar renderização de dados e comandos;
-- preservar confirmação, risco e política no coordenador.
+Continuar a decomposição segura de `gui/app.py`, selecionando uma
+responsabilidade visual coesa e mantendo backend, estado e políticas no
+orquestrador.
+
+A homologação final da v2.1.0 permanece obrigatória e cobrirá todos os recursos
+anunciados em Recursos e ajuda, suas variações, execução local e remota,
+confirmações, cancelamentos, riscos e casos negativos.

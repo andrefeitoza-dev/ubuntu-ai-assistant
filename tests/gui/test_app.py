@@ -380,3 +380,15 @@ def test_computer_controls_close_when_user_clicks_outside() -> None:
     assert "self._hide_remote_controls()" in source
     assert "tk.OptionMenu(" in component_source
     assert '"Diagnosticar"' in component_source
+
+
+def test_plan_and_execution_cards_are_delegated() -> None:
+    app_source = Path("src/ubuntu_ai/gui/app.py").read_text(encoding="utf-8")
+    component_source = Path("src/ubuntu_ai/gui/execution_cards.py").read_text(encoding="utf-8")
+
+    assert "build_plan_card(" in app_source
+    assert "build_execution_result_card(" in app_source
+    assert "PLANO DE EXECUÇÃO" not in app_source
+    assert "RESULTADO DA EXECUÇÃO" not in app_source
+    assert "PLANO DE EXECUÇÃO" in component_source
+    assert "RESULTADO DA EXECUÇÃO" in component_source
