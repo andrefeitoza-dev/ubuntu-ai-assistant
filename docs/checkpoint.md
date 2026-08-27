@@ -152,3 +152,13 @@ diferença entre o comportamento observado e o recurso anunciado.
 - recorrência semanal retirada dos exemplos até possuir implementação completa;
 - arquitetura permanece sem ciclos;
 - evidência: `docs/releases/v2.1-p4-r5-operational-queries-validation.md`.
+
+## V2.1-P4-R6 — Entrega assíncrona e ações anunciadas
+
+- fila segura criada entre workers e a thread principal do Tkinter;
+- chamadas diretas `root.after(0, ...)` removidas dos workers;
+- entrega corrigida para ações, chat, SSH, multiagente e confirmação;
+- H09, H10, H11 e H18 receberam planos determinísticos corretos;
+- variações naturais mantêm rota segura e independente do Ollama;
+- homologação visual confirmou cartões, resultados e retorno ao estado Pronto;
+- evidência: `docs/releases/v2.1-p4-r6-thread-delivery-actions-validation.md`.

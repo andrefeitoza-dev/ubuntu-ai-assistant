@@ -3,6 +3,7 @@ from __future__ import annotations
 import threading
 import tkinter as tk
 from pathlib import Path
+from queue import Empty, SimpleQueue
 from time import perf_counter
 from tkinter import messagebox, simpledialog
 
@@ -90,12 +91,14 @@ class UbuntuAIApp:
         self._automation_summary_label: tk.Label | None = None
         self._automation_tasks = ()
         self._active_automation_task_id: str | None = None
+        self._ui_queue = SimpleQueue()
 
         self.root = tk.Tk(className=WINDOW_CLASS)
         self.root.title("Ubuntu AI Assistant")
         self.root.geometry("1040x760")
         self.root.minsize(780, 580)
         self.root.configure(bg=BACKGROUND)
+        self.root.after(25, self._drain_ui_queue)
         self._set_window_icon()
 
         self._build_interface()
@@ -336,6 +339,26 @@ class UbuntuAIApp:
             daemon=True,
         ).start()
 
+    def _post_to_ui(self, callback, *args) -> None:
+        """Entrega resultados de workers sem chamar o Tkinter fora da thread principal."""
+
+        self._ui_queue.put((callback, args))
+
+    def _drain_ui_queue(self) -> None:
+        """Executa, na thread principal, os eventos publicados pelos workers."""
+
+        try:
+            while True:
+                callback, args = self._ui_queue.get_nowait()
+                callback(*args)
+        except Empty:
+            pass
+        finally:
+            try:
+                self.root.after(25, self._drain_ui_queue)
+            except tk.TclError:
+                pass
+
     def _collect_remote_diagnostics(self, operation: int) -> None:
         try:
             health = self._backend.test_remote_connection()
@@ -343,9 +366,9 @@ class UbuntuAIApp:
                 raise ConnectionError(health.message)
             context = self._backend.remote_diagnostics()
         except Exception as exc:
-            self.root.after(0, self._deliver_error, operation, str(exc))
+            self._post_to_ui(self._deliver_error, operation, str(exc))
             return
-        self.root.after(0, self._deliver_remote_diagnostics, operation, context)
+        self._post_to_ui(self._deliver_remote_diagnostics, operation, context)
 
     def _deliver_remote_diagnostics(
         self,
@@ -677,9 +700,9 @@ class UbuntuAIApp:
         try:
             report = self._backend.execute_multi_agent(goal, confirmed=True)
         except Exception as exc:
-            self.root.after(0, self._deliver_error, operation, str(exc))
+            self._post_to_ui(self._deliver_error, operation, str(exc))
             return
-        self.root.after(0, self._deliver_multi_agent_report, operation, report)
+        self._post_to_ui(self._deliver_multi_agent_report, operation, report)
 
     def _poll_automation_panel(self, operation: int) -> None:
         if operation != self._operation_generation or not self._busy:
@@ -865,11 +888,10 @@ class UbuntuAIApp:
                 target_name=target,
             )
         except Exception as exc:
-            self.root.after(0, self._deliver_error, operation, str(exc))
+            self._post_to_ui(self._deliver_error, operation, str(exc))
             return
 
-        self.root.after(
-            0,
+        self._post_to_ui(
             self._deliver_selected_system_fact,
             operation,
             response,
@@ -900,16 +922,14 @@ class UbuntuAIApp:
         try:
             snapshot = self._backend.start(request)
         except Exception as exc:
-            self.root.after(
-                0,
+            self._post_to_ui(
                 self._deliver_error,
                 operation,
                 str(exc),
             )
             return
 
-        self.root.after(
-            0,
+        self._post_to_ui(
             self._deliver_snapshot,
             operation,
             snapshot,
@@ -923,10 +943,10 @@ class UbuntuAIApp:
         try:
             response = self._backend.chat(request)
         except Exception as exc:
-            self.root.after(0, self._deliver_error, operation, str(exc))
+            self._post_to_ui(self._deliver_error, operation, str(exc))
             return
 
-        self.root.after(0, self._deliver_chat, operation, response)
+        self._post_to_ui(self._deliver_chat, operation, response)
 
     def _deliver_chat(
         self,
@@ -1056,16 +1076,14 @@ class UbuntuAIApp:
         try:
             snapshot = self._backend.confirm()
         except Exception as exc:
-            self.root.after(
-                0,
+            self._post_to_ui(
                 self._deliver_error,
                 operation,
                 str(exc),
             )
             return
 
-        self.root.after(
-            0,
+        self._post_to_ui(
             self._deliver_execution,
             operation,
             snapshot,
@@ -1327,7 +1345,7 @@ class UbuntuAIApp:
     def request_activation(self) -> None:
         """Agenda a restauração da janela a partir do listener de instância única."""
 
-        self.root.after(0, self._activate_window)
+        self._post_to_ui(self._activate_window)
 
     def _activate_window(self) -> None:
         """Restaura, eleva e focaliza a janela já aberta."""

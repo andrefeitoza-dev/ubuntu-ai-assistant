@@ -6,6 +6,7 @@ from dataclasses import dataclass
 from difflib import SequenceMatcher
 
 from ubuntu_ai.domain.plan import Plan, PlanStep
+from ubuntu_ai.planner.builtin.capability_actions import CapabilityActionPlanner
 from ubuntu_ai.planner.builtin.desktop_action import SafeDesktopActionPlanner
 from ubuntu_ai.planner.builtin.file_search import SafeFileSearchPlanner
 from ubuntu_ai.planner.builtin.registry import (
@@ -59,12 +60,18 @@ class BuiltinPlanner:
         self,
         file_search: SafeFileSearchPlanner | None = None,
         desktop_action: SafeDesktopActionPlanner | None = None,
+        capability_actions: CapabilityActionPlanner | None = None,
     ) -> None:
         self._file_search = file_search or SafeFileSearchPlanner()
         self._desktop_action = desktop_action or SafeDesktopActionPlanner()
+        self._capability_actions = capability_actions or CapabilityActionPlanner()
 
     def try_create_plan(self, request: str) -> Plan | None:
         """Retorna um plano builtin ou None quando não houver correspondência."""
+
+        capability_plan = self._capability_actions.try_create_plan(request)
+        if capability_plan is not None:
+            return capability_plan
 
         desktop_plan = self._desktop_action.try_create_plan(request)
         if desktop_plan is not None:

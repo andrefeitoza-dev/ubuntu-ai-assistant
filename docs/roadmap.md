@@ -456,6 +456,9 @@ as capacidades, políticas de risco ou compatibilidade pública da v2.0.2.
 
 ### V2.1-P4 — Homologação funcional e release v2.1.0
 
+- [x] corrigir a entrega assíncrona dos resultados à thread principal da GUI;
+- [x] validar ações anunciadas e suas variações naturais na interface;
+
 - [x] alinhar consultas operacionais, tarefas, perfis e plugins ao estado real;
 - [x] integrar exemplos naturais ao diagnóstico SSH e aos agentes especializados;
 
