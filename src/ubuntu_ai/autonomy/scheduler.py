@@ -52,6 +52,9 @@ class LocalAutomationScheduler:
         self._items[schedule_id] = confirmed
         return confirmed
 
+    def all(self) -> tuple[ScheduledAutomation, ...]:
+        return tuple(self._items[key] for key in sorted(self._items))
+
     def get(self, schedule_id: str) -> ScheduledAutomation:
         try:
             return self._items[schedule_id]

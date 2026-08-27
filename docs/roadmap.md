@@ -456,6 +456,9 @@ as capacidades, políticas de risco ou compatibilidade pública da v2.0.2.
 
 ### V2.1-P4 — Homologação funcional e release v2.1.0
 
+- [x] alinhar consultas operacionais, tarefas, perfis e plugins ao estado real;
+- [x] integrar exemplos naturais ao diagnóstico SSH e aos agentes especializados;
+
 - [x] inventariar todas as perguntas exibidas em Recursos e ajuda;
 - [x] criar matriz rastreável para os 39 exemplos e 8 casos negativos;
 - [x] corrigir os cinco casos anunciados de abertura segura do desktop;

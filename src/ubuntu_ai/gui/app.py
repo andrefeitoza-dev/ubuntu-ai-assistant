@@ -390,6 +390,14 @@ class UbuntuAIApp:
 
         self._add_user_message(request)
 
+        if self._backend.is_remote_diagnostic_request(request):
+            self._start_remote_diagnostics()
+            return
+
+        if self._backend.is_cancel_selected_automation_request(request):
+            self._automation_action("cancel")
+            return
+
         multi_agent_request = self._multi_agent_request(request)
         if multi_agent_request is not None:
             self._show_multi_agent_plan(multi_agent_request)
@@ -590,10 +598,20 @@ class UbuntuAIApp:
             button.configure(text="Recursos e ajuda  ▾")
 
     @staticmethod
+    @staticmethod
     def _multi_agent_request(request: str) -> str | None:
         normalized = request.strip()
+        lowered = normalized.lower().rstrip("?.!")
+
+        natural_requests = {
+            "analise este problema de rede": "problema de rede",
+            "diagnostique a falta de espaço": "falta de espaço",
+        }
+        if lowered in natural_requests:
+            return natural_requests[lowered]
+
         for prefix in ("agentes:", "multiagente:"):
-            if normalized.lower().startswith(prefix):
+            if lowered.startswith(prefix):
                 return normalized[len(prefix) :].strip()
         return None
 

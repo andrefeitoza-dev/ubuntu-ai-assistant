@@ -3,6 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 from ubuntu_ai.agent_loop.models import LoopSnapshot
+from ubuntu_ai.agents import default_agent_profiles
 from ubuntu_ai.agents.orchestration import OrchestrationGoal
 from ubuntu_ai.agents.selection import OrchestrationPlanner, build_specialist_orchestrator
 from ubuntu_ai.agents.specialists import AgentEnvironment
@@ -11,6 +12,7 @@ from ubuntu_ai.autonomy.long_tasks import LongTask
 from ubuntu_ai.autonomy.observability import AutomationEvent, AutomationMetrics
 from ubuntu_ai.container.bootstrap import container
 from ubuntu_ai.fast_path import CapabilityCatalog, CapabilityTopic, SystemFactResponder
+from ubuntu_ai.gui.operational_queries import OperationalQueryResponder
 from ubuntu_ai.interaction import ChatResponse, InteractionDecision, InteractionRoute
 from ubuntu_ai.remote.audit import RemoteAuditRecord
 from ubuntu_ai.remote.diagnostics import RemoteDiagnosticService, RemoteSystemContext
@@ -106,6 +108,17 @@ class GUIBackend:
     def route(self, request: str) -> InteractionDecision:
         """Classifica a solicitação antes de acionar qualquer executor."""
 
+        operational = OperationalQueryResponder()
+        if operational.matches(request):
+            response = operational.respond(
+                request,
+                tasks=self.automation_tasks(),
+                schedules=self.automation_schedules(),
+                profiles=default_agent_profiles(),
+                plugins=container.plugin_registry().all(),
+            )
+            return InteractionDecision(InteractionRoute.LOCAL, response)
+
         if self.is_remote_selected and SystemFactResponder.matches(request):
             return InteractionDecision(
                 InteractionRoute.LOCAL,
@@ -169,6 +182,9 @@ class GUIBackend:
     def automation_tasks(self) -> tuple[LongTask, ...]:
         return container.autonomous_runtime().long_tasks.all()
 
+    def automation_schedules(self):
+        return container.autonomous_runtime().scheduler.all()
+
     def automation_metrics(self) -> AutomationMetrics:
         return container.autonomous_runtime().telemetry.metrics()
 
@@ -183,6 +199,22 @@ class GUIBackend:
 
     def cancel_automation(self, task_id: str) -> LongTask:
         return container.autonomous_runtime().long_tasks.cancel(task_id)
+
+    @staticmethod
+    def is_remote_diagnostic_request(request: str) -> bool:
+        normalized = OperationalQueryResponder._normalize(request)
+        return normalized in {
+            "diagnostique o servidor selecionado",
+            "diagnostique o computador remoto selecionado",
+        }
+
+    @staticmethod
+    def is_cancel_selected_automation_request(request: str) -> bool:
+        normalized = OperationalQueryResponder._normalize(request)
+        return normalized in {
+            "cancele a tarefa selecionada",
+            "cancele a automacao selecionada",
+        }
 
     def plan_multi_agent(self, request: str, *, goal_id: str) -> OrchestrationGoal:
         """Cria uma prévia somente leitura para o destino explicitamente selecionado."""

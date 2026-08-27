@@ -193,8 +193,8 @@ class CapabilityCatalog:
         _topic(
             "15",
             "Tarefas em execução e agendamentos",
-            ("mostrar tarefas e resultados", "agendar tarefas locais seguras"),
-            ("Quais tarefas estão em execução?", "Agende um diagnóstico semanal."),
+            ("mostrar tarefas e resultados", "consultar agendamentos locais seguros"),
+            ("Quais tarefas estão em execução?", "Mostre meus agendamentos."),
             kind="Consulta ou agendamento",
             risk="Conforme a tarefa",
             confirmation="Quando a tarefa possuir risco",

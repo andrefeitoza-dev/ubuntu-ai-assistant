@@ -49,3 +49,14 @@ def test_critical_action_cannot_be_scheduled() -> None:
 def test_naive_datetime_is_rejected() -> None:
     with pytest.raises(ValueError, match="fuso"):
         ScheduledAutomation("s1", "t1", datetime.now(), AutomationRisk.LOW)
+
+
+def test_scheduler_lists_items_in_stable_order() -> None:
+    scheduler = LocalAutomationScheduler()
+    high = item(AutomationRisk.HIGH)
+    low = item(AutomationRisk.LOW)
+
+    scheduler.schedule(high)
+    scheduler.schedule(low)
+
+    assert scheduler.all() == (high, low)

@@ -141,3 +141,14 @@ comportamento, políticas de segurança ou compatibilidade da versão estável.
 
 Executar os casos pela interface, registrar evidências e corrigir qualquer
 diferença entre o comportamento observado e o recurso anunciado.
+
+## V2.1-P4-R5 — Consultas e coordenação operacional
+
+- H16, H20, H27–H32, H35 e H36 alinhados às APIs reais;
+- consultas de tarefas, agendamentos, perfis e plugins executadas localmente;
+- diagnóstico SSH e cancelamento mantidos sob seleção explícita na GUI;
+- rede e armazenamento integrados ao planejamento multiagente;
+- consulta ao APT limitada ao cache local e sem alterações;
+- recorrência semanal retirada dos exemplos até possuir implementação completa;
+- arquitetura permanece sem ciclos;
+- evidência: `docs/releases/v2.1-p4-r5-operational-queries-validation.md`.
