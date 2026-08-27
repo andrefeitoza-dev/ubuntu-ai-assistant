@@ -245,7 +245,7 @@ class CapabilityCatalog:
             "20",
             "Integração com VS Code",
             ("acessar comandos seguros", "consultar diagnósticos", "iniciar tarefas autorizadas"),
-            ("Abra os recursos do Ubuntu AI no VS Code.",),
+            ("Abra o VS Code.",),
             kind="Integração opcional",
             risk="Conforme o comando",
             confirmation="Conforme a ação",

@@ -88,3 +88,59 @@ def test_rejects_path_outside_home(tmp_path: Path) -> None:
 
     assert planner.try_create_plan("abra o arquivo /etc/passwd") is None
     assert planner.rejection_reason("abra o arquivo /etc/passwd") is not None
+
+
+@pytest.mark.parametrize(
+    ("phrase", "app_id"),
+    [
+        ("Abra o Firefox.", "firefox"),
+        ("Abra as configurações de rede.", "gnome-network-panel"),
+        ("Abra o VS Code.", "code"),
+    ],
+)
+def test_catalog_desktop_examples_accept_sentence_period(
+    phrase: str,
+    app_id: str,
+) -> None:
+    plan = SafeDesktopActionPlanner().try_create_plan(phrase)
+
+    assert plan is not None
+    assert plan.risk is RiskLevel.LOW
+    assert plan.steps[0].command == ["gtk-launch", app_id]
+
+
+def test_catalog_documents_example_accepts_localized_possession(
+    tmp_path: Path,
+) -> None:
+    documents = tmp_path / "Documentos"
+    documents.mkdir()
+    planner = SafeDesktopActionPlanner(home=tmp_path)
+
+    plan = planner.try_create_plan("Abra minha pasta Documentos.")
+
+    assert plan is not None
+    assert plan.risk is RiskLevel.LOW
+    assert plan.steps[0].command == ["xdg-open", str(documents)]
+
+
+def test_documents_alias_uses_xdg_user_directory(
+    tmp_path: Path,
+) -> None:
+    configured_documents = tmp_path / "MeusDocumentos"
+    configured_documents.mkdir()
+
+    config = tmp_path / ".config"
+    config.mkdir()
+    (config / "user-dirs.dirs").write_text(
+        'XDG_DOCUMENTS_DIR="$HOME/MeusDocumentos"\n',
+        encoding="utf-8",
+    )
+
+    planner = SafeDesktopActionPlanner(home=tmp_path)
+    plan = planner.try_create_plan("Abra minha pasta Documentos.")
+
+    assert plan is not None
+    assert plan.steps[0].command == [
+        "xdg-open",
+        str(configured_documents),
+    ]

@@ -130,3 +130,20 @@ def test_router_refuses_unsafe_url_without_execution() -> None:
     assert decision.route is InteractionRoute.LOCAL
     assert decision.response is not None
     assert "Aplicativo não aberto" in decision.response
+
+
+@pytest.mark.parametrize(
+    "phrase",
+    (
+        "Abra o Firefox.",
+        "Abra as configurações de rede.",
+        "Abra o VS Code.",
+    ),
+)
+def test_catalog_desktop_app_examples_route_to_safe_action(
+    phrase: str,
+) -> None:
+    decision = InteractionRouter().route(phrase)
+
+    assert decision.route is InteractionRoute.ACTION
+    assert decision.response is None

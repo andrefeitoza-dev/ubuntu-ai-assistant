@@ -20,14 +20,17 @@ class DesktopAction:
 class SafeDesktopActionPlanner:
     """Planeja aberturas locais sem shell e com destinos validados."""
 
-    _FOLDER = re.compile(r"^abra\s+(?:a\s+)?pasta\s+(.+)$", re.IGNORECASE)
+    _FOLDER = re.compile(
+        r"^abra\s+(?:(?:a|minha)\s+)?pasta\s+(.+)$",
+        re.IGNORECASE,
+    )
     _FILE = re.compile(r"^abra\s+(?:o\s+)?arquivo\s+(.+)$", re.IGNORECASE)
     _SITE = re.compile(
         r"^(?:abra|acesse)\s+(?:(?:o\s+)?site\s+)?(https?://\S+|www\.\S+|\S+\.\S+)$",
         re.IGNORECASE,
     )
     _APPLICATION = re.compile(
-        r"^(?:abra|inicie|execute)\s+(?:o\s+|a\s+)?(.+)$",
+        r"^(?:abra|inicie|execute)\s+(?:(?:o|a|os|as)\s+)?(.+)$",
         re.IGNORECASE,
     )
     _EMAIL = re.compile(
@@ -43,7 +46,10 @@ class SafeDesktopActionPlanner:
         "calculadora": "org.gnome.Calculator",
         "configuracoes": "org.gnome.Settings",
         "configurações": "org.gnome.Settings",
+        "configuracoes de rede": "gnome-network-panel",
+        "configurações de rede": "gnome-network-panel",
         "visual studio code": "code",
+        "vs code": "code",
         "vscode": "code",
     }
 
@@ -70,7 +76,7 @@ class SafeDesktopActionPlanner:
         return plan
 
     def resolve(self, request: str) -> DesktopAction | None:
-        value = request.strip()
+        value = self._request_value(request)
         folder = self._FOLDER.fullmatch(value)
         if folder is not None:
             path = self._safe_path(folder.group(1), expected="directory")
@@ -116,7 +122,7 @@ class SafeDesktopActionPlanner:
         return None
 
     def rejection_reason(self, request: str) -> str | None:
-        value = request.strip()
+        value = self._request_value(request)
         if self._EMAIL.fullmatch(value):
             return (
                 "Seu pedido é ambíguo: informe se deseja abrir um cliente de e-mail "
@@ -136,7 +142,7 @@ class SafeDesktopActionPlanner:
         return None
 
     def has_desktop_intent(self, request: str) -> bool:
-        value = request.strip()
+        value = self._request_value(request)
         return any(
             pattern.fullmatch(value) is not None
             for pattern in (
@@ -148,11 +154,19 @@ class SafeDesktopActionPlanner:
             )
         )
 
+    @staticmethod
+    def _request_value(request: str) -> str:
+        value = request.strip()
+        if value.endswith("."):
+            return value[:-1].rstrip()
+        return value
+
     def _safe_path(self, raw_value: str, *, expected: str) -> Path | None:
         value = raw_value.strip().strip("\"'")
         if not value or any(character in value for character in ";|`\n\r\x00"):
             return None
-        candidate = Path(value).expanduser()
+        standard_folder = self._standard_folder(value)
+        candidate = standard_folder if standard_folder is not None else Path(value).expanduser()
         if not candidate.is_absolute():
             candidate = self._home / candidate
         try:
@@ -166,6 +180,49 @@ class SafeDesktopActionPlanner:
             return None
         required = os.R_OK | (os.X_OK if expected == "directory" else 0)
         return resolved if os.access(resolved, required) else None
+
+    def _standard_folder(self, value: str) -> Path | None:
+        if value.casefold() not in {"documentos", "documents"}:
+            return None
+
+        candidates: list[Path] = []
+        config = self._home / ".config" / "user-dirs.dirs"
+
+        try:
+            lines = config.read_text(encoding="utf-8").splitlines()
+        except OSError:
+            lines = []
+
+        prefix = "XDG_DOCUMENTS_DIR="
+        for line in lines:
+            if not line.startswith(prefix):
+                continue
+            configured = line.removeprefix(prefix).strip().strip('"')
+            configured = configured.replace(
+                "$HOME",
+                str(self._home),
+                1,
+            )
+            candidates.append(Path(configured).expanduser())
+            break
+
+        candidates.extend(
+            (
+                self._home / "Documentos",
+                self._home / "Documents",
+            )
+        )
+
+        for candidate in candidates:
+            try:
+                resolved = candidate.resolve(strict=True)
+                resolved.relative_to(self._home)
+            except (OSError, RuntimeError, ValueError):
+                continue
+            if resolved.is_dir():
+                return resolved
+
+        return None
 
     @staticmethod
     def _safe_url(raw_value: str) -> str | None:
