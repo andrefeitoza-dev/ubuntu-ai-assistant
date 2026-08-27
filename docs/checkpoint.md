@@ -172,3 +172,12 @@ diferença entre o comportamento observado e o recurso anunciado.
 - resultados persistidos separadamente do catálogo;
 - `capability_matrix.py --write` preserva resultados e evidências;
 - evidência: `docs/releases/v2.1-p4-r7-local-homologation-validation.md`.
+
+## Próxima evolução — Ações naturais seguras
+
+A v2.2.0 deverá ampliar o assistente de consultas para operação cotidiana do
+Ubuntu por linguagem natural, incluindo aplicativos instalados, sites e pastas
+XDG. A execução continuará subordinada à política de risco, confirmação,
+bloqueios críticos e auditoria.
+
+Especificação: `docs/natural-actions-roadmap.md`.

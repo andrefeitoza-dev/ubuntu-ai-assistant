@@ -478,3 +478,18 @@ as capacidades, políticas de risco ou compatibilidade pública da v2.0.2.
 - [ ] validar pacote Debian em instalação e atualização reais;
 - [ ] executar suíte, arquitetura, CI e auditoria dos artefatos;
 - [ ] preparar changelog, documentação e tag `v2.1.0`.
+
+### V2.2-P1 — Ações naturais seguras no desktop
+
+- [ ] criar resolução segura de aplicativos instalados por entradas `.desktop`;
+- [ ] abrir Calculadora, LibreOffice e Terminal por linguagem natural;
+- [ ] abrir sites HTTP/HTTPS e aliases confiáveis no navegador;
+- [ ] bloquear protocolos, URLs e argumentos inseguros;
+- [ ] ampliar pastas XDG, incluindo Downloads e nomes localizados;
+- [ ] separar abertura do Terminal da execução de comandos;
+- [ ] criar prévia e confirmação para alterações controladas;
+- [ ] preservar bloqueios para elevação e comandos críticos;
+- [ ] auditar aplicativo, pasta, domínio, comando e resultado;
+- [ ] testar frases oficiais e principais variações naturais;
+- [ ] criar matriz de segurança e homologação da v2.2.0;
+- [ ] documentar arquitetura, limitações e evidências.
