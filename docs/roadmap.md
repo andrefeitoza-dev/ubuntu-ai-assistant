@@ -450,13 +450,14 @@ as capacidades, políticas de risco ou compatibilidade pública da v2.0.2.
 
 - [x] atualizar actions com avisos de runtime depreciado;
 - [x] proteger automaticamente a composição e o tamanho da GUI;
-- [ ] preservar CI, release, attestations e checksums;
+- [x] preservar CI, release, attestations e checksums;
 - [ ] executar build e instalação limpa;
 - [ ] preparar a release `v2.1.0`.
 
 ### V2.1-P4 — Homologação funcional e release v2.1.0
 
-- [ ] inventariar todas as perguntas exibidas em Recursos e ajuda;
+- [x] inventariar todas as perguntas exibidas em Recursos e ajuda;
+- [x] criar matriz rastreável para os 39 exemplos e 8 casos negativos;
 - [ ] testar os 20 recursos anunciados e suas principais variações;
 - [ ] validar rotas locais, Ollama, automação e execução controlada;
 - [ ] validar operação local e em computador remoto por SSH;

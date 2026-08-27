@@ -120,7 +120,24 @@ comportamento, políticas de segurança ou compatibilidade da versão estável.
 - verificar automaticamente os componentes visuais obrigatórios;
 - executar testes, documentação e arquitetura antes da publicação.
 
-## Próxima validação
+## Validação remota concluída
 
-Após o push, confirmar os workflows CI e CodeQL verdes no GitHub. A construção,
-instalação limpa e homologação funcional permanecem pendentes para a v2.1.0.
+- CI aprovado no commit `e4d8572`;
+- CodeQL aprovado no commit `e4d8572`;
+- actions Node.js 24 confirmadas no GitHub;
+- proteção arquitetural da GUI ativa.
+
+## Pacote atual
+
+### V2.1-P4-R1 — Matriz de homologação
+
+- 20 recursos catalogados;
+- 39 perguntas anunciadas identificadas;
+- 8 casos negativos complementares definidos;
+- 47 casos aguardando execução funcional;
+- matriz protegida contra divergência pelo CI.
+
+## Próxima etapa
+
+Executar os casos pela interface, registrar evidências e corrigir qualquer
+diferença entre o comportamento observado e o recurso anunciado.
