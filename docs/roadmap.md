@@ -442,6 +442,9 @@ as capacidades, políticas de risco ou compatibilidade pública da v2.0.2.
 - [ ] extrair componentes sem alterar comportamento visual;
 - [ ] reduzir acoplamento entre GUI, backend e execução;
 - [ ] adicionar testes de regressão da composição da interface.
+- [x] extrair estrutura principal, cabeçalho e barra de entrada;
+- [x] extrair tela de boas-vindas e apresentação das mensagens;
+- [x] extrair apresentação do estado ocupado da interface;
 
 ### V2.1-P3 — Pipeline e manutenção da release
 

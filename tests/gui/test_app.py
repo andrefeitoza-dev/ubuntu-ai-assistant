@@ -41,7 +41,15 @@ def test_window_icon_uses_first_valid_candidate(
 
 
 def test_gui_declares_stable_window_class() -> None:
-    source = Path(gui_app.__file__).read_text(encoding="utf-8")
+    source = "\n".join(
+        Path(path).read_text(encoding="utf-8")
+        for path in (
+            gui_app.__file__,
+            "src/ubuntu_ai/gui/interface.py",
+            "src/ubuntu_ai/gui/conversation_view.py",
+            "src/ubuntu_ai/gui/execution_cards.py",
+        )
+    )
 
     assert gui_app.WINDOW_CLASS == "UbuntuAIAssistant"
     assert "tk.Tk(className=WINDOW_CLASS)" in source
@@ -194,7 +202,15 @@ def test_gui_uses_readable_conversation_typography() -> None:
     assert gui_app.FONT_TINY == ("Sans", 10)
     assert gui_app.FONT_MONO == ("Monospace", 11)
 
-    source = Path(gui_app.__file__).read_text(encoding="utf-8")
+    source = "\n".join(
+        Path(path).read_text(encoding="utf-8")
+        for path in (
+            gui_app.__file__,
+            "src/ubuntu_ai/gui/interface.py",
+            "src/ubuntu_ai/gui/conversation_view.py",
+            "src/ubuntu_ai/gui/execution_cards.py",
+        )
+    )
     assert "font=FONT_BODY" in source
     assert "font=FONT_TITLE" in source
     assert "font=FONT_HERO" in source
@@ -392,3 +408,18 @@ def test_plan_and_execution_cards_are_delegated() -> None:
     assert "RESULTADO DA EXECUÇÃO" not in app_source
     assert "PLANO DE EXECUÇÃO" in component_source
     assert "RESULTADO DA EXECUÇÃO" in component_source
+
+
+def test_main_interface_and_conversation_are_delegated() -> None:
+    source = Path("src/ubuntu_ai/gui/app.py").read_text(encoding="utf-8")
+
+    assert "build_main_interface(" in source
+    assert "build_welcome(" in source
+    assert "add_user_message(" in source
+    assert "add_system_message(" in source
+    assert "apply_busy_state(" in source
+    interface_source = Path("src/ubuntu_ai/gui/interface.py").read_text(encoding="utf-8")
+
+    assert 'text="Como posso ajudar?"' not in source
+    assert 'text="Recursos e ajuda  ▾"' in interface_source
+    assert 'text="Agentes e progresso  ▾"' in interface_source

@@ -14,10 +14,16 @@ from ubuntu_ai.gui.automation_panel import (
 )
 from ubuntu_ai.gui.backend import GUIBackend, MultiAgentExecutionReport
 from ubuntu_ai.gui.capabilities_panel import build_capabilities_panel
+from ubuntu_ai.gui.conversation_view import (
+    add_system_message,
+    add_user_message,
+    build_welcome,
+)
 from ubuntu_ai.gui.execution_cards import (
     build_execution_result_card,
     build_plan_card,
 )
+from ubuntu_ai.gui.interface import apply_busy_state, build_main_interface
 from ubuntu_ai.gui.presentation import (
     command_text,
     format_duration,
@@ -27,32 +33,22 @@ from ubuntu_ai.gui.presentation import (
     state_message,
 )
 from ubuntu_ai.gui.remote_controls import (
-    build_remote_controls,
     remote_button_text,
 )
 from ubuntu_ai.gui.single_instance import SingleInstance
 from ubuntu_ai.gui.theme import (
-    ACCENT,
-    ACCENT_HOVER,
     BACKGROUND,
-    BORDER,
-    CONTENT_PAD,
     ERROR,
-    FONT_BODY,
-    FONT_HERO,
-    FONT_SMALL,
-    FONT_SMALL_BOLD,
     FONT_TINY,
-    FONT_TITLE,
     SUCCESS,
     SURFACE,
-    SURFACE_ALT,
-    SURFACE_HOVER,
     TEXT,
-    TEXT_DIM,
     TEXT_MUTED,
     WARNING,
     WINDOW_CLASS,
+)
+from ubuntu_ai.gui.theme import (
+    FONT_BODY as FONT_BODY,
 )
 from ubuntu_ai.gui.theme import (
     FONT_BODY_BOLD as FONT_BODY_BOLD,
@@ -62,6 +58,9 @@ from ubuntu_ai.gui.theme import (
 )
 from ubuntu_ai.gui.theme import (
     FONT_MONO_SMALL as FONT_MONO_SMALL,
+)
+from ubuntu_ai.gui.theme import (
+    FONT_SMALL as FONT_SMALL,
 )
 from ubuntu_ai.gui.theme import (
     TERMINAL as TERMINAL,
@@ -150,237 +149,39 @@ class UbuntuAIApp:
     # ------------------------------------------------------------------
 
     def _build_interface(self) -> None:
-        header = tk.Frame(
+        widgets = build_main_interface(
             self.root,
-            bg=BACKGROUND,
-            padx=30,
-            pady=20,
-        )
-        header.pack(fill=tk.X)
-
-        brand = tk.Frame(header, bg=BACKGROUND)
-        brand.pack(side=tk.LEFT)
-
-        if self._window_icon is not None:
-            self._header_icon = self._window_icon.subsample(16, 16)
-            tk.Label(
-                brand,
-                image=self._header_icon,
-                bg=BACKGROUND,
-                borderwidth=0,
-            ).pack(
-                side=tk.LEFT,
-                padx=(0, 10),
-            )
-
-        tk.Label(
-            brand,
-            text="Ubuntu AI",
-            bg=BACKGROUND,
-            fg=TEXT,
-            font=FONT_TITLE,
-        ).pack(side=tk.LEFT)
-
-        tk.Label(
-            brand,
-            text="  Assistant",
-            bg=BACKGROUND,
-            fg=TEXT_MUTED,
-            font=FONT_BODY,
-        ).pack(side=tk.LEFT)
-
-        self.status_label = tk.Label(
-            header,
-            text="●  Pronto",
-            bg=BACKGROUND,
-            fg=SUCCESS,
-            font=FONT_SMALL,
-        )
-        self.status_label.pack(side=tk.RIGHT)
-
-        self.resources_button = tk.Button(
-            header,
-            text="Recursos e ajuda  ▾",
-            command=self._show_capabilities,
-            bg=BACKGROUND,
-            fg=TEXT_MUTED,
-            activebackground=SURFACE_HOVER,
-            activeforeground=TEXT,
-            relief=tk.FLAT,
-            borderwidth=0,
-            cursor="hand2",
-            takefocus=True,
-            font=FONT_TINY,
-            padx=8,
-            pady=4,
-        )
-        self.resources_button.pack(side=tk.RIGHT, padx=(0, 10))
-
-        self.automation_button = tk.Button(
-            header,
-            text="Agentes e progresso  ▾",
-            command=self._show_automation_panel,
-            bg=BACKGROUND,
-            fg=TEXT_MUTED,
-            activebackground=SURFACE_HOVER,
-            activeforeground=TEXT,
-            relief=tk.FLAT,
-            borderwidth=0,
-            cursor="hand2",
-            takefocus=True,
-            font=FONT_TINY,
-            padx=8,
-            pady=4,
-        )
-        self.automation_button.pack(side=tk.RIGHT, padx=(0, 10))
-
-        self._remote_controls_visible = False
-        remote_widgets = build_remote_controls(
-            header,
-            on_toggle=self._toggle_remote_controls,
+            window_icon=self._window_icon,
+            on_show_capabilities=self._show_capabilities,
+            on_show_automation=self._show_automation_panel,
+            on_toggle_remote=self._toggle_remote_controls,
             on_target_selected=self._on_target_selected,
-            on_add=self._add_remote_host,
-            on_remove=self._remove_remote_host,
-            on_diagnose=self._start_remote_diagnostics,
-        )
-        self.remote_controls_button = remote_widgets.button
-        self.remote_controls = remote_widgets.container
-        self.target_variable = remote_widgets.target_variable
-        self.target_menu = remote_widgets.target_menu
-
-        self.content = tk.Frame(
-            self.root,
-            bg=BACKGROUND,
-        )
-        self.content.pack(
-            fill=tk.BOTH,
-            expand=True,
-            padx=28,
+            on_add_remote=self._add_remote_host,
+            on_remove_remote=self._remove_remote_host,
+            on_diagnose_remote=self._start_remote_diagnostics,
+            on_resize_messages=self._resize_messages,
+            on_enter=self._on_enter,
+            on_submit=self.submit,
         )
 
-        self.canvas = tk.Canvas(
-            self.content,
-            bg=BACKGROUND,
-            highlightthickness=0,
-            borderwidth=0,
-        )
-
-        self.scrollbar = tk.Scrollbar(
-            self.content,
-            orient=tk.VERTICAL,
-            command=self.canvas.yview,
-            borderwidth=0,
-            highlightthickness=0,
-        )
-
-        self.messages = tk.Frame(
-            self.canvas,
-            bg=BACKGROUND,
-        )
-
-        self.messages.bind(
-            "<Configure>",
-            lambda _event: self.canvas.configure(scrollregion=self.canvas.bbox("all")),
-        )
-
-        self.canvas_window = self.canvas.create_window(
-            (0, 0),
-            window=self.messages,
-            anchor="nw",
-        )
-
-        self.canvas.bind(
-            "<Configure>",
-            self._resize_messages,
-        )
-
-        self.canvas.configure(
-            yscrollcommand=self.scrollbar.set,
-        )
-
-        self.canvas.pack(
-            side=tk.LEFT,
-            fill=tk.BOTH,
-            expand=True,
-        )
-
-        self.scrollbar.pack(
-            side=tk.RIGHT,
-            fill=tk.Y,
-        )
-
-        # Composer ------------------------------------------------------
-
-        self.composer_outer = tk.Frame(
-            self.root,
-            bg=BACKGROUND,
-            padx=28,
-            pady=12,
-        )
-        self.composer_outer.pack(
-            fill=tk.X,
-            pady=(0, 190),
-        )
-
-        self.composer = tk.Frame(
-            self.composer_outer,
-            bg=SURFACE_ALT,
-            padx=18,
-            pady=10,
-            highlightbackground=BORDER,
-            highlightthickness=1,
-        )
-        self.composer.pack(
-            fill=tk.X,
-            padx=CONTENT_PAD,
-        )
-
-        self.request_entry = tk.Entry(
-            self.composer,
-            bg=SURFACE_ALT,
-            fg=TEXT,
-            insertbackground=TEXT,
-            disabledbackground=SURFACE_ALT,
-            disabledforeground=TEXT_DIM,
-            relief=tk.FLAT,
-            borderwidth=0,
-            font=FONT_BODY,
-        )
-        self.request_entry.pack(
-            side=tk.LEFT,
-            fill=tk.X,
-            expand=True,
-            ipady=9,
-        )
-
-        self.request_entry.bind(
-            "<Return>",
-            self._on_enter,
-        )
-
-        self.send_button = tk.Button(
-            self.composer,
-            text="Enviar",
-            command=self.submit,
-            bg=ACCENT,
-            fg="#101318",
-            activebackground=ACCENT_HOVER,
-            activeforeground="#101318",
-            disabledforeground=TEXT_DIM,
-            relief=tk.FLAT,
-            borderwidth=0,
-            padx=20,
-            pady=9,
-            cursor="hand2",
-            takefocus=True,
-            font=FONT_SMALL_BOLD,
-        )
-        self.send_button.pack(
-            side=tk.RIGHT,
-            padx=(14, 0),
-        )
-
-        self.request_entry.focus_set()
+        self._header_icon = widgets.header_icon
+        self.status_label = widgets.status_label
+        self.resources_button = widgets.resources_button
+        self.automation_button = widgets.automation_button
+        self._remote_controls_visible = False
+        self.remote_controls_button = widgets.remote_controls_button
+        self.remote_controls = widgets.remote_controls
+        self.target_variable = widgets.target_variable
+        self.target_menu = widgets.target_menu
+        self.content = widgets.content
+        self.canvas = widgets.canvas
+        self.scrollbar = widgets.scrollbar
+        self.messages = widgets.messages
+        self.canvas_window = widgets.canvas_window
+        self.composer_outer = widgets.composer_outer
+        self.composer = widgets.composer
+        self.request_entry = widgets.request_entry
+        self.send_button = widgets.send_button
 
     def _bind_mousewheel(self) -> None:
         """Habilita roda do mouse e touchpad no histórico da conversa."""
@@ -561,31 +362,12 @@ class UbuntuAIApp:
         self._add_system_message("\n".join(lines), color=TEXT)
 
     def _show_welcome(self) -> None:
-        self.welcome = tk.Frame(
+        widgets = build_welcome(
             self.messages,
-            bg=BACKGROUND,
+            window_icon=self._window_icon,
         )
-        self.welcome.pack(
-            fill=tk.X,
-            pady=(55, 24),
-        )
-
-        if self._window_icon is not None:
-            self._welcome_icon = self._window_icon.subsample(4, 4)
-            tk.Label(
-                self.welcome,
-                image=self._welcome_icon,
-                bg=BACKGROUND,
-                borderwidth=0,
-            ).pack(pady=(0, 20))
-
-        tk.Label(
-            self.welcome,
-            text="Como posso ajudar?",
-            bg=BACKGROUND,
-            fg=TEXT,
-            font=FONT_HERO,
-        ).pack()
+        self.welcome = widgets.frame
+        self._welcome_icon = widgets.icon
 
     # ------------------------------------------------------------------
     # Request
@@ -1200,29 +982,7 @@ class UbuntuAIApp:
     # ------------------------------------------------------------------
 
     def _add_user_message(self, message: str) -> None:
-        frame = tk.Frame(
-            self.messages,
-            bg=BACKGROUND,
-        )
-        frame.pack(
-            fill=tk.X,
-            pady=10,
-            padx=CONTENT_PAD,
-        )
-
-        bubble = tk.Label(
-            frame,
-            text=message,
-            bg=SURFACE_ALT,
-            fg=TEXT,
-            font=FONT_BODY,
-            justify=tk.LEFT,
-            wraplength=560,
-            padx=17,
-            pady=12,
-        )
-        bubble.pack(side=tk.RIGHT)
-
+        add_user_message(self.messages, message=message)
         self._scroll_bottom()
 
     def _add_system_message(
@@ -1231,26 +991,11 @@ class UbuntuAIApp:
         *,
         color: str = TEXT,
     ) -> None:
-        frame = tk.Frame(
+        add_system_message(
             self.messages,
-            bg=BACKGROUND,
+            message=message,
+            color=color,
         )
-        frame.pack(
-            fill=tk.X,
-            padx=CONTENT_PAD,
-            pady=12,
-        )
-
-        tk.Label(
-            frame,
-            text=message,
-            bg=BACKGROUND,
-            fg=color,
-            font=FONT_BODY,
-            justify=tk.LEFT,
-            wraplength=650,
-        ).pack(anchor="w")
-
         self._scroll_bottom()
 
     # ------------------------------------------------------------------
@@ -1478,36 +1223,15 @@ class UbuntuAIApp:
         label: str = "Pronto",
     ) -> None:
         self._busy = busy
-
-        if busy:
-            self.status_label.configure(
-                text=f"●  {label}...",
-                fg=WARNING,
-            )
-            self.send_button.configure(
-                text="Interromper",
-                command=self.cancel_current_operation,
-                state=tk.NORMAL,
-                bg=WARNING,
-            )
-            self.request_entry.configure(
-                state=tk.DISABLED,
-            )
-        else:
-            self.status_label.configure(
-                text="●  Pronto",
-                fg=SUCCESS,
-            )
-            self.send_button.configure(
-                text="Enviar",
-                command=self.submit,
-                state=tk.NORMAL,
-                bg=ACCENT,
-            )
-            self.request_entry.configure(
-                state=tk.NORMAL,
-            )
-            self.request_entry.focus_set()
+        apply_busy_state(
+            busy=busy,
+            label=label,
+            status_label=self.status_label,
+            send_button=self.send_button,
+            request_entry=self.request_entry,
+            on_submit=self.submit,
+            on_cancel=self.cancel_current_operation,
+        )
 
     @staticmethod
     def _command_text(command: object) -> str:

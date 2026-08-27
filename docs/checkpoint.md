@@ -99,12 +99,18 @@ comportamento, políticas de segurança ou compatibilidade da versão estável.
 - auditoria arquitetural permaneceu com zero ciclos;
 - `gui/app.py` reduzido para 1.614 linhas.
 
-## Próximo incremento
+## Último incremento concluído
 
-Continuar a decomposição segura de `gui/app.py`, selecionando uma
-responsabilidade visual coesa e mantendo backend, estado e políticas no
-orquestrador.
+### V2.1-P2-R6 — Estrutura visual e conversa
 
-A homologação final da v2.1.0 permanece obrigatória e cobrirá todos os recursos
-anunciados em Recursos e ajuda, suas variações, execução local e remota,
-confirmações, cancelamentos, riscos e casos negativos.
+- estrutura principal delegada a `gui/interface.py`;
+- conversa e boas-vindas delegadas a `gui/conversation_view.py`;
+- apresentação do estado ocupado isolada;
+- backend e coordenação preservados em `UbuntuAIApp`;
+- contratos tipográficos preservados;
+- suíte completa e arquitetura aprovadas.
+
+## Próximo pacote
+
+Concluir a decomposição segura restante da GUI e preparar a modernização do
+pipeline de CI. A homologação funcional permanece obrigatória antes da v2.1.0.
