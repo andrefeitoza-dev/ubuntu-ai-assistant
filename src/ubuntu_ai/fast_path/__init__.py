@@ -1,5 +1,6 @@
 from ubuntu_ai.fast_path.capabilities import CapabilityCatalog, CapabilityTopic
 from ubuntu_ai.fast_path.linux_commands import LinuxCommand, LinuxCommandCatalog
+from ubuntu_ai.fast_path.linux_knowledge import LinuxKnowledgeResponder
 from ubuntu_ai.fast_path.local_responder import LocalResponder, LocalResponse
 from ubuntu_ai.fast_path.runtime_status import RuntimeStatusResponder
 from ubuntu_ai.fast_path.software import InstalledSoftwareResponder
@@ -10,6 +11,7 @@ __all__ = [
     "CapabilityTopic",
     "LinuxCommand",
     "LinuxCommandCatalog",
+    "LinuxKnowledgeResponder",
     "InstalledSoftwareResponder",
     "LocalResponder",
     "LocalResponse",

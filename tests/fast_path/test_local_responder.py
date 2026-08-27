@@ -153,3 +153,51 @@ def test_system_health_is_answered_locally_without_ollama() -> None:
     assert "saudável" in response.text
     assert "CPU: 12.0%" in response.text
     assert "RAM: 45.0%" in response.text
+
+
+def test_slow_computer_uses_current_local_metrics() -> None:
+    sample = SystemMetrics(
+        cpu_percent=25.0,
+        memory_percent=91.0,
+        memory_available_mb=700,
+        swap_percent=60.0,
+        disk_percent=94.0,
+        disk_free_gb=8.0,
+        active_network_interfaces=2,
+        process_count=220,
+        uptime_seconds=7200,
+    )
+    responder = LocalResponder(
+        health_service=SystemHealthService(lambda: sample),
+    )
+
+    response = responder.respond("Por que meu computador está lento?")
+
+    assert response is not None
+    assert response.route == "local"
+    assert "Memória elevada: 91.0%" in response.text
+    assert "Swap elevada: 60.0%" in response.text
+    assert "Disco próximo da capacidade: 94.0%" in response.text
+    assert "Processos em execução: 220" in response.text
+
+
+def test_slow_computer_reports_when_metrics_are_healthy() -> None:
+    sample = SystemMetrics(
+        cpu_percent=12.0,
+        memory_percent=45.0,
+        memory_available_mb=4096,
+        swap_percent=2.0,
+        disk_percent=55.0,
+        disk_free_gb=100.0,
+        active_network_interfaces=2,
+        process_count=130,
+        uptime_seconds=3600,
+    )
+    responder = LocalResponder(
+        health_service=SystemHealthService(lambda: sample),
+    )
+
+    response = responder.respond("Por que meu computador está lento?")
+
+    assert response is not None
+    assert "não indicam sobrecarga elevada" in response.text

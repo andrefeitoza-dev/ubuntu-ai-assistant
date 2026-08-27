@@ -46,7 +46,14 @@ class RuntimeStatusResponder:
             status = self._safe_optional(self._ssh_provider)
             if status is None:
                 return "Não foi possível consultar o estado do serviço SSH."
-            return f"Serviço SSH deste computador: {status}."
+            translated = {
+                "active": "ativo",
+                "inactive": "inativo",
+                "failed": "com falha",
+                "activating": "iniciando",
+                "deactivating": "parando",
+            }.get(status.casefold(), status)
+            return f"Serviço SSH deste computador: {translated}."
 
         if topic == "docker":
             version = self._safe_optional(self._docker_provider)

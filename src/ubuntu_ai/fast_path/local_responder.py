@@ -11,6 +11,7 @@ from datetime import datetime
 from ubuntu_ai.context.health import SystemHealthService
 from ubuntu_ai.fast_path.capabilities import CapabilityCatalog
 from ubuntu_ai.fast_path.linux_commands import LinuxCommandCatalog
+from ubuntu_ai.fast_path.linux_knowledge import LinuxKnowledgeResponder
 from ubuntu_ai.fast_path.runtime_status import RuntimeStatusResponder
 from ubuntu_ai.fast_path.software import InstalledSoftwareResponder
 from ubuntu_ai.fast_path.system_facts import SystemFactResponder
@@ -83,6 +84,12 @@ class LocalResponder:
         "cancel",
         "interromper",
     }
+    _SLOW_REQUESTS = {
+        "por que meu computador esta lento",
+        "por que este computador esta lento",
+        "por que o computador esta lento",
+        "meu computador esta lento",
+    }
     _HEALTH_REQUESTS = {
         "como esta o computador",
         "como esta este computador",
@@ -102,6 +109,7 @@ class LocalResponder:
         capabilities: CapabilityCatalog | None = None,
         software: InstalledSoftwareResponder | None = None,
         runtime_status: RuntimeStatusResponder | None = None,
+        linux_knowledge: LinuxKnowledgeResponder | None = None,
     ) -> None:
         self._now = now or datetime.now
         self._health_service = health_service or SystemHealthService()
@@ -110,6 +118,7 @@ class LocalResponder:
         self._capabilities = capabilities or CapabilityCatalog()
         self._software = software or InstalledSoftwareResponder()
         self._runtime_status = runtime_status or RuntimeStatusResponder()
+        self._linux_knowledge = linux_knowledge or LinuxKnowledgeResponder()
 
     @classmethod
     def _is_date_request(cls, normalized: str) -> bool:
@@ -213,6 +222,10 @@ class LocalResponder:
         if command_response is not None:
             return LocalResponse(command_response)
 
+        knowledge_response = self._linux_knowledge.respond(normalized)
+        if knowledge_response is not None:
+            return LocalResponse(knowledge_response)
+
         software_response = self._software.respond(normalized)
         if software_response is not None:
             return LocalResponse(software_response)
@@ -228,10 +241,45 @@ class LocalResponder:
         if normalized in self._CANCEL_REQUESTS:
             return LocalResponse("Não há nenhuma operação em andamento para cancelar.")
 
+        if normalized in self._SLOW_REQUESTS:
+            return LocalResponse(self._slow_diagnosis())
+
         if normalized in self._HEALTH_REQUESTS:
             return LocalResponse(self._health_service.snapshot().to_text())
 
         return None
+
+    def _slow_diagnosis(self) -> str:
+        snapshot = self._health_service.snapshot()
+        metrics = snapshot.metrics
+
+        if metrics is None:
+            return (
+                "Não foi possível coletar métricas locais para diagnosticar "
+                "a lentidão deste computador."
+            )
+
+        findings = []
+        if metrics.cpu_percent >= 80:
+            findings.append(f"CPU elevada: {metrics.cpu_percent:.1f}%.")
+        if metrics.memory_percent >= 80:
+            findings.append(f"Memória elevada: {metrics.memory_percent:.1f}%.")
+        if metrics.swap_percent >= 50:
+            findings.append(f"Swap elevada: {metrics.swap_percent:.1f}%.")
+        if metrics.disk_percent >= 90:
+            findings.append(f"Disco próximo da capacidade: {metrics.disk_percent:.1f}% usado.")
+
+        if not findings:
+            findings.append(
+                "As métricas atuais não indicam sobrecarga elevada de CPU, memória, swap ou disco."
+            )
+
+        findings.append(f"Processos em execução: {metrics.process_count}.")
+        findings.append("Para aprofundar, consulte os processos que mais usam CPU e memória.")
+
+        return "Diagnóstico local de desempenho:\n" + "\n".join(
+            f"• {finding}" for finding in findings
+        )
 
     @staticmethod
     def _normalize(value: str) -> str:
