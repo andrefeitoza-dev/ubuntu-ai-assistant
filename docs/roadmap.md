@@ -439,16 +439,17 @@ as capacidades, políticas de risco ou compatibilidade pública da v2.0.2.
 - [x] extrair a construção e apresentação do painel de automação;
 - [x] extrair os controles visuais de destino local e SSH;
 - [x] extrair cartões visuais de plano e resultado da execução;
-- [ ] extrair componentes sem alterar comportamento visual;
-- [ ] reduzir acoplamento entre GUI, backend e execução;
-- [ ] adicionar testes de regressão da composição da interface.
+- [x] extrair componentes sem alterar comportamento visual;
+- [x] reduzir acoplamento entre GUI, backend e execução;
+- [x] adicionar testes de regressão da composição da interface.
 - [x] extrair estrutura principal, cabeçalho e barra de entrada;
 - [x] extrair tela de boas-vindas e apresentação das mensagens;
 - [x] extrair apresentação do estado ocupado da interface;
 
 ### V2.1-P3 — Pipeline e manutenção da release
 
-- [ ] atualizar actions com avisos de runtime depreciado;
+- [x] atualizar actions com avisos de runtime depreciado;
+- [x] proteger automaticamente a composição e o tamanho da GUI;
 - [ ] preservar CI, release, attestations e checksums;
 - [ ] executar build e instalação limpa;
 - [ ] preparar a release `v2.1.0`.

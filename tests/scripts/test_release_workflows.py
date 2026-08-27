@@ -24,7 +24,7 @@ def test_release_requires_matching_tag_checksums_and_keyless_attestation() -> No
     assert 'test "${GITHUB_REF_NAME}" = "v${PACKAGE_VERSION}"' in source
     assert "release_artifacts.py checksums" in source
     assert "release_artifacts.py verify" in source
-    assert "actions/attest-build-provenance@v2" in source
+    assert "actions/attest-build-provenance@v4" in source
     assert "id-token: write" in source
     assert "dist/SHA256SUMS" in source
     assert "build_deb.py" in source

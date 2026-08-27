@@ -110,7 +110,17 @@ comportamento, políticas de segurança ou compatibilidade da versão estável.
 - contratos tipográficos preservados;
 - suíte completa e arquitetura aprovadas.
 
-## Próximo pacote
+## Pacote atual
 
-Concluir a decomposição segura restante da GUI e preparar a modernização do
-pipeline de CI. A homologação funcional permanece obrigatória antes da v2.1.0.
+### V2.1-P3-R1 — CI moderno e proteção arquitetural
+
+- atualizar actions para runtimes Node.js 24;
+- preservar checkout, uv, testes, artefatos e provenance;
+- impedir que `gui/app.py` ultrapasse 1.400 linhas;
+- verificar automaticamente os componentes visuais obrigatórios;
+- executar testes, documentação e arquitetura antes da publicação.
+
+## Próxima validação
+
+Após o push, confirmar os workflows CI e CodeQL verdes no GitHub. A construção,
+instalação limpa e homologação funcional permanecem pendentes para a v2.1.0.
