@@ -200,3 +200,14 @@ Especificação: `docs/natural-actions-roadmap.md`.
 - RC2 reinstalada após correção das consultas de versão;
 - homologação visual e preservação do histórico aprovadas;
 - próxima etapa: commit da candidata e validação pelo CI.
+
+## Validação remota da v2.1.0
+
+- commit candidato `7147c28` publicado;
+- CI aprovado no GitHub;
+- CodeQL aprovado no GitHub;
+- suíte local com 992 testes aprovada;
+- RC2 instalada e homologada visualmente;
+- artefatos e checksums aprovados;
+- H16, N07 e N08 permanecem documentados para teste futuro;
+- release pronta para o commit final e a tag `v2.1.0`.

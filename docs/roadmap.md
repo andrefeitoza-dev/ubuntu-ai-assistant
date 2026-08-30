@@ -453,7 +453,7 @@ as capacidades, políticas de risco ou compatibilidade pública da v2.0.2.
 - [x] proteger automaticamente a composição e o tamanho da GUI;
 - [x] preservar CI, release, attestations e checksums;
 - [x] executar build e instalação limpa;
-- [ ] preparar a release `v2.1.0`.
+- [x] preparar a release `v2.1.0`.
 
 ### V2.1-P4 — Homologação funcional e release v2.1.0
 
@@ -477,8 +477,8 @@ as capacidades, políticas de risco ou compatibilidade pública da v2.0.2.
 - [x] registrar resultados em uma matriz de evidências;
 - [x] corrigir falhas ou documentar limitações conhecidas;
 - [x] validar pacote Debian em instalação e atualização reais;
-- [ ] executar suíte, arquitetura, CI e auditoria dos artefatos;
-- [ ] preparar changelog, documentação e tag `v2.1.0`.
+- [x] executar suíte, arquitetura, CI e auditoria dos artefatos;
+- [x] preparar changelog, documentação e tag `v2.1.0`.
 
 ### V2.2-P1 — Ações naturais seguras no desktop
 
