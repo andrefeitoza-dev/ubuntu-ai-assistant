@@ -6,6 +6,7 @@ from uuid import uuid4
 from ubuntu_ai.agent.lifecycle import AgentLifecycle
 from ubuntu_ai.agent.models import AgentResult, AgentTask
 from ubuntu_ai.agent.session import SessionManager
+from ubuntu_ai.audit import LocalActionAuditService
 from ubuntu_ai.confirmation.engine import ConfirmationEngine
 from ubuntu_ai.confirmation.models import Confirmation
 from ubuntu_ai.context.engine import ContextEngine
@@ -46,6 +47,7 @@ class AgentRuntime:
         learning_service: LearningService | None = None,
         execution_intelligence: ExecutionIntelligence | None = None,
         reflection_engine: ReflectionEngine | None = None,
+        audit_service: LocalActionAuditService | None = None,
     ) -> None:
         self._execution_pipeline = execution_pipeline or ExecutionPipeline()
         self._session_manager = session_manager or SessionManager()
@@ -60,6 +62,7 @@ class AgentRuntime:
         self._learning_service = learning_service
         self._execution_intelligence = execution_intelligence
         self._reflection_engine = reflection_engine
+        self._audit_service = audit_service
         self._context_engine = context_engine or ContextEngine(
             context_provider=self._context_provider,
             session_manager=self._session_manager,
@@ -229,6 +232,7 @@ class AgentRuntime:
                         status=ExecutionStatus.BLOCKED,
                         message=report.summary(),
                         command=command,
+                        policy_reason=report.summary(),
                     )
                 else:
                     result = self._controlled_executor.execute(ExecutionRequest(command=command))
@@ -242,6 +246,7 @@ class AgentRuntime:
                 result,
             )
             self._persist_execution_result(result)
+            self._audit_execution(step.title, command, result)
             self._learn_from_execution(result)
             if self._reflection_engine is not None:
                 reflection = self._reflect_after_execution(
@@ -334,6 +339,24 @@ class AgentRuntime:
         self._learning_service.learn_from_execution(
             user_request=self._pending_request,
             project_name=self._pending_context.project_name,
+            result=result,
+        )
+
+    def _audit_execution(
+        self,
+        intent: str,
+        command: str,
+        result: ExecutionResult,
+    ) -> None:
+        if self._audit_service is None:
+            return
+        if self._pending_request is None:
+            raise RuntimeError("A solicitação pendente não está disponível para auditoria.")
+        self._audit_service.record(
+            session_id=self._session_id,
+            request=self._pending_request,
+            intent=intent,
+            command=command,
             result=result,
         )
 

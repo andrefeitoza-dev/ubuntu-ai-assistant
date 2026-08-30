@@ -482,15 +482,15 @@ as capacidades, políticas de risco ou compatibilidade pública da v2.0.2.
 
 ### V2.2-P1 — Ações naturais seguras no desktop
 
-- [ ] criar resolução segura de aplicativos instalados por entradas `.desktop`;
-- [ ] abrir Calculadora, LibreOffice e Terminal por linguagem natural;
-- [ ] abrir sites HTTP/HTTPS e aliases confiáveis no navegador;
-- [ ] bloquear protocolos, URLs e argumentos inseguros;
-- [ ] ampliar pastas XDG, incluindo Downloads e nomes localizados;
-- [ ] separar abertura do Terminal da execução de comandos;
-- [ ] criar prévia e confirmação para alterações controladas;
-- [ ] preservar bloqueios para elevação e comandos críticos;
-- [ ] auditar aplicativo, pasta, domínio, comando e resultado;
-- [ ] testar frases oficiais e principais variações naturais;
-- [ ] criar matriz de segurança e homologação da v2.2.0;
-- [ ] documentar arquitetura, limitações e evidências.
+- [x] criar resolução segura de aplicativos instalados por entradas `.desktop`;
+- [x] abrir Calculadora, LibreOffice e Terminal por linguagem natural;
+- [x] abrir sites HTTP/HTTPS e aliases confiáveis no navegador;
+- [x] bloquear protocolos, URLs e argumentos inseguros;
+- [x] ampliar pastas XDG, incluindo Downloads e nomes localizados;
+- [x] separar abertura do Terminal da execução de comandos;
+- [x] criar prévia e confirmação para alterações controladas;
+- [x] preservar bloqueios para elevação e comandos críticos;
+- [x] auditar aplicativo, pasta, domínio, comando e resultado;
+- [x] testar frases oficiais e principais variações naturais;
+- [x] criar matriz de segurança e homologação da v2.2.0;
+- [x] documentar arquitetura, limitações e evidências.

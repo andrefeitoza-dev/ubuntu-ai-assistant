@@ -15,7 +15,21 @@ class LinuxKnowledgeResponder:
             "O comando systemctl consulta e controla as unidades; o journalctl "
             "consulta os registros mantidos pelo systemd-journald."
         ),
+        "como o systemd trabalha": (
+            "O systemd é o gerenciador de inicialização e serviços usado pelo "
+            "Ubuntu. Ele é iniciado como processo PID 1, organiza recursos em "
+            "unidades, resolve dependências e pode iniciar serviços em paralelo. "
+            "O comando systemctl consulta e controla as unidades; o journalctl "
+            "consulta os registros mantidos pelo systemd-journald."
+        ),
         "o que e um servico": (
+            "Um serviço é um processo ou conjunto de processos que fornece uma "
+            "função do sistema em segundo plano, como rede, SSH ou impressão. "
+            "No Ubuntu, serviços normalmente são representados por unidades "
+            ".service do systemd e podem ser consultados, iniciados, parados ou "
+            "configurados para iniciar durante o boot."
+        ),
+        "explique o que significa servico no linux": (
             "Um serviço é um processo ou conjunto de processos que fornece uma "
             "função do sistema em segundo plano, como rede, SSH ou impressão. "
             "No Ubuntu, serviços normalmente são representados por unidades "

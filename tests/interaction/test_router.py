@@ -129,7 +129,8 @@ def test_router_refuses_unsafe_url_without_execution() -> None:
 
     assert decision.route is InteractionRoute.LOCAL
     assert decision.response is not None
-    assert "Aplicativo não aberto" in decision.response
+    assert "Site não aberto" in decision.response
+    assert "HTTP ou HTTPS" in decision.response
 
 
 @pytest.mark.parametrize(
@@ -166,3 +167,28 @@ def test_assistant_version_variations_stay_on_local_route(
     assert decision.route is InteractionRoute.LOCAL
     assert decision.response is not None
     assert "Ubuntu AI Assistant: versão 2.1.0" in decision.response
+
+
+@pytest.mark.parametrize(
+    "phrase",
+    (
+        "Abra a Calculadora.",
+        "Abra o LibreOffice.",
+        "Abra o Terminal.",
+        "Abra o GitHub no Firefox.",
+        "Abra https://ubuntu.com.",
+        "Abra minha pasta Downloads.",
+    ),
+)
+def test_v22_natural_open_actions_use_safe_route(
+    phrase: str,
+    tmp_path,
+    monkeypatch,
+) -> None:
+    (tmp_path / "Downloads").mkdir()
+    monkeypatch.setattr("pathlib.Path.home", lambda: tmp_path)
+
+    decision = InteractionRouter().route(phrase)
+
+    assert decision.route is InteractionRoute.ACTION
+    assert decision.response is None

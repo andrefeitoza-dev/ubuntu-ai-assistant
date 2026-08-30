@@ -89,6 +89,7 @@ class LocalResponder:
         "por que este computador esta lento",
         "por que o computador esta lento",
         "meu computador esta lento",
+        "diagnostique a lentidao do meu computador",
     }
     _HEALTH_REQUESTS = {
         "como esta o computador",

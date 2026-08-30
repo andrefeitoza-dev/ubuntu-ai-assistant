@@ -46,7 +46,12 @@ class CapabilityCatalog:
         _topic(
             "01",
             "Informações do computador",
-            ("mostrar hostname e usuário", "consultar CPU e memória", "apresentar resumo"),
+            (
+                "mostrar hostname e usuário",
+                "consultar CPU e memória",
+                "medir o consumo do assistente",
+                "apresentar resumo",
+            ),
             ("Quanto tenho de memória?", "Mostre um resumo deste computador."),
         ),
         _topic(
@@ -184,7 +189,12 @@ class CapabilityCatalog:
         _topic(
             "14",
             "Automações e tarefas longas",
-            ("criar tarefas acompanhadas", "mostrar progresso", "pausar, retomar ou cancelar"),
+            (
+                "criar tarefas acompanhadas",
+                "mostrar progresso",
+                "pausar, retomar ou cancelar",
+                "consultar histórico auditável de ações",
+            ),
             ("Mostre minhas automações.", "Cancele a tarefa selecionada."),
             kind="Automação",
             risk="Conforme as etapas",
@@ -226,6 +236,7 @@ class CapabilityCatalog:
                 "importar configurações sem segredos",
                 "gerenciar perfis",
                 "validar e aprovar plugins",
+                "consultar o aprendizado persistente",
             ),
             ("Mostre os perfis de agentes.", "Mostre o catálogo de plugins."),
             kind="Consulta ou configuração",

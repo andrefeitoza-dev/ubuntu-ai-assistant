@@ -1,8 +1,10 @@
 from dataclasses import dataclass
+from unittest.mock import Mock
 
 from ubuntu_ai.agent.context import AgentContext
 from ubuntu_ai.agent.models import AgentTask
 from ubuntu_ai.agent.runtime import AgentRuntime
+from ubuntu_ai.audit import LocalActionAuditService
 from ubuntu_ai.domain.plan import Plan, PlanStep
 from ubuntu_ai.domain.risk import RiskLevel
 from ubuntu_ai.execution.models import ExecutionResult, ExecutionStatus
@@ -96,3 +98,24 @@ def test_runtime_persists_execution_after_confirmation() -> None:
     assert call["user_request"] == "Mostre ok"
     assert call["working_directory"] == "/tmp/project"
     assert call["project_name"] == "project"
+
+
+def test_runtime_audits_request_intent_policy_and_result() -> None:
+    audit_service = Mock(spec=LocalActionAuditService)
+    runtime = AgentRuntime(
+        execution_pipeline=FakePipeline(),  # type: ignore[arg-type]
+        context_provider=FakeContextProvider(),  # type: ignore[arg-type]
+        controlled_executor=FakeControlledExecutor(),  # type: ignore[arg-type]
+        audit_service=audit_service,
+    )
+
+    runtime.run(AgentTask(request="Mostre ok"))
+    results = runtime.confirm()
+
+    audit_service.record.assert_called_once_with(
+        session_id=runtime.session_id,
+        request="Mostre ok",
+        intent="Executar",
+        command="echo ok",
+        result=results[0],
+    )

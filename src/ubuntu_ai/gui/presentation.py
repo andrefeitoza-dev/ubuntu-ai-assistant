@@ -32,6 +32,12 @@ def friendly_error(message: str) -> str:
             "Revise o plano e as permissões necessárias."
         )
 
+    if "já existe um ciclo de agente em andamento" in normalized:
+        return (
+            "Já existe um plano aguardando confirmação ou cancelamento. "
+            "Decida o plano pendente antes de enviar outra ação."
+        )
+
     return message.strip()
 
 

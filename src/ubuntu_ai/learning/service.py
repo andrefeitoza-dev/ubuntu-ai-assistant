@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import re
 from collections.abc import Iterable
+from dataclasses import dataclass
 
 from ubuntu_ai.execution.models import ExecutionResult, ExecutionStatus
 from ubuntu_ai.intent.context import IntentContextBuilder
@@ -14,6 +15,16 @@ from ubuntu_ai.learning.models import (
 from ubuntu_ai.learning.repository import LearningRepository
 
 _TOKEN_PATTERN = re.compile(r"[a-zA-ZÀ-ÿ0-9_./-]+")
+
+
+@dataclass(frozen=True, slots=True)
+class LearningStats:
+    patterns: int
+    attempts: int
+    successes: int
+    failures: int
+    blocked: int
+    approved_for_reuse: int
 
 
 class LearningService:
@@ -139,6 +150,19 @@ class LearningService:
 
     def record_feedback(self, pattern_id: str, *, helpful: bool) -> LearningPattern:
         return self._repository.record_feedback(pattern_id, helpful=helpful)
+
+    def stats(self) -> LearningStats:
+        """Resume o aprendizado sem expor solicitações ou comandos armazenados."""
+
+        patterns = self._repository.list_patterns(limit=10_000)
+        return LearningStats(
+            patterns=len(patterns),
+            attempts=sum(pattern.attempts for pattern in patterns),
+            successes=sum(pattern.success_count for pattern in patterns),
+            failures=sum(pattern.failure_count for pattern in patterns),
+            blocked=sum(pattern.blocked_count for pattern in patterns),
+            approved_for_reuse=sum(pattern.approved_for_reuse for pattern in patterns),
+        )
 
     @staticmethod
     def normalize_request(request: str) -> str:

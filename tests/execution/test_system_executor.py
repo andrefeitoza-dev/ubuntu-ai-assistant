@@ -1,3 +1,4 @@
+import shlex
 from unittest.mock import Mock
 
 import pytest
@@ -52,7 +53,8 @@ def test_system_executor_returns_failed_result() -> None:
     result = executor.execute(ExecutionRequest(command="false"))
 
     assert result.status is ExecutionStatus.FAILED
-    assert result.message == "O comando terminou com erro."
+    assert "não permitem identificar" in result.message
+    assert "Próxima ação:" in result.message
     assert result.command == "false"
     assert result.return_code == 1
     assert result.stdout == ""
@@ -75,7 +77,7 @@ def test_system_executor_explains_permission_denied_without_elevation() -> None:
 
     assert result.status is ExecutionStatus.FAILED
     assert "não possui permissão" in result.message
-    assert "Nenhuma elevação automática" in result.message
+    assert "nenhuma elevação automática" in result.message
     assert result.stderr == "find: /protected: Permission denied"
 
 
@@ -92,7 +94,8 @@ def test_system_executor_distinguishes_missing_resource() -> None:
     result = executor.execute(ExecutionRequest(command="ls /missing"))
 
     assert result.status is ExecutionStatus.FAILED
-    assert result.message == "O recurso solicitado não foi encontrado."
+    assert "não foi encontrado" in result.message
+    assert "confirme o nome" in result.message
 
 
 def test_system_executor_explains_permission_exception() -> None:
@@ -104,7 +107,28 @@ def test_system_executor_explains_permission_exception() -> None:
 
     assert result.status is ExecutionStatus.FAILED
     assert "não possui permissão" in result.message
-    assert "Nenhuma elevação automática" in result.message
+    assert "nenhuma elevação automática" in result.message
+
+
+@pytest.mark.parametrize(
+    ("detail", "expected"),
+    (
+        ("request timed out", "tempo limite"),
+        ("Temporary failure in name resolution", "resolução de nomes"),
+        ("No space left on device", "espaço livre"),
+        ("tool: command not found", "dependência"),
+        ("invalid option -- z", "argumento incompatível"),
+    ),
+)
+def test_system_executor_provides_actionable_failure_diagnostics(
+    detail: str,
+    expected: str,
+) -> None:
+    message = SystemExecutor._failure_message(detail)
+
+    assert "Causa provável:" in message
+    assert "Próxima ação:" in message
+    assert expected in message
 
 
 def test_system_executor_preserves_quoted_arguments() -> None:
@@ -139,6 +163,7 @@ def test_system_executor_detaches_desktop_application() -> None:
     result = executor.execute(ExecutionRequest(command="gtk-launch firefox"))
 
     assert result.status is ExecutionStatus.EXECUTED
+    assert result.message == "Solicitação de abertura enviada ao ambiente gráfico."
     shell_service.launch.assert_called_once_with(["gtk-launch", "firefox"])
     shell_service.run.assert_not_called()
 
@@ -218,3 +243,47 @@ def test_system_executor_rejects_invalid_timeout() -> None:
         match="O timeout deve ser maior que zero.",
     ):
         SystemExecutor(timeout=0)
+
+
+@pytest.mark.parametrize(
+    "command",
+    (
+        "gtk-launch org.gnome.Calculator",
+        "gtk-launch org.gnome.Terminal",
+        "gtk-launch libreoffice-startcenter",
+        "firefox https://github.com",
+    ),
+)
+def test_system_executor_detaches_v22_graphical_executable(
+    command: str,
+) -> None:
+    shell_service = Mock(spec=ShellService)
+    shell_service.launch.return_value = CommandResult(
+        command=command,
+        return_code=0,
+        stdout="",
+        stderr="",
+    )
+    executor = SystemExecutor(shell_service=shell_service)
+
+    result = executor.execute(ExecutionRequest(command=command))
+
+    assert result.status is ExecutionStatus.EXECUTED
+    shell_service.launch.assert_called_once_with(shlex.split(command))
+    shell_service.run.assert_not_called()
+
+
+def test_system_executor_does_not_report_immediate_launch_failure_as_success() -> None:
+    shell_service = Mock(spec=ShellService)
+    shell_service.launch.return_value = CommandResult(
+        command="gtk-launch org.gnome.Calculator",
+        return_code=1,
+        stdout="",
+        stderr="cannot open display",
+    )
+    executor = SystemExecutor(shell_service=shell_service)
+
+    result = executor.execute(ExecutionRequest(command="gtk-launch org.gnome.Calculator"))
+
+    assert result.status is ExecutionStatus.FAILED
+    assert result.stderr == "cannot open display"

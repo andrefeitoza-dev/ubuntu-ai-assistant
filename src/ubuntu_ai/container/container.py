@@ -8,6 +8,7 @@ from ubuntu_ai.ai.ollama_provider import OllamaProvider
 from ubuntu_ai.ai.provider import AIProvider
 from ubuntu_ai.ai.registry import AIProviderRegistry
 from ubuntu_ai.application.runtime import ApplicationRuntime
+from ubuntu_ai.audit import LocalActionAuditService
 from ubuntu_ai.autonomy.factory import build_autonomous_runtime
 from ubuntu_ai.autonomy.runtime import AutonomousRuntime
 from ubuntu_ai.benchmark import BenchmarkRecorder, BenchmarkService
@@ -506,6 +507,11 @@ class Container:
             lambda: MemoryService(self.memory_repository()),
         )
 
+    def local_action_audit_service(self) -> LocalActionAuditService:
+        """Retorna a trilha protegida das ações executadas localmente."""
+
+        return self._singleton("local_action_audit_service", LocalActionAuditService)
+
     def conversation_repository(self) -> ConversationRepository:
         """Retorna o repositório persistente de conversas."""
 
@@ -654,4 +660,5 @@ class Container:
             learning_service=self.learning_service(),
             execution_intelligence=self.execution_intelligence(),
             reflection_engine=self.reflection_engine(),
+            audit_service=self.local_action_audit_service(),
         )

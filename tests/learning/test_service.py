@@ -44,3 +44,9 @@ def test_service_only_promotes_explicitly_approved_pattern(tmp_path: Path) -> No
 
     assert approved
     assert approved[0].pattern.command == "ls"
+
+    stats = service.stats()
+    assert stats.patterns == 1
+    assert stats.attempts == 1
+    assert stats.successes == 1
+    assert stats.approved_for_reuse == 1

@@ -24,7 +24,12 @@ from ubuntu_ai.gui.execution_cards import (
     build_execution_result_card,
     build_plan_card,
 )
-from ubuntu_ai.gui.interface import apply_busy_state, build_main_interface
+from ubuntu_ai.gui.interface import (
+    apply_busy_state,
+    bind_hover_reveal,
+    build_main_interface,
+    scroll_canvas_bottom,
+)
 from ubuntu_ai.gui.presentation import (
     command_text,
     format_duration,
@@ -43,6 +48,7 @@ from ubuntu_ai.gui.theme import (
     FONT_TINY,
     SUCCESS,
     SURFACE,
+    SURFACE_ALT,
     TEXT,
     TEXT_MUTED,
     WARNING,
@@ -185,6 +191,13 @@ class UbuntuAIApp:
         self.composer = widgets.composer
         self.request_entry = widgets.request_entry
         self.send_button = widgets.send_button
+        bind_hover_reveal(
+            self.remote_controls_button,
+            foreground=lambda: WARNING if self._backend.is_remote_selected else TEXT,
+            visible_background=SURFACE_ALT,
+        )
+        bind_hover_reveal(self.automation_button, foreground=TEXT_MUTED)
+        bind_hover_reveal(self.resources_button, foreground=TEXT_MUTED)
 
     def _bind_mousewheel(self) -> None:
         """Habilita roda do mouse e touchpad no histórico da conversa."""
@@ -235,7 +248,6 @@ class UbuntuAIApp:
                 host.name,
                 expanded=self._remote_controls_visible,
             ),
-            fg=WARNING if remote else TEXT,
         )
         self.status_label.configure(
             text=f"●  {'Remoto: ' + host.name if remote else 'Pronto'}",
@@ -401,10 +413,8 @@ class UbuntuAIApp:
             return
 
         request = self.request_entry.get().strip()
-
         if not request:
             return
-
         self.request_entry.delete(0, tk.END)
 
         if self.welcome.winfo_exists():
@@ -412,7 +422,17 @@ class UbuntuAIApp:
             self.composer_outer.pack_configure(pady=(0, 24))
 
         self._add_user_message(request)
-
+        confirm_pending = self._backend.is_confirm_pending_request(request)
+        cancel_pending = self._backend.is_cancel_pending_request(request)
+        if confirm_pending or cancel_pending:
+            if not self._backend.has_pending_plan():
+                action = "confirmar" if confirm_pending else "cancelar"
+                self._add_system_message(f"Não há plano pendente para {action}.", color=WARNING)
+            elif confirm_pending:
+                self.confirm()
+            else:
+                self.cancel()
+            return
         if self._backend.is_remote_diagnostic_request(request):
             self._start_remote_diagnostics()
             return
@@ -463,6 +483,14 @@ class UbuntuAIApp:
             self.request_entry.focus_set()
             return
 
+        if self._backend.has_pending_plan():
+            self._add_system_message(
+                "Já existe um plano aguardando sua decisão. Use o card ou diga "
+                "'Confirme o plano pendente' / 'Cancele o plano pendente'.",
+                color=WARNING,
+            )
+            self.request_entry.focus_set()
+            return
         operation = self._begin_operation("Analisando")
         self._operation_started_at[operation] = perf_counter()
 
@@ -621,7 +649,6 @@ class UbuntuAIApp:
             button.configure(text="Recursos e ajuda  ▾")
 
     @staticmethod
-    @staticmethod
     def _multi_agent_request(request: str) -> str | None:
         normalized = request.strip()
         lowered = normalized.lower().rstrip("?.!")
@@ -629,6 +656,8 @@ class UbuntuAIApp:
         natural_requests = {
             "analise este problema de rede": "problema de rede",
             "diagnostique a falta de espaço": "falta de espaço",
+            "investigue meu problema de conexão": "problema de rede",
+            "analise por que o disco está cheio": "falta de espaço",
         }
         if lowered in natural_requests:
             return natural_requests[lowered]
@@ -1300,10 +1329,7 @@ class UbuntuAIApp:
         )
 
     def _scroll_bottom(self) -> None:
-        self.root.after(
-            30,
-            lambda: self.canvas.yview_moveto(1.0),
-        )
+        scroll_canvas_bottom(self.root, self.canvas)
 
     def _bind_accessibility_shortcuts(self) -> None:
         self.root.bind("<Escape>", self._on_escape)

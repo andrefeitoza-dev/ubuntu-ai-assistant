@@ -31,3 +31,7 @@ de assinatura no repositório.
 A tag deve corresponder exatamente à versão do `pyproject.toml`. O workflow da
 tag repete toda a auditoria, valida o ciclo de vida em ambiente isolado e publica
 wheel, source archive e `SHA256SUMS` na GitHub Release.
+
+O pacote Debian e o arquivo de checksums também fazem parte do atestado de
+proveniência. A futura distribuição por APT deverá reutilizar exatamente esses
+artefatos, sem reconstrução fora do workflow da tag.

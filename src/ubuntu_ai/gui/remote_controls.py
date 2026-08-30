@@ -52,6 +52,7 @@ def build_remote_controls(
         activeforeground=TEXT,
         relief=tk.FLAT,
         borderwidth=0,
+        highlightthickness=0,
         cursor="hand2",
         takefocus=True,
         font=FONT_TINY,

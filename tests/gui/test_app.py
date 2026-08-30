@@ -5,6 +5,8 @@ from pathlib import Path
 from types import SimpleNamespace
 
 from ubuntu_ai.gui import app as gui_app
+from ubuntu_ai.gui.interface import bind_hover_reveal, scroll_canvas_bottom
+from ubuntu_ai.gui.theme import BACKGROUND
 from ubuntu_ai.interaction import ChatResponse
 
 
@@ -14,6 +16,47 @@ class FakeRoot:
 
     def iconphoto(self, default: bool, image: object) -> None:
         self.calls.append((default, image))
+
+
+class FakeHoverWidget:
+    def __init__(self) -> None:
+        self.handlers = {}
+        self.options = {}
+
+    def bind(self, event, callback, *, add=None) -> None:
+        self.handlers[event] = callback
+
+    def configure(self, **options) -> None:
+        self.options.update(options)
+
+
+class FakeScrollRoot:
+    def __init__(self) -> None:
+        self.callbacks = []
+
+    def after_idle(self, callback) -> None:
+        self.callbacks.append(callback)
+
+    def after(self, _delay, callback) -> None:
+        self.callbacks.append(callback)
+
+    def update_idletasks(self) -> None:
+        return None
+
+
+class FakeCanvas:
+    def __init__(self) -> None:
+        self.regions = []
+        self.positions = []
+
+    def bbox(self, _tag):
+        return (0, 0, 800, 1200)
+
+    def configure(self, **options) -> None:
+        self.regions.append(options["scrollregion"])
+
+    def yview_moveto(self, position) -> None:
+        self.positions.append(position)
 
 
 def make_app(candidates: tuple[Path, ...]):
@@ -125,6 +168,21 @@ def test_friendly_error_explains_timeout() -> None:
     message = gui_app.UbuntuAIApp._friendly_error("request timed out")
 
     assert "tempo esperado" in message
+
+
+def test_friendly_error_explains_pending_plan() -> None:
+    message = gui_app.UbuntuAIApp._friendly_error("Já existe um ciclo de agente em andamento.")
+
+    assert "plano aguardando" in message
+    assert "confirmação ou cancelamento" in message
+
+
+def test_gui_prevents_second_action_while_plan_is_pending() -> None:
+    source = Path(gui_app.__file__).read_text(encoding="utf-8")
+
+    assert "self._backend.has_pending_plan()" in source
+    assert "Confirme o plano pendente" in source
+    assert "Cancele o plano pendente" in source
 
 
 def test_remote_button_keeps_selected_target_visible() -> None:
@@ -423,3 +481,60 @@ def test_main_interface_and_conversation_are_delegated() -> None:
     assert 'text="Como posso ajudar?"' not in source
     assert 'text="Recursos e ajuda  ▾"' in interface_source
     assert 'text="Agentes e progresso  ▾"' in interface_source
+
+
+def test_three_header_controls_reveal_only_on_hover_or_keyboard_focus() -> None:
+    source = Path("src/ubuntu_ai/gui/app.py").read_text(encoding="utf-8")
+    interface_source = Path("src/ubuntu_ai/gui/interface.py").read_text(encoding="utf-8")
+
+    assert "bind_hover_reveal(\n            self.remote_controls_button" in source
+    assert "bind_hover_reveal(self.automation_button" in source
+    assert "bind_hover_reveal(self.resources_button" in source
+    assert 'widget.bind("<Enter>"' in interface_source
+    assert 'widget.bind("<Leave>"' in interface_source
+    assert 'widget.bind("<FocusIn>"' in interface_source
+    assert 'widget.bind("<FocusOut>"' in interface_source
+
+
+def test_three_header_controls_have_no_visible_focus_frame() -> None:
+    source = Path("src/ubuntu_ai/gui/interface.py").read_text(encoding="utf-8")
+    remote_source = Path("src/ubuntu_ai/gui/remote_controls.py").read_text(encoding="utf-8")
+
+    assert source.count("highlightthickness=0") >= 2
+    assert "highlightthickness=0" in remote_source
+
+
+def test_hover_control_hides_again_after_pointer_leaves() -> None:
+    widget = FakeHoverWidget()
+
+    bind_hover_reveal(widget, foreground="#ffffff")  # type: ignore[arg-type]
+    assert widget.options["fg"] == BACKGROUND
+
+    widget.handlers["<Enter>"](None)
+    assert widget.options["fg"] == "#ffffff"
+
+    widget.handlers["<Leave>"](None)
+    assert widget.options["fg"] == BACKGROUND
+
+
+def test_hover_control_remains_visible_while_keyboard_focused() -> None:
+    widget = FakeHoverWidget()
+    bind_hover_reveal(widget, foreground="#ffffff")  # type: ignore[arg-type]
+
+    widget.handlers["<FocusIn>"](None)
+    widget.handlers["<Leave>"](None)
+    assert widget.options["fg"] == "#ffffff"
+    widget.handlers["<FocusOut>"](None)
+    assert widget.options["fg"] == BACKGROUND
+
+
+def test_scroll_bottom_waits_for_geometry_and_recalculates_region() -> None:
+    root = FakeScrollRoot()
+    canvas = FakeCanvas()
+
+    scroll_canvas_bottom(root, canvas)  # type: ignore[arg-type]
+    for callback in root.callbacks:
+        callback()
+
+    assert canvas.regions == [(0, 0, 800, 1200), (0, 0, 800, 1200)]
+    assert canvas.positions == [1.0, 1.0]

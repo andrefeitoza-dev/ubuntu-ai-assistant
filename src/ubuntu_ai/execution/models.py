@@ -26,3 +26,4 @@ class ExecutionResult:
     stdout: str = ""
     stderr: str = ""
     duration: float | None = None
+    policy_reason: str | None = None

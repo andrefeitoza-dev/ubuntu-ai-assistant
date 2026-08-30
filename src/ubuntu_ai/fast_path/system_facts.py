@@ -236,6 +236,8 @@ class SystemFactResponder:
                 "resumo do computador",
                 "informacoes deste computador",
                 "informacoes do computador",
+                "informacoes gerais deste computador",
+                "informacoes gerais do meu computador",
                 "configuracao deste computador",
                 "configuracao do computador",
             )
@@ -257,7 +259,9 @@ class SystemFactResponder:
             )
         ):
             return "ip"
-        if "versao" in request and ("ubuntu" in request or "sistema operacional" in request):
+        if ("versao" in request or "instalado" in request) and (
+            "ubuntu" in request or "sistema operacional" in request
+        ):
             return "operating_system"
         if "qual" in request and "sistema operacional" in request:
             return "operating_system"
@@ -270,7 +274,8 @@ class SystemFactResponder:
         ):
             return "cpu"
         if any(word in request for word in ("memoria", "ram")) and (
-            request.startswith(("qual", "quanto", "mostre", "informe")) or "tenho" in request
+            request.startswith(("qual", "quanta", "quanto", "mostre", "informe"))
+            or "tenho" in request
         ):
             return "memory"
         if any(word in request for word in ("disco", "armazenamento", "espaco livre")) and (
@@ -303,7 +308,7 @@ class SystemFactResponder:
             word in request for word in ("quanto", "qual", "nivel", "estado", "mostre")
         ):
             return "battery"
-        if "servicos" in request and any(
+        if words & {"servico", "servicos"} and any(
             word in request for word in ("falha", "falhando", "estado", "mostre", "existem")
         ):
             return "services"

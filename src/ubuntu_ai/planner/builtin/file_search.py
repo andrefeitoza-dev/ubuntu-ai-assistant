@@ -21,7 +21,7 @@ class SafeFileSearchPlanner:
     _REQUEST = re.compile(
         r"^(?:encontre|localize|procure|busque|ache|onde\s+(?:est[aá]|fica))\s+"
         r"(?:(?:o|a|um|uma)\s+)?"
-        r"(?:(arquivo|pasta|diret[oó]rio)\s+)?(.+?)"
+        r"(?:(arquivos?|pastas?|diret[oó]rios?)\s+)?(.+?)"
         r"(?:\s+(?:no|neste|nesse)\s+(?:computador|sistema))?$",
         re.IGNORECASE,
     )
@@ -95,6 +95,14 @@ class SafeFileSearchPlanner:
 
         kind, raw_term = match.groups()
         term = raw_term.strip().strip("\"'").rstrip("?.!").strip()
+        term = re.sub(
+            r"^(?:chamad[oa]s?|com\s+(?:o\s+)?nome)\s+",
+            "",
+            term,
+            flags=re.IGNORECASE,
+        ).strip()
+        if term.casefold() in {"pdf", "pdfs"}:
+            term = ".pdf"
         if not term or len(term) > cls._MAX_TERM_LENGTH:
             return None
         if term.casefold() in {"arquivo", "pasta", "diretório", "diretorio"}:
@@ -105,7 +113,7 @@ class SafeFileSearchPlanner:
             return None
 
         item_type = None
-        if kind and kind.casefold() == "arquivo":
+        if kind and kind.casefold().startswith("arquivo"):
             item_type = "f"
         elif kind:
             item_type = "d"

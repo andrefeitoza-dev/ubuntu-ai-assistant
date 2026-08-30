@@ -104,6 +104,10 @@ class LinuxCommandCatalog:
     }
 
     def respond(self, request: str) -> str | None:
+        direct_explanation = self._direct_explanation(request)
+        if direct_explanation is not None:
+            return direct_explanation
+
         if "comando" not in request and request not in {"linux", "terminal"}:
             return None
 
@@ -125,8 +129,26 @@ class LinuxCommandCatalog:
         if any(word in request for word in ("localizar", "encontrar", "procurar")):
             return self._render_commands((self._find("find"), self._find("rg")))
 
-        if any(word in request for word in ("principais", "todos", "lista", "mostrar")):
+        if any(
+            word in request
+            for word in ("principais", "todos", "lista", "mostrar", "quais", "usados")
+        ):
             return self._overview(include_all="todos" in request)
+        return None
+
+    def _direct_explanation(self, request: str) -> str | None:
+        words = request.split()
+        if not any(
+            marker in request
+            for marker in ("como usar", "o que faz", "para que serve", "qual a funcao")
+        ):
+            return None
+        for word in words:
+            try:
+                command = self._find(word)
+            except KeyError:
+                continue
+            return self._describe(command.name)
         return None
 
     def _overview(self, *, include_all: bool) -> str:

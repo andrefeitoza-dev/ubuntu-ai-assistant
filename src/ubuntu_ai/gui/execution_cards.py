@@ -23,6 +23,7 @@ from ubuntu_ai.gui.theme import (
     TEXT,
     TEXT_DIM,
     TEXT_MUTED,
+    WARNING,
 )
 
 
@@ -52,6 +53,10 @@ def execution_output(result: object) -> str:
     return stdout or stderr
 
 
+def plan_risk_tone(risk: object) -> str:
+    return risk_color(str(risk), success=SUCCESS, warning=WARNING, error=ERROR)
+
+
 def build_plan_card(
     parent: tk.Misc,
     *,
@@ -72,7 +77,7 @@ def build_plan_card(
 
     risk = getattr(plan, "risk", None)
     risk_name = risk_label(risk)
-    risk_tone = risk_color(risk)
+    risk_tone = plan_risk_tone(risk)
 
     header = tk.Frame(outer, bg=SURFACE)
     header.pack(fill=tk.X)
@@ -145,7 +150,7 @@ def build_plan_card(
             wraplength=720,
         ).pack(fill=tk.X)
 
-        command = command_text(step)
+        command = command_text(getattr(step, "command", ""))
         if command:
             tk.Label(
                 step_box,

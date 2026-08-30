@@ -16,8 +16,11 @@ class RuntimeStatusResponder:
 
     _TOPICS = {
         "o servico ssh esta ativo": "ssh",
+        "verifique se o ssh esta rodando": "ssh",
         "o docker esta instalado": "docker",
+        "tenho docker instalado": "docker",
         "qual a versao do python": "python",
+        "que versao do python esta instalada": "python",
         "mostre a versao do assistente": "assistant",
         "qual a versao do assistente": "assistant",
         "qual e a versao do assistente": "assistant",
@@ -26,6 +29,7 @@ class RuntimeStatusResponder:
         "qual e a versao do ubuntu ai": "assistant",
         "que versao do ubuntu ai esta instalada": "assistant",
         "verifique a instalacao": "installation",
+        "cheque a integridade da instalacao do assistente": "installation",
     }
 
     def __init__(

@@ -4,11 +4,14 @@ from enum import Enum
 from pathlib import Path
 from types import SimpleNamespace
 
+from ubuntu_ai.domain.risk import RiskLevel
 from ubuntu_ai.gui.execution_cards import (
     execution_output,
     execution_status_value,
     execution_succeeded,
+    plan_risk_tone,
 )
+from ubuntu_ai.gui.theme import ERROR, SUCCESS, WARNING
 
 
 class ResultStatus(Enum):
@@ -43,3 +46,15 @@ def test_visual_component_does_not_access_backend_or_policy() -> None:
     assert "ConfirmationEngine" not in source
     assert "ExecutionPolicy" not in source
     assert "messagebox" not in source
+
+
+def test_plan_card_maps_real_risk_enum_to_theme_color() -> None:
+    assert plan_risk_tone(RiskLevel.LOW) == SUCCESS
+    assert plan_risk_tone(RiskLevel.MEDIUM) == WARNING
+    assert plan_risk_tone(RiskLevel.HIGH) == ERROR
+
+
+def test_plan_step_exposes_structured_command() -> None:
+    step = SimpleNamespace(command=["mkdir", "/home/user/Teste"])
+
+    assert step.command == ["mkdir", "/home/user/Teste"]

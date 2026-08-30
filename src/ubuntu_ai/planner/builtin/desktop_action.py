@@ -2,10 +2,12 @@ from __future__ import annotations
 
 import os
 import re
+import unicodedata
 from dataclasses import dataclass
 from pathlib import Path
 from urllib.parse import urlparse
 
+from ubuntu_ai.desktop import DesktopApplicationCatalog
 from ubuntu_ai.domain.plan import Plan, PlanStep
 from ubuntu_ai.domain.risk import RiskLevel
 
@@ -29,6 +31,29 @@ class SafeDesktopActionPlanner:
         r"^(?:abra|acesse)\s+(?:(?:o\s+)?site\s+)?(https?://\S+|www\.\S+|\S+\.\S+)$",
         re.IGNORECASE,
     )
+    _UNSAFE_URI = re.compile(
+        r"^(?:abra|acesse)\s+(?:o\s+site\s+)?[a-z][a-z0-9+.-]*:",
+        re.IGNORECASE,
+    )
+    _SITE_IN_BROWSER = re.compile(
+        r"^(?:abra|acesse)\s+(?:o\s+)?(?:site\s+)?"
+        r"(.+?)\s+(?:no|na)\s+(firefox)$",
+        re.IGNORECASE,
+    )
+    _SITE_ALIAS = re.compile(
+        r"^(?:abra|acesse)\s+(?:(?:o|a)\s+)?(?:site\s+)?(?:(?:do|da)\s+)?(.+)$",
+        re.IGNORECASE,
+    )
+    _EXPLICIT_NAMED_SITE = re.compile(r"^(?:abra|acesse)\s+(?:(?:o|a)\s+)?site\s+", re.IGNORECASE)
+    _SITE_ALIASES = {
+        "github": "https://github.com",
+        "receita": "https://www.gov.br/receitafederal/pt-br",
+        "receita federal": "https://www.gov.br/receitafederal/pt-br",
+        "ubuntu": "https://ubuntu.com",
+    }
+    _BROWSERS = {
+        "firefox": "firefox",
+    }
     _APPLICATION = re.compile(
         r"^(?:abra|inicie|execute)\s+(?:(?:o|a|os|as)\s+)?(.+)$",
         re.IGNORECASE,
@@ -38,7 +63,10 @@ class SafeDesktopActionPlanner:
         re.IGNORECASE,
     )
     _APPLICATIONS = {
+        "calculator": "org.gnome.Calculator",
         "firefox": "firefox",
+        "libreoffice": "libreoffice-startcenter",
+        "libre office": "libreoffice-startcenter",
         "navegador firefox": "firefox",
         "arquivos": "org.gnome.Nautilus",
         "gerenciador de arquivos": "org.gnome.Nautilus",
@@ -48,13 +76,33 @@ class SafeDesktopActionPlanner:
         "configurações": "org.gnome.Settings",
         "configuracoes de rede": "gnome-network-panel",
         "configurações de rede": "gnome-network-panel",
+        "painel de rede": "gnome-network-panel",
         "visual studio code": "code",
         "vs code": "code",
         "vscode": "code",
     }
 
-    def __init__(self, home: Path | None = None) -> None:
+    _STANDARD_FOLDERS = {
+        "documentos": ("DOCUMENTS", ("Documentos", "Documents")),
+        "documents": ("DOCUMENTS", ("Documents", "Documentos")),
+        "downloads": ("DOWNLOAD", ("Downloads",)),
+        "download": ("DOWNLOAD", ("Downloads",)),
+        "imagens": ("PICTURES", ("Imagens", "Pictures")),
+        "pictures": ("PICTURES", ("Pictures", "Imagens")),
+        "musica": ("MUSIC", ("Música", "Music")),
+        "music": ("MUSIC", ("Music", "Música")),
+        "videos": ("VIDEOS", ("Vídeos", "Videos")),
+        "area de trabalho": ("DESKTOP", ("Área de Trabalho", "Desktop")),
+        "desktop": ("DESKTOP", ("Desktop", "Área de Trabalho")),
+    }
+
+    def __init__(
+        self,
+        home: Path | None = None,
+        applications: DesktopApplicationCatalog | None = None,
+    ) -> None:
         self._home = (home or Path.home()).expanduser().resolve()
+        self._applications = applications or DesktopApplicationCatalog()
 
     def try_create_plan(self, request: str) -> Plan | None:
         action = self.resolve(request)
@@ -77,6 +125,21 @@ class SafeDesktopActionPlanner:
 
     def resolve(self, request: str) -> DesktopAction | None:
         value = self._request_value(request)
+        browser_site = self._SITE_IN_BROWSER.fullmatch(value)
+        if browser_site is not None:
+            raw_target = browser_site.group(1).strip()
+            alias = self._normalize_label(raw_target)
+            target = self._SITE_ALIASES.get(alias, raw_target)
+            url = self._safe_url(target)
+            browser = self._BROWSERS.get(browser_site.group(2).strip().casefold())
+            if url is None or browser is None:
+                return None
+            return DesktopAction(
+                "Abrir site no navegador",
+                f"Abre o endereço validado {url} no Firefox.",
+                (browser, url),
+            )
+
         folder = self._FOLDER.fullmatch(value)
         if folder is not None:
             path = self._safe_path(folder.group(1), expected="directory")
@@ -110,14 +173,43 @@ class SafeDesktopActionPlanner:
                 ("xdg-open", url),
             )
 
+        site_alias = self._SITE_ALIAS.fullmatch(value)
+        if site_alias is not None:
+            alias = self._normalize_label(site_alias.group(1))
+            url = self._SITE_ALIASES.get(alias)
+            if url is not None:
+                return DesktopAction(
+                    "Abrir site",
+                    f"Abre o endereço validado {url} no navegador padrão.",
+                    ("xdg-open", url),
+                )
+
         application = self._APPLICATION.fullmatch(value)
         if application is not None:
-            app_id = self._APPLICATIONS.get(application.group(1).strip().casefold())
+            app_name = application.group(1).strip().casefold()
+            folder = self._standard_folder(app_name)
+            if folder is not None:
+                return DesktopAction(
+                    "Abrir pasta",
+                    f"Abre a pasta padrão validada {folder}.",
+                    ("xdg-open", str(folder)),
+                )
+            app_id = self._APPLICATIONS.get(app_name)
             if app_id is not None:
                 return DesktopAction(
                     "Abrir aplicativo",
                     "Inicia um aplicativo conhecido do Ubuntu.",
                     ("gtk-launch", app_id),
+                )
+            discovered = self._applications.find(app_name)
+            if discovered is not None:
+                return DesktopAction(
+                    "Abrir aplicativo",
+                    (
+                        "Inicia o aplicativo validado "
+                        f"{discovered.name} a partir de uma entrada de sistema confiável."
+                    ),
+                    ("gtk-launch", discovered.desktop_id),
                 )
         return None
 
@@ -130,6 +222,11 @@ class SafeDesktopActionPlanner:
             )
         if self.resolve(request) is not None:
             return None
+        if self._SITE_IN_BROWSER.fullmatch(value):
+            return (
+                "Site não aberto no navegador. Somente destinos HTTP ou HTTPS "
+                "válidos e navegadores confiáveis são permitidos."
+            )
         if self._FOLDER.fullmatch(value) or self._FILE.fullmatch(value):
             return (
                 "Não foi possível abrir o caminho. Ele deve existir dentro da sua pasta "
@@ -137,8 +234,19 @@ class SafeDesktopActionPlanner:
             )
         if self._SITE.fullmatch(value):
             return "Site não aberto. Somente endereços HTTP ou HTTPS válidos são permitidos."
+        if self._UNSAFE_URI.match(value):
+            return "Site não aberto. Somente endereços HTTP ou HTTPS válidos são permitidos."
         if self._APPLICATION.fullmatch(value):
-            return "Aplicativo não aberto. Informe um aplicativo Ubuntu conhecido e confiável."
+            if self._EXPLICIT_NAMED_SITE.match(value):
+                return (
+                    "Site não identificado com segurança. Informe o domínio HTTPS "
+                    "ou use o nome de um site presente no catálogo confiável."
+                )
+            return (
+                "Aplicativo não encontrado entre as entradas confiáveis instaladas. "
+                "Verifique o nome ou instale-o pela Central de Aplicativos; "
+                "nenhuma instalação foi iniciada automaticamente."
+            )
         return None
 
     def has_desktop_intent(self, request: str) -> bool:
@@ -146,6 +254,7 @@ class SafeDesktopActionPlanner:
         return any(
             pattern.fullmatch(value) is not None
             for pattern in (
+                self._SITE_IN_BROWSER,
                 self._FOLDER,
                 self._FILE,
                 self._SITE,
@@ -182,9 +291,12 @@ class SafeDesktopActionPlanner:
         return resolved if os.access(resolved, required) else None
 
     def _standard_folder(self, value: str) -> Path | None:
-        if value.casefold() not in {"documentos", "documents"}:
+        normalized = self._normalize_label(value)
+        folder = self._STANDARD_FOLDERS.get(normalized)
+        if folder is None:
             return None
 
+        xdg_name, fallback_names = folder
         candidates: list[Path] = []
         config = self._home / ".config" / "user-dirs.dirs"
 
@@ -193,25 +305,16 @@ class SafeDesktopActionPlanner:
         except OSError:
             lines = []
 
-        prefix = "XDG_DOCUMENTS_DIR="
+        prefix = f"XDG_{xdg_name}_DIR="
         for line in lines:
             if not line.startswith(prefix):
                 continue
             configured = line.removeprefix(prefix).strip().strip('"')
-            configured = configured.replace(
-                "$HOME",
-                str(self._home),
-                1,
-            )
+            configured = configured.replace("$HOME", str(self._home), 1)
             candidates.append(Path(configured).expanduser())
             break
 
-        candidates.extend(
-            (
-                self._home / "Documentos",
-                self._home / "Documents",
-            )
-        )
+        candidates.extend(self._home / name for name in fallback_names)
 
         for candidate in candidates:
             try:
@@ -219,14 +322,22 @@ class SafeDesktopActionPlanner:
                 resolved.relative_to(self._home)
             except (OSError, RuntimeError, ValueError):
                 continue
-            if resolved.is_dir():
+            if resolved.is_dir() and os.access(resolved, os.R_OK | os.X_OK):
                 return resolved
 
         return None
 
     @staticmethod
+    def _normalize_label(value: str) -> str:
+        normalized = unicodedata.normalize("NFKD", value)
+        normalized = normalized.encode("ascii", "ignore").decode().lower()
+        return " ".join(normalized.split())
+
+    @staticmethod
     def _safe_url(raw_value: str) -> str | None:
         value = raw_value.strip().rstrip(".,")
+        if not value or any(ord(character) < 32 for character in value):
+            return None
         if "://" not in value:
             value = f"https://{value}"
         parsed = urlparse(value)

@@ -3,6 +3,7 @@ from __future__ import annotations
 import shlex
 from time import perf_counter
 
+from ubuntu_ai.execution.failure_diagnostics import FailureDiagnosticService
 from ubuntu_ai.execution.models import (
     ExecutionRequest,
     ExecutionResult,
@@ -14,7 +15,13 @@ from ubuntu_ai.services.shell import ShellService
 class SystemExecutor:
     """Executa comandos reais por meio do ShellService."""
 
-    _DETACHED_EXECUTABLES = frozenset({"gtk-launch", "xdg-open"})
+    _DETACHED_EXECUTABLES = frozenset(
+        {
+            "firefox",
+            "gtk-launch",
+            "xdg-open",
+        }
+    )
 
     def __init__(
         self,
@@ -68,9 +75,14 @@ class SystemExecutor:
         duration = perf_counter() - started_at
 
         if command_result.success:
+            message = (
+                "Solicitação de abertura enviada ao ambiente gráfico."
+                if arguments[0] in self._DETACHED_EXECUTABLES
+                else "Comando executado com sucesso."
+            )
             return ExecutionResult(
                 status=ExecutionStatus.EXECUTED,
-                message="Comando executado com sucesso.",
+                message=message,
                 command=command_result.command,
                 return_code=command_result.return_code,
                 stdout=command_result.stdout,
@@ -90,26 +102,4 @@ class SystemExecutor:
 
     @staticmethod
     def _failure_message(detail: str) -> str:
-        normalized = detail.casefold()
-        permission_markers = (
-            "permission denied",
-            "permissão negada",
-            "operation not permitted",
-            "operação não permitida",
-            "errno 13",
-        )
-        if any(marker in normalized for marker in permission_markers):
-            return (
-                "A operação não foi executada porque o usuário atual não possui "
-                "permissão. Nenhuma elevação automática foi tentada."
-            )
-
-        missing_markers = (
-            "no such file or directory",
-            "arquivo ou diretório inexistente",
-            "errno 2",
-        )
-        if any(marker in normalized for marker in missing_markers):
-            return "O recurso solicitado não foi encontrado."
-
-        return "O comando terminou com erro."
+        return FailureDiagnosticService.analyze(detail).render()

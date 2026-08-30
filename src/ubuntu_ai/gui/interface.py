@@ -47,6 +47,51 @@ class InterfaceWidgets:
     send_button: tk.Button
 
 
+def bind_hover_reveal(
+    widget: tk.Widget,
+    *,
+    foreground: str | Callable[[], str],
+    visible_background: str = BACKGROUND,
+) -> None:
+    """Mantém o controle discreto até hover ou foco pelo teclado."""
+
+    state = {"pointer": False, "focus": False}
+
+    def visible_foreground() -> str:
+        return foreground() if callable(foreground) else foreground
+
+    def refresh() -> None:
+        visible = state["pointer"] or state["focus"]
+        widget.configure(
+            fg=visible_foreground() if visible else BACKGROUND,
+            bg=visible_background if visible else BACKGROUND,
+        )
+
+    def set_state(name: str, value: bool) -> None:
+        state[name] = value
+        refresh()
+
+    widget.bind("<Enter>", lambda _event: set_state("pointer", True), add="+")
+    widget.bind("<Leave>", lambda _event: set_state("pointer", False), add="+")
+    widget.bind("<FocusIn>", lambda _event: set_state("focus", True), add="+")
+    widget.bind("<FocusOut>", lambda _event: set_state("focus", False), add="+")
+    refresh()
+
+
+def scroll_canvas_bottom(root: tk.Misc, canvas: tk.Canvas) -> None:
+    """Rola após o Tk calcular a geometria de cards recém-adicionados."""
+
+    def apply() -> None:
+        root.update_idletasks()
+        bounds = canvas.bbox("all")
+        if bounds is not None:
+            canvas.configure(scrollregion=bounds)
+        canvas.yview_moveto(1.0)
+
+    root.after_idle(apply)
+    root.after(80, apply)
+
+
 def build_main_interface(
     root: tk.Misc,
     *,
@@ -121,6 +166,7 @@ def build_main_interface(
         activeforeground=TEXT,
         relief=tk.FLAT,
         borderwidth=0,
+        highlightthickness=0,
         cursor="hand2",
         takefocus=True,
         font=FONT_TINY,
@@ -139,6 +185,7 @@ def build_main_interface(
         activeforeground=TEXT,
         relief=tk.FLAT,
         borderwidth=0,
+        highlightthickness=0,
         cursor="hand2",
         takefocus=True,
         font=FONT_TINY,

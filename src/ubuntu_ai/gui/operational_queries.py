@@ -5,6 +5,8 @@ import unicodedata
 from collections.abc import Iterable
 from typing import Any
 
+import psutil
+
 
 class OperationalQueryResponder:
     """Consulta estado operacional sem executar alterações."""
@@ -30,13 +32,25 @@ class OperationalQueryResponder:
         "mostre o catalogo de plugins",
         "quais plugins estao carregados",
     }
+    _AUDIT = {
+        "mostre o historico de acoes",
+        "liste as acoes recentes",
+        "mostre a auditoria local",
+    }
+    _LEARNING = {
+        "o assistente aprende com o uso",
+        "mostre o aprendizado do assistente",
+        "mostre o status do aprendizado",
+    }
+    _RESOURCE_USAGE = {
+        "quanto de memoria o assistente usa",
+        "mostre o consumo de memoria do assistente",
+        "quanta ram o ubuntu ai usa",
+    }
 
     @classmethod
     def matches(cls, phrase: str) -> bool:
-        normalized = cls._normalize(phrase)
-        return normalized in (
-            cls._UPDATES | cls._AUTOMATIONS | cls._SCHEDULES | cls._PROFILES | cls._PLUGINS
-        )
+        return cls._topic_for(phrase) is not None
 
     def respond(
         self,
@@ -46,19 +60,109 @@ class OperationalQueryResponder:
         schedules: Iterable[Any] = (),
         profiles: Iterable[Any] = (),
         plugins: Iterable[Any] = (),
+        audit_records: Iterable[Any] = (),
+        learning_stats: Any | None = None,
     ) -> str | None:
-        normalized = self._normalize(phrase)
+        topic = self._topic_for(phrase)
 
-        if normalized in self._UPDATES:
+        if topic == "updates":
             return self._updates()
-        if normalized in self._AUTOMATIONS:
+        if topic == "automations":
             return self._tasks(tasks)
-        if normalized in self._SCHEDULES:
+        if topic == "schedules":
             return self._schedules(schedules)
-        if normalized in self._PROFILES:
+        if topic == "profiles":
             return self._profiles(profiles)
-        if normalized in self._PLUGINS:
+        if topic == "plugins":
             return self._plugins(plugins)
+        if topic == "audit":
+            return self._audit(audit_records)
+        if topic == "learning":
+            return self._learning(learning_stats)
+        if topic == "resource_usage":
+            return self._resource_usage()
+        return None
+
+    @classmethod
+    def _topic_for(cls, phrase: str) -> str | None:
+        normalized = cls._normalize(phrase)
+        if normalized in cls._UPDATES:
+            return "updates"
+        if normalized in cls._AUTOMATIONS:
+            return "automations"
+        if normalized in cls._SCHEDULES:
+            return "schedules"
+        if normalized in cls._PROFILES:
+            return "profiles"
+        if normalized in cls._PLUGINS:
+            return "plugins"
+        if normalized in cls._AUDIT:
+            return "audit"
+        if normalized in cls._LEARNING:
+            return "learning"
+        if normalized in cls._RESOURCE_USAGE:
+            return "resource_usage"
+
+        words = set(normalized.split())
+        query = bool(words & {"exiba", "ha", "liste", "mostre", "quais"})
+        if (
+            query
+            and words & {"atualizacao", "atualizacoes", "pacotes"}
+            and words
+            & {
+                "atualizar",
+                "disponiveis",
+            }
+        ):
+            return "updates"
+        if query and words & {"automacao", "automacoes"}:
+            return "automations"
+        if (
+            query
+            and words & {"tarefa", "tarefas"}
+            and words
+            & {
+                "ativas",
+                "execucao",
+                "registradas",
+            }
+        ):
+            return "automations"
+        if query and words & {"agendamento", "agendamentos"}:
+            return "schedules"
+        if (
+            query
+            and words & {"agente", "agentes"}
+            and words
+            & {
+                "disponiveis",
+                "perfil",
+                "perfis",
+            }
+        ):
+            return "profiles"
+        if (
+            query
+            and words & {"plugin", "plugins"}
+            and words
+            & {
+                "carregados",
+                "catalogo",
+                "disponiveis",
+            }
+        ):
+            return "plugins"
+        if (
+            query
+            and words & {"acao", "acoes", "auditoria", "historico"}
+            and words
+            & {
+                "auditoria",
+                "historico",
+                "recentes",
+            }
+        ):
+            return "audit"
         return None
 
     @staticmethod
@@ -157,6 +261,48 @@ class OperationalQueryResponder:
             version = getattr(manifest, "version", "versão não informada")
             lines.append(f"• {manifest.name} · {version}")
         return "\n".join(lines)
+
+    @staticmethod
+    def _audit(records: Iterable[Any]) -> str:
+        items = tuple(records)
+        if not items:
+            return "Nenhuma ação local foi registrada na auditoria."
+        lines = [f"Ações locais auditadas: {len(items)} evento(s) recente(s)."]
+        for record in items:
+            target = getattr(record, "target", None) or "sem alvo"
+            lines.append(f"• {record.timestamp} · {record.status} · {record.intent} · {target}")
+        lines.append("Comandos sensíveis e saídas não são exibidos nesta consulta.")
+        return "\n".join(lines)
+
+    @staticmethod
+    def _learning(stats: Any | None) -> str:
+        if stats is None:
+            return "O mecanismo de aprendizado não está disponível nesta sessão."
+        return (
+            "Aprendizado persistente do assistente:\n"
+            f"• padrões registrados: {stats.patterns}\n"
+            f"• tentativas observadas: {stats.attempts}\n"
+            f"• sucessos: {stats.successes}\n"
+            f"• falhas: {stats.failures}\n"
+            f"• bloqueios de segurança: {stats.blocked}\n"
+            f"• padrões aprovados explicitamente para reutilização: "
+            f"{stats.approved_for_reuse}\n"
+            "A execução aprendida continua subordinada à política de segurança."
+        )
+
+    @staticmethod
+    def _resource_usage() -> str:
+        process = psutil.Process()
+        processes = (process, *process.children(recursive=True))
+        rss = sum(item.memory_info().rss for item in processes)
+        threads = sum(item.num_threads() for item in processes)
+        return (
+            "Uso atual do Ubuntu AI Assistant:\n"
+            f"• memória residente: {rss / (1024 * 1024):.1f} MiB\n"
+            f"• processos considerados: {len(processes)}\n"
+            f"• threads: {threads}\n"
+            "A medição inclui processos filhos ativos neste instante."
+        )
 
     @staticmethod
     def _normalize(value: str) -> str:

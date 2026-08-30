@@ -13,6 +13,10 @@ from ubuntu_ai.planner.builtin import SafeFileSearchPlanner
         ("procure a pasta Projetos", "d", "Projetos"),
         ("onde está README.md?", None, "README.md"),
         ("localize ubuntu-ai no computador", None, "ubuntu-ai"),
+        ("procure arquivos chamados contrato", "f", "contrato"),
+        ("busque arquivos com o nome orçamento", "f", "orçamento"),
+        ("encontre PDFs", None, ".pdf"),
+        ("ache pastas chamadas Projetos", "d", "Projetos"),
     ],
 )
 def test_builds_structured_read_only_search(

@@ -2,6 +2,7 @@ from pathlib import Path
 
 import pytest
 
+from ubuntu_ai.desktop import DesktopApplicationCatalog
 from ubuntu_ai.domain.risk import RiskLevel
 from ubuntu_ai.planner.builtin import SafeDesktopActionPlanner
 
@@ -60,6 +61,24 @@ def test_launches_only_trusted_applications(phrase: str, app_id: str) -> None:
     assert plan.steps[0].command == ["gtk-launch", app_id]
 
 
+def test_launches_discovered_system_application(tmp_path: Path) -> None:
+    entry = tmp_path / "org.gimp.GIMP.desktop"
+    entry.write_text(
+        "[Desktop Entry]\nType=Application\nName=GIMP\nExec=gimp %U\n",
+        encoding="utf-8",
+    )
+    entry.chmod(0o644)
+    planner = SafeDesktopActionPlanner(
+        home=tmp_path,
+        applications=DesktopApplicationCatalog((tmp_path,)),
+    )
+
+    plan = planner.try_create_plan("Abra o GIMP.")
+
+    assert plan is not None
+    assert plan.steps[0].command == ["gtk-launch", "org.gimp.GIMP"]
+
+
 def test_email_request_is_ambiguous_and_not_executed() -> None:
     planner = SafeDesktopActionPlanner()
 
@@ -81,6 +100,19 @@ def test_rejects_unsafe_urls_and_unknown_apps(phrase: str) -> None:
 
     assert planner.try_create_plan(phrase) is None
     assert planner.rejection_reason(phrase) is not None
+
+
+def test_unknown_application_explains_that_installation_is_not_automatic() -> None:
+    planner = SafeDesktopActionPlanner(
+        applications=DesktopApplicationCatalog(()),
+    )
+
+    reason = planner.rejection_reason("Abra o GIMP.")
+
+    assert reason is not None
+    assert "não encontrado" in reason
+    assert "Central de Aplicativos" in reason
+    assert "nenhuma instalação" in reason
 
 
 def test_rejects_path_outside_home(tmp_path: Path) -> None:
@@ -144,3 +176,80 @@ def test_documents_alias_uses_xdg_user_directory(
         "xdg-open",
         str(configured_documents),
     ]
+
+
+@pytest.mark.parametrize(
+    ("phrase", "expected"),
+    (
+        ("Abra a Calculadora.", ("gtk-launch", "org.gnome.Calculator")),
+        ("Abra o LibreOffice.", ("gtk-launch", "libreoffice-startcenter")),
+        ("Abra o Terminal.", ("gtk-launch", "org.gnome.Terminal")),
+        (
+            "Abra o GitHub no Firefox.",
+            ("firefox", "https://github.com"),
+        ),
+        ("Abra o GitHub.", ("xdg-open", "https://github.com")),
+        ("Acesse o Ubuntu.", ("xdg-open", "https://ubuntu.com")),
+        (
+            "Abra o site da Receita Federal.",
+            ("xdg-open", "https://www.gov.br/receitafederal/pt-br"),
+        ),
+        (
+            "Acesse a Receita Federal.",
+            ("xdg-open", "https://www.gov.br/receitafederal/pt-br"),
+        ),
+        ("Abra https://ubuntu.com.", ("xdg-open", "https://ubuntu.com")),
+    ),
+)
+def test_v22_required_natural_desktop_actions(
+    phrase: str,
+    expected: tuple[str, ...],
+) -> None:
+    plan = SafeDesktopActionPlanner().try_create_plan(phrase)
+
+    assert plan is not None
+    assert plan.risk is RiskLevel.LOW
+    assert plan.steps[0].command == list(expected)
+
+
+def test_v22_downloads_uses_xdg_configuration(tmp_path: Path) -> None:
+    downloads = tmp_path / "MeusDownloads"
+    downloads.mkdir()
+    config = tmp_path / ".config"
+    config.mkdir()
+    (config / "user-dirs.dirs").write_text(
+        'XDG_DOWNLOAD_DIR="$HOME/MeusDownloads"\n',
+        encoding="utf-8",
+    )
+
+    plan = SafeDesktopActionPlanner(home=tmp_path).try_create_plan("Abra minha pasta Downloads.")
+
+    assert plan is not None
+    assert plan.steps[0].command == ["xdg-open", str(downloads)]
+
+
+@pytest.mark.parametrize(
+    "phrase",
+    (
+        "Abra file:///etc/passwd no Firefox.",
+        "Abra javascript:alert(1) no Firefox.",
+        "Abra data:text/html,teste no Firefox.",
+        "Abra o Terminal e execute rm -rf Downloads.",
+    ),
+)
+def test_v22_rejects_unsafe_browser_and_terminal_requests(
+    phrase: str,
+) -> None:
+    planner = SafeDesktopActionPlanner()
+
+    assert planner.try_create_plan(phrase) is None
+    assert planner.rejection_reason(phrase) is not None
+
+
+def test_unknown_site_name_is_not_guessed_or_sent_to_search_engine() -> None:
+    planner = SafeDesktopActionPlanner()
+
+    assert planner.try_create_plan("Abra o site exemplo desconhecido.") is None
+    reason = planner.rejection_reason("Abra o site exemplo desconhecido.")
+
+    assert "Informe o domínio HTTPS" in reason

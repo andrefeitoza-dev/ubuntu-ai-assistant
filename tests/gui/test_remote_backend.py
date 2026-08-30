@@ -106,3 +106,9 @@ def test_backend_exposes_twenty_capability_topics(backend) -> None:
     assert len(topics) == 20
     assert topics[0].title == "Informações do computador"
     assert "Risco:" in backend.capability_detail("04")
+
+
+def test_backend_reports_detected_desktop_applications(backend) -> None:
+    desktop_topic = next(topic for topic in backend.capability_topics() if topic.code == "12")
+
+    assert "aplicativo(s) confiável(is) detectado(s)" in desktop_topic.availability

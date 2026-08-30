@@ -1,17 +1,23 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 
 from ubuntu_ai.agent_loop.models import LoopSnapshot
 from ubuntu_ai.agents import default_agent_profiles
 from ubuntu_ai.agents.orchestration import OrchestrationGoal
 from ubuntu_ai.agents.selection import OrchestrationPlanner, build_specialist_orchestrator
 from ubuntu_ai.agents.specialists import AgentEnvironment
+from ubuntu_ai.audit import LocalActionAuditRecord
 from ubuntu_ai.autonomy.control import TaskCancelledError
 from ubuntu_ai.autonomy.long_tasks import LongTask
 from ubuntu_ai.autonomy.observability import AutomationEvent, AutomationMetrics
 from ubuntu_ai.container.bootstrap import container
+from ubuntu_ai.desktop import DesktopApplicationCatalog
+from ubuntu_ai.diagnostics import SanitizedDiagnosticExporter
+from ubuntu_ai.execution.mode import execution_mode
+from ubuntu_ai.execution.permissions import capability_permissions
 from ubuntu_ai.fast_path import CapabilityCatalog, CapabilityTopic, SystemFactResponder
+from ubuntu_ai.gui.conversation_context import ReadOnlyConversationContext
 from ubuntu_ai.gui.operational_queries import OperationalQueryResponder
 from ubuntu_ai.interaction import ChatResponse, InteractionDecision, InteractionRoute
 from ubuntu_ai.remote.audit import RemoteAuditRecord
@@ -45,6 +51,10 @@ class GUIBackend:
         self._inventory = RemoteInventoryService(self._remote.registry)
         self._selected_target = "local"
         self._capabilities = CapabilityCatalog()
+        self._desktop_applications = DesktopApplicationCatalog()
+        self._conversation_context = ReadOnlyConversationContext()
+        self._diagnostic_exporter = SanitizedDiagnosticExporter()
+        self._diagnostic_export_pending = False
 
     @property
     def selected_target(self) -> str:
@@ -108,25 +118,116 @@ class GUIBackend:
     def route(self, request: str) -> InteractionDecision:
         """Classifica a solicitação antes de acionar qualquer executor."""
 
+        normalized_request = OperationalQueryResponder._normalize(request)
+        if normalized_request in {"exporte um diagnostico", "exporte o diagnostico"}:
+            self._diagnostic_export_pending = True
+            return InteractionDecision(
+                InteractionRoute.LOCAL,
+                "Prévia: será criado em Downloads um JSON privado (0600) com versão, "
+                "uso agregado e contagem da auditoria. Conversas, comandos e saídas não "
+                "serão incluídos. Diga 'Confirme a exportação do diagnóstico' para gravar.",
+            )
+        if normalized_request == "cancele a exportacao do diagnostico":
+            self._diagnostic_export_pending = False
+            return InteractionDecision(InteractionRoute.LOCAL, "Exportação cancelada.")
+        if normalized_request == "confirme a exportacao do diagnostico":
+            if not self._diagnostic_export_pending:
+                return InteractionDecision(
+                    InteractionRoute.LOCAL,
+                    "Não há exportação pendente. Solicite primeiro a prévia do diagnóstico.",
+                )
+            self._diagnostic_export_pending = False
+            path = self._diagnostic_exporter.export(
+                audit_records=self.local_action_audit_records(limit=100),
+                simulation=execution_mode.simulation,
+                denied_capabilities=capability_permissions.denied,
+            )
+            return InteractionDecision(
+                InteractionRoute.LOCAL,
+                f"Diagnóstico sanitizado exportado para {path}.",
+            )
+        permission_commands = {
+            "aplicativos": "desktop",
+            "arquivos": "files",
+            "sistema": "system",
+            "servicos": "services",
+            "pacotes": "packages",
+        }
+        for label, capability in permission_commands.items():
+            if normalized_request == f"bloqueie {label}":
+                capability_permissions.set_allowed(capability, allowed=False)
+                return InteractionDecision(
+                    InteractionRoute.LOCAL,
+                    f"Capacidade '{capability}' desativada nesta sessão.",
+                )
+            if normalized_request == f"permita {label}":
+                capability_permissions.set_allowed(capability, allowed=True)
+                return InteractionDecision(
+                    InteractionRoute.LOCAL,
+                    f"Capacidade '{capability}' reativada. A política central continua válida.",
+                )
+        if normalized_request == "mostre as permissoes do assistente":
+            denied = capability_permissions.denied
+            status = ", ".join(denied) if denied else "nenhuma capacidade adicional bloqueada"
+            return InteractionDecision(InteractionRoute.LOCAL, f"Permissões da sessão: {status}.")
+
+        if normalized_request in {"ative o modo de simulacao", "ativar modo de simulacao"}:
+            execution_mode.set_simulation(True)
+            return InteractionDecision(
+                InteractionRoute.LOCAL,
+                "Modo de simulação ativado. As ações serão validadas, mas não executadas.",
+            )
+        if normalized_request in {"desative o modo de simulacao", "desativar modo de simulacao"}:
+            execution_mode.set_simulation(False)
+            return InteractionDecision(
+                InteractionRoute.LOCAL,
+                "Modo de simulação desativado. As políticas e confirmações continuam ativas.",
+            )
+        if normalized_request in {"mostre o modo de execucao", "modo de simulacao"}:
+            status = "ativado" if execution_mode.simulation else "desativado"
+            return InteractionDecision(InteractionRoute.LOCAL, f"Modo de simulação: {status}.")
+
+        contextual = self._conversation_context.resolve(
+            request,
+            target=self._selected_target,
+        )
+        if contextual.message is not None:
+            return InteractionDecision(InteractionRoute.LOCAL, contextual.message)
+        effective_request = contextual.request or request
+
         operational = OperationalQueryResponder()
-        if operational.matches(request):
+        if operational.matches(effective_request):
             response = operational.respond(
-                request,
+                effective_request,
                 tasks=self.automation_tasks(),
                 schedules=self.automation_schedules(),
                 profiles=default_agent_profiles(),
                 plugins=container.plugin_registry().all(),
+                audit_records=self.local_action_audit_records(limit=20),
+                learning_stats=container.learning_service().stats(),
             )
-            return InteractionDecision(InteractionRoute.LOCAL, response)
+            decision = InteractionDecision(InteractionRoute.LOCAL, response)
+            self._remember_local_query(effective_request, decision)
+            return decision
 
-        if self.is_remote_selected and SystemFactResponder.matches(request):
+        if self.is_remote_selected and SystemFactResponder.matches(effective_request):
             return InteractionDecision(
                 InteractionRoute.LOCAL,
                 "A consulta se refere ao computador remoto "
                 f"“{self._selected_target}”. Use Diagnosticar para coletar os "
                 "dados por SSH; nenhuma informação do computador local foi exibida.",
             )
-        return self._router.route(request)
+        decision = self._router.route(effective_request)
+        self._remember_local_query(effective_request, decision)
+        return decision
+
+    def _remember_local_query(
+        self,
+        request: str,
+        decision: InteractionDecision,
+    ) -> None:
+        if decision.route is InteractionRoute.LOCAL and decision.response:
+            self._conversation_context.remember(request, target=self._selected_target)
 
     @staticmethod
     def is_system_fact_request(request: str) -> bool:
@@ -150,10 +251,27 @@ class GUIBackend:
         return RemoteDiagnosticService(self._remote).answer_fact(host.name, topic)
 
     def capability_topics(self) -> tuple[CapabilityTopic, ...]:
-        return self._capabilities.topics
+        application_count = len(self._desktop_applications.applications)
+        availability = (
+            "Computador local com desktop · "
+            f"{application_count} aplicativo(s) confiável(is) detectado(s)"
+        )
+        return tuple(
+            replace(topic, availability=availability) if topic.code in {"12", "13", "20"} else topic
+            for topic in self._capabilities.topics
+        )
 
     def capability_detail(self, query: str) -> str:
         return self._capabilities.detail(query)
+
+    def local_action_audit_records(
+        self,
+        *,
+        limit: int = 100,
+    ) -> tuple[LocalActionAuditRecord, ...]:
+        """Expõe o histórico local somente para leitura pela interface."""
+
+        return container.local_action_audit_service().records(limit=limit)
 
     def chat(self, request: str) -> ChatResponse:
         """Responde sem criar plano nem executar comandos."""
@@ -178,6 +296,27 @@ class GUIBackend:
 
     def snapshot(self) -> LoopSnapshot:
         return self._runtime.snapshot()
+
+    def has_pending_plan(self) -> bool:
+        """Informa se uma ação aguarda decisão explícita do usuário."""
+
+        return self.snapshot().requires_confirmation
+
+    @staticmethod
+    def is_confirm_pending_request(request: str) -> bool:
+        return OperationalQueryResponder._normalize(request) in {
+            "confirme o plano",
+            "confirme o plano pendente",
+            "pode executar o plano",
+        }
+
+    @staticmethod
+    def is_cancel_pending_request(request: str) -> bool:
+        return OperationalQueryResponder._normalize(request) in {
+            "cancele o plano",
+            "cancele o plano pendente",
+            "nao execute o plano",
+        }
 
     def automation_tasks(self) -> tuple[LongTask, ...]:
         return container.autonomous_runtime().long_tasks.all()
@@ -206,6 +345,8 @@ class GUIBackend:
         return normalized in {
             "diagnostique o servidor selecionado",
             "diagnostique o computador remoto selecionado",
+            "faca um diagnostico do servidor escolhido",
+            "faca um diagnostico do servidor selecionado",
         }
 
     @staticmethod
@@ -214,6 +355,8 @@ class GUIBackend:
         return normalized in {
             "cancele a tarefa selecionada",
             "cancele a automacao selecionada",
+            "cancele a automacao escolhida",
+            "cancele a tarefa escolhida",
         }
 
     def plan_multi_agent(self, request: str, *, goal_id: str) -> OrchestrationGoal:
