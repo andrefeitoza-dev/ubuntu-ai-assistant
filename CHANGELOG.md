@@ -2,6 +2,37 @@
 
 Todas as mudanças relevantes deste projeto são registradas neste arquivo.
 
+## [2.1.0] - 2026-08-30
+
+### Added
+
+- Proteção contra ciclos arquiteturais.
+- Matriz persistente de homologação funcional.
+- Respostas locais de runtime, instalação e conhecimento Linux.
+- Planos determinísticos para consultas anunciadas.
+
+### Changed
+
+- GUI dividida em oito componentes especializados.
+- `gui/app.py` reduzido de 2.213 para 1.374 linhas.
+- GitHub Actions e CodeQL modernizados.
+
+### Fixed
+
+- Entrega assíncrona de resultados na thread do Tkinter.
+- Ações que permaneciam indefinidamente em execução.
+- Variações naturais de consultas e ações anunciadas.
+
+### Security
+
+- Ações críticas bloqueadas e ações sensíveis confirmadas.
+- Execução com argumentos separados e sem `shell=True`.
+
+### Validation
+
+- 44 de 47 casos aprovados e nenhuma falha.
+- Três testes SSH adiados até o segundo computador.
+
 ## [2.0.2] - 2026-08-25
 
 ### Fixed

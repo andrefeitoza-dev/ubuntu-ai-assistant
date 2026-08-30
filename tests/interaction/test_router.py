@@ -147,3 +147,22 @@ def test_catalog_desktop_app_examples_route_to_safe_action(
 
     assert decision.route is InteractionRoute.ACTION
     assert decision.response is None
+
+
+@pytest.mark.parametrize(
+    "phrase",
+    (
+        "Qual a versão do assistente?",
+        "Qual é a versão do assistente?",
+        "Qual a versão do Ubuntu AI?",
+        "Que versão do Ubuntu AI está instalada?",
+    ),
+)
+def test_assistant_version_variations_stay_on_local_route(
+    phrase: str,
+) -> None:
+    decision = InteractionRouter().route(phrase)
+
+    assert decision.route is InteractionRoute.LOCAL
+    assert decision.response is not None
+    assert "Ubuntu AI Assistant: versão 2.1.0" in decision.response

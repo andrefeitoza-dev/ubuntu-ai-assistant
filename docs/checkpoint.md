@@ -1,6 +1,6 @@
 # Ubuntu AI Assistant — Development Checkpoint
 
-> Última atualização: 2026-08-27
+> Última atualização: 2026-08-30
 
 ## Estado atual
 
@@ -181,3 +181,22 @@ XDG. A execução continuará subordinada à política de risco, confirmação,
 bloqueios críticos e auditoria.
 
 Especificação: `docs/natural-actions-roadmap.md`.
+
+## Candidata v2.1.0
+
+- metadados promovidos de `2.0.2` para `2.1.0`;
+- changelog e notas da release preparados;
+- roadmap histórico corrigido para o estado atual;
+- 44 de 47 casos homologados, sem falhas;
+- H16, N07 e N08 aguardam um segundo computador SSH;
+- próxima etapa: suíte, build, auditoria e instalação;
+- nenhuma tag deve ser criada antes da validação final.
+
+## RC2 instalada e homologada
+
+- 992 testes aprovados;
+- quatro artefatos construídos e auditados;
+- atualização real de 2.0.2 para 2.1.0 aprovada;
+- RC2 reinstalada após correção das consultas de versão;
+- homologação visual e preservação do histórico aprovadas;
+- próxima etapa: commit da candidata e validação pelo CI.

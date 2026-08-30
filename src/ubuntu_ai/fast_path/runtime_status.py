@@ -19,6 +19,12 @@ class RuntimeStatusResponder:
         "o docker esta instalado": "docker",
         "qual a versao do python": "python",
         "mostre a versao do assistente": "assistant",
+        "qual a versao do assistente": "assistant",
+        "qual e a versao do assistente": "assistant",
+        "qual versao do assistente": "assistant",
+        "qual a versao do ubuntu ai": "assistant",
+        "qual e a versao do ubuntu ai": "assistant",
+        "que versao do ubuntu ai esta instalada": "assistant",
         "verifique a instalacao": "installation",
     }
 

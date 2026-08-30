@@ -5,7 +5,7 @@ import tomllib
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-EXPECTED_VERSION = "2.0.2"
+EXPECTED_VERSION = "2.1.0"
 
 
 def main() -> None:
@@ -25,7 +25,7 @@ def main() -> None:
         ROOT / "README.md",
         ROOT / "CHANGELOG.md",
         ROOT / "LICENSE",
-        ROOT / "docs/releases/v2.0.2.md",
+        ROOT / "docs/releases/v2.1.0.md",
     ]
     missing = [str(path.relative_to(ROOT)) for path in required if not path.exists()]
     if missing:

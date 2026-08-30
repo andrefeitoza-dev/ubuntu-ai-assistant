@@ -13,16 +13,17 @@ segurança operacional.
 
 ## Estado atual
 
-- Linha de desenvolvimento: `v1.3`
-- Branch: `develop/v1.3`
-- Versão do pacote: `1.2.0`
-- Interface terminal: concluída
-- Interface gráfica G1 e G2: concluídas
-- Launcher desktop: funcional
-- Testes automatizados: `530 passed`
-- Qualidade estática: Ruff aprovado
+- Última versão estável: `v2.0.2`
+- Branch atual: `develop/v2.1`
+- Candidata em preparação: `v2.1.0`
+- Interface terminal e gráfica: funcionais
+- Arquitetura: zero ciclos entre pacotes
+- GUI: 1.374 linhas e oito componentes
+- Homologação: 44 aprovações e nenhuma falha
+- Casos SSH pendentes: H16, N07 e N08
+- Qualidade estática, CI e CodeQL: aprovados
 
-> A versão `1.2.0` foi auditada e concluída.
+> A versão `v2.1.0` está em preparação para validação final.
 
 ## Visão geral das versões
 
@@ -451,7 +452,7 @@ as capacidades, políticas de risco ou compatibilidade pública da v2.0.2.
 - [x] atualizar actions com avisos de runtime depreciado;
 - [x] proteger automaticamente a composição e o tamanho da GUI;
 - [x] preservar CI, release, attestations e checksums;
-- [ ] executar build e instalação limpa;
+- [x] executar build e instalação limpa;
 - [ ] preparar a release `v2.1.0`.
 
 ### V2.1-P4 — Homologação funcional e release v2.1.0
@@ -467,15 +468,15 @@ as capacidades, políticas de risco ou compatibilidade pública da v2.0.2.
 - [x] corrigir os cinco casos anunciados de abertura segura do desktop;
 - [x] responder localmente consultas anunciadas de runtime e instalação;
 - [x] corrigir diagnóstico de lentidão e conhecimento Linux anunciado;
-- [ ] testar os 20 recursos anunciados e suas principais variações;
+- [x] testar localmente os 20 recursos e suas principais variações;
 - [x] validar rotas locais, Ollama, automação e execução controlada;
 - [ ] validar operação local e em computador remoto por SSH;
 - [x] testar confirmações, cancelamentos e bloqueios por risco;
 - [x] testar entradas inválidas e indisponibilidade de dependências;
-- [ ] executar homologação visual completa da GUI;
+- [x] executar homologação visual local completa da GUI;
 - [x] registrar resultados em uma matriz de evidências;
 - [x] corrigir falhas ou documentar limitações conhecidas;
-- [ ] validar pacote Debian em instalação e atualização reais;
+- [x] validar pacote Debian em instalação e atualização reais;
 - [ ] executar suíte, arquitetura, CI e auditoria dos artefatos;
 - [ ] preparar changelog, documentação e tag `v2.1.0`.
 

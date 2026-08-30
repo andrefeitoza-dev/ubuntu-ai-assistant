@@ -63,11 +63,11 @@ ollama pull qwen2.5:3b
 
 ### Ubuntu — pacote único recomendado
 
-Baixe `ubuntu-ai-assistant_2.0.2_amd64.deb` na release e abra o arquivo pela
+Baixe `ubuntu-ai-assistant_2.1.0_amd64.deb` na release e abra o arquivo pela
 Central de Aplicativos ou execute:
 
 ```bash
-sudo apt install ./ubuntu-ai-assistant_2.0.2_amd64.deb
+sudo apt install ./ubuntu-ai-assistant_2.1.0_amd64.deb
 ubuntu-ai-setup
 ```
 
