@@ -1,4 +1,3 @@
-import os
 import subprocess
 from unittest.mock import Mock, patch
 
@@ -15,7 +14,8 @@ def test_shell_echo() -> None:
 
 
 @patch("ubuntu_ai.services.shell.subprocess.Popen")
-def test_launch_detaches_graphical_process(popen) -> None:
+def test_launch_detaches_graphical_process(popen, monkeypatch) -> None:
+    monkeypatch.setenv("DISPLAY", ":99")
     process = Mock()
     process.wait.side_effect = subprocess.TimeoutExpired("gtk-launch", 0.5)
     popen.return_value = process
@@ -26,7 +26,7 @@ def test_launch_detaches_graphical_process(popen) -> None:
     popen.assert_called_once()
     _, kwargs = popen.call_args
     assert kwargs["start_new_session"] is True
-    assert kwargs["env"]["DISPLAY"] == os.environ.get("DISPLAY")
+    assert kwargs["env"]["DISPLAY"] == ":99"
     process.wait.assert_called_once_with(timeout=0.5)
 
 
