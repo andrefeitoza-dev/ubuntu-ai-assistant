@@ -211,3 +211,20 @@ Especificação: `docs/natural-actions-roadmap.md`.
 - artefatos e checksums aprovados;
 - H16, N07 e N08 permanecem documentados para teste futuro;
 - release pronta para o commit final e a tag `v2.1.0`.
+
+## Candidata v2.2.0
+
+- ações naturais seguras para aplicativos, sites e pastas XDG concluídas;
+- descoberta dinâmica de aplicativos instalados por entradas `.desktop` confiáveis;
+- doze melhorias complementares e estruturais implementadas;
+- aprendizado persistente, consumo de memória e auditoria consultáveis pela GUI;
+- controles superiores discretos cobertos por testes de hover e foco;
+- operações de arquivo limitadas à pasta pessoal, com prévia e confirmação;
+- autoria preservada como `Andre Anderson Feitoza` nos metadados de distribuição;
+- metadados promovidos de `2.1.0` para `2.2.0` em 31 de agosto de 2026;
+- suíte final aprovada com 1.139 testes, Ruff e documentação estrita;
+- arquitetura aprovada sem ciclos e GUI aprovada com oito componentes;
+- wheel, source archive, pacote Debian e checksums da 2.2.0 aprovados;
+- instalação, atualização e remoção aprovadas em ambiente isolado;
+- próxima etapa: commit candidato e validação remota pelo CI e CodeQL;
+- a tag `v2.2.0` somente poderá ser criada após todas as validações finais.

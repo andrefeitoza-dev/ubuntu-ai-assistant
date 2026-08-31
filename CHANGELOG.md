@@ -2,6 +2,37 @@
 
 Todas as mudanças relevantes deste projeto são registradas neste arquivo.
 
+## [2.2.0] - 2026-08-31
+
+### Added
+
+- Abertura por linguagem natural de aplicativos instalados, sites HTTP/HTTPS e pastas XDG.
+- Descoberta segura e dinâmica de aplicativos por entradas `.desktop` confiáveis.
+- Operações controladas de criação, cópia, movimentação, renomeação e envio à Lixeira.
+- Auditoria local protegida e exportação sanitizada de diagnósticos.
+- Modo global de simulação e permissões adicionais por capacidade.
+- Consultas locais sobre aprendizado persistente e consumo de memória do assistente.
+
+### Changed
+
+- Três controles superiores permanecem discretos até receberem hover ou foco do teclado.
+- Busca local reconhece nomes naturais, plurais e documentos PDF.
+- Contexto curto permite repetir consultas locais de leitura sem autorizar ações ambíguas.
+- Falhas conhecidas apresentam causa provável e uma próxima ação segura.
+
+### Security
+
+- Aplicativos, URLs e caminhos são validados independentemente antes da execução.
+- Protocolos inseguros, operadores de shell, elevação e comandos críticos permanecem bloqueados.
+- Alterações apresentam prévia e exigem confirmação; destinos existentes não são sobrescritos.
+- Remoção permanente não é oferecida e ações locais geram registros redigidos.
+
+### Validation
+
+- Seis exemplos obrigatórios de ações naturais homologados visualmente na GUI local.
+- Vinte tópicos e 39 paráfrases do painel Recursos e ajuda cobertos automaticamente.
+- Regressão anterior à promoção da candidata aprovada com 1.136 testes.
+
 ## [2.1.0] - 2026-08-30
 
 ### Added

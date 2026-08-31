@@ -13,17 +13,17 @@ segurança operacional.
 
 ## Estado atual
 
-- Última versão estável: `v2.0.2`
-- Branch atual: `develop/v2.1`
-- Candidata em preparação: `v2.1.0`
+- Última versão estável: `v2.1.0`
+- Branch atual: `develop/v2.2`
+- Candidata em preparação: `v2.2.0`
 - Interface terminal e gráfica: funcionais
 - Arquitetura: zero ciclos entre pacotes
-- GUI: 1.374 linhas e oito componentes
+- GUI: 1.400 linhas e oito componentes
 - Homologação: 44 aprovações e nenhuma falha
 - Casos SSH pendentes: H16, N07 e N08
 - Qualidade estática, CI e CodeQL: aprovados
 
-> A versão `v2.1.0` está em preparação para validação final.
+> A versão `v2.1.0` foi publicada. A candidata `v2.2.0` está em validação final.
 
 ## Visão geral das versões
 
