@@ -2,6 +2,7 @@ import pytest
 
 from ubuntu_ai.benchmark import BenchmarkService
 from ubuntu_ai.interaction import InteractionRoute, InteractionRouter
+from ubuntu_ai.version import get_version
 
 
 class FakeLearningService:
@@ -166,7 +167,7 @@ def test_assistant_version_variations_stay_on_local_route(
 
     assert decision.route is InteractionRoute.LOCAL
     assert decision.response is not None
-    assert "Ubuntu AI Assistant: versão 2.1.0" in decision.response
+    assert f"Ubuntu AI Assistant: versão {get_version()}" in decision.response
 
 
 @pytest.mark.parametrize(
