@@ -513,7 +513,8 @@ def test_main_interface_and_conversation_are_delegated() -> None:
     assert 'text="Como posso ajudar?"' not in source
     assert 'text="Recursos e ajuda  ▾"' in interface_source
     assert 'text="Agentes e progresso  ▾"' in interface_source
-    assert 'text="Falar"' in interface_source
+    assert 'text=">> voice input"' in interface_source
+    assert 'text="voice output"' in interface_source
 
 
 def test_three_header_controls_reveal_only_on_hover_or_keyboard_focus() -> None:

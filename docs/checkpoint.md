@@ -259,3 +259,11 @@ Especificação: `docs/natural-actions-roadmap.md`.
 - criação de arquivos em subpastas existentes da Home corrigida para execução real;
 - falsas confirmações conversacionais dessa operação eliminadas;
 - suíte completa aprovada com 1.218 testes e GUI em 1.399/1.400 linhas.
+
+## Correção v2.3.3
+
+- controles renomeados para `>> voice input` e `voice output`;
+- reconhecimento de voz anterior preservado;
+- confirmação de criação agora apresenta o caminho realmente executado;
+- orientação `F5` adicionada para atualizar janelas do gerenciador de arquivos;
+- suíte aprovada com 1.220 testes e cobertura de 80,12%.

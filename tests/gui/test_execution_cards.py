@@ -9,6 +9,7 @@ from ubuntu_ai.gui.execution_cards import (
     execution_output,
     execution_status_value,
     execution_succeeded,
+    file_execution_confirmation,
     plan_risk_tone,
 )
 from ubuntu_ai.gui.theme import ERROR, SUCCESS, WARNING
@@ -37,6 +38,27 @@ def test_execution_success_recognizes_supported_statuses() -> None:
 def test_execution_output_prefers_stdout_and_falls_back_to_stderr() -> None:
     assert execution_output(SimpleNamespace(stdout="resultado", stderr="erro")) == "resultado"
     assert execution_output(SimpleNamespace(stdout="", stderr="falha")) == "falha"
+
+
+def test_created_file_confirmation_exposes_real_path_and_refresh_hint() -> None:
+    result = SimpleNamespace(
+        status="executed",
+        command="touch /home/user/Andre07/t01",
+    )
+
+    confirmation = file_execution_confirmation(result)
+
+    assert confirmation is not None
+    assert "/home/user/Andre07/t01" in confirmation
+    assert "F5" in confirmation
+
+
+def test_file_confirmation_requires_successful_real_creation() -> None:
+    failed = SimpleNamespace(status="failed", command="touch /home/user/t01")
+    unrelated = SimpleNamespace(status="executed", command="ls -la")
+
+    assert file_execution_confirmation(failed) is None
+    assert file_execution_confirmation(unrelated) is None
 
 
 def test_visual_component_does_not_access_backend_or_policy() -> None:

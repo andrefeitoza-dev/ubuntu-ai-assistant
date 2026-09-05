@@ -1,5 +1,24 @@
 # Changelog
 
+## [2.3.3] - 2026-09-05
+
+### Alterado
+
+- botão de reconhecimento renomeado para `>> voice input`;
+- botão de leitura das respostas renomeado para `voice output`;
+- estado da voz de saída indicado pela cor do botão, sem alterar seu nome.
+
+### Corrigido
+
+- resultado de criação mostra o caminho real do arquivo ou pasta somente após sucesso;
+- orientação de atualização com `F5` exibida quando a janela Arquivos já estava aberta;
+- criação dentro de subpastas mantém retorno verificável e não usa confirmação da IA.
+
+### Validação
+
+- 1.220 testes aprovados com 80,12% de cobertura;
+- arquitetura, estilo e GUI aprovados.
+
 ## [2.3.2] - 2026-09-05
 
 ### Adicionado

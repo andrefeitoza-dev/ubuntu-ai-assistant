@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "ubuntu-ai-assistant"
-version = "2.3.2"
+version = "2.3.3"
 description = "Framework local para agentes inteligentes e administração segura do Ubuntu"
 readme = "README.md"
 requires-python = ">=3.12"

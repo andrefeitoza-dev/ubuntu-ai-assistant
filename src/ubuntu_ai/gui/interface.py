@@ -323,7 +323,7 @@ def build_main_interface(
 
     voice_button = tk.Button(
         composer,
-        text="Falar",
+        text=">> voice input",
         command=on_voice,
         bg=SURFACE_ALT,
         fg=TEXT_MUTED,
@@ -339,7 +339,7 @@ def build_main_interface(
     )
     speech_button = tk.Button(
         composer,
-        text="Ouvir respostas: não",
+        text="voice output",
         command=on_toggle_speech,
         bg=SURFACE_ALT,
         fg=TEXT_MUTED,

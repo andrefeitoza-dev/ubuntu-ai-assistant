@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import shlex
 import tkinter as tk
 from collections.abc import Callable
 from dataclasses import dataclass
@@ -51,6 +52,29 @@ def execution_output(result: object) -> str:
     stdout = str(getattr(result, "stdout", "") or "")
     stderr = str(getattr(result, "stderr", "") or "")
     return stdout or stderr
+
+
+def file_execution_confirmation(result: object) -> str | None:
+    """Confirma alterações reais e explica possível atraso visual do gerenciador."""
+
+    if not execution_succeeded(result):
+        return None
+    command = getattr(result, "command", "")
+    try:
+        arguments = (
+            list(command)
+            if isinstance(command, (list, tuple))
+            else shlex.split(str(command))
+        )
+    except ValueError:
+        return None
+    if len(arguments) != 2 or arguments[0] not in {"touch", "mkdir"}:
+        return None
+    item = "Arquivo" if arguments[0] == "touch" else "Pasta"
+    return (
+        f"{item} criado em {arguments[1]}. "
+        "Se a janela Arquivos já estava aberta, pressione F5 para atualizar a visualização."
+    )
 
 
 def plan_risk_tone(risk: object) -> str:
@@ -214,6 +238,7 @@ def build_execution_result_card(
     message = str(getattr(result, "message", "") or "")
     return_code = getattr(result, "return_code", None)
     output = execution_output(result)
+    confirmation = file_execution_confirmation(result)
 
     outer = tk.Frame(
         parent,
@@ -264,6 +289,18 @@ def build_execution_result_card(
             text=message,
             bg=SURFACE,
             fg=TEXT,
+            font=FONT_BODY,
+            anchor="w",
+            justify=tk.LEFT,
+            wraplength=760,
+        ).pack(fill=tk.X, pady=(4, 8))
+
+    if confirmation:
+        tk.Label(
+            outer,
+            text=confirmation,
+            bg=SURFACE,
+            fg=SUCCESS,
             font=FONT_BODY,
             anchor="w",
             justify=tk.LEFT,
