@@ -179,6 +179,7 @@ class UbuntuAIApp(VoiceControllerMixin, FirstRunControllerMixin, PanelController
             on_resize_messages=self._resize_messages,
             on_enter=self._on_enter,
             on_voice=self._start_voice_input,
+            on_toggle_speech=self._toggle_speech_output,
             on_submit=self.submit,
         )
 
@@ -201,6 +202,7 @@ class UbuntuAIApp(VoiceControllerMixin, FirstRunControllerMixin, PanelController
         self.composer = widgets.composer
         self.request_entry = widgets.request_entry
         self.voice_button = widgets.voice_button
+        self.speech_button = widgets.speech_button
         self.send_button = widgets.send_button
         bind_hover_reveal(
             self.remote_controls_button,
@@ -1059,6 +1061,7 @@ class UbuntuAIApp(VoiceControllerMixin, FirstRunControllerMixin, PanelController
             message=message,
             color=color,
         )
+        self._speak_response(message)
         self._scroll_bottom()
 
     # ------------------------------------------------------------------

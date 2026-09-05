@@ -233,8 +233,9 @@ class CapabilityCatalog:
                 "explicar Linux e Ubuntu",
                 "usar conhecimento local",
                 "receber pedidos por voz com reconhecimento local em português",
+                "ler respostas em voz alta com síntese local opcional",
             ),
-            ("Explique como funciona o systemd.", "O que é um serviço?"),
+            ("Explique como funciona o systemd.", "Leia suas respostas em voz alta."),
         ),
         _topic(
             "18",

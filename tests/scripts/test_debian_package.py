@@ -28,6 +28,7 @@ def test_control_uses_bundled_python_and_declares_native_dependencies() -> None:
     assert "libc6 (>= 2.35)" in control
     assert "libx11-6" in control
     assert "libportaudio2" in control
+    assert "speech-dispatcher" in control
     assert "python3-tk" not in control
 
 

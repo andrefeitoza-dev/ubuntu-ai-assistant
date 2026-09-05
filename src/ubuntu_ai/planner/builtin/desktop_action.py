@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import os
 import re
+import subprocess
 import unicodedata
 from dataclasses import dataclass
 from pathlib import Path
@@ -81,6 +82,10 @@ class SafeDesktopActionPlanner:
         "vs code": "code",
         "vscode": "code",
     }
+    _GENERIC_BROWSER = frozenset({"navegador", "browser"})
+    _DEFAULT_BROWSER = frozenset(
+        {"navegador padrao", "navegador padrão", "browser padrao", "browser padrão"}
+    )
 
     _STANDARD_FOLDERS = {
         "documentos": ("DOCUMENTS", ("Documentos", "Documents")),
@@ -187,6 +192,15 @@ class SafeDesktopActionPlanner:
         application = self._APPLICATION.fullmatch(value)
         if application is not None:
             app_name = application.group(1).strip().casefold()
+            if app_name in self._GENERIC_BROWSER | self._DEFAULT_BROWSER:
+                default_browser = self._default_browser()
+                if default_browser is None:
+                    return None
+                return DesktopAction(
+                    "Abrir navegador padrão",
+                    "Inicia o navegador padrão configurado no Ubuntu.",
+                    ("gtk-launch", default_browser),
+                )
             folder = self._standard_folder(app_name)
             if folder is not None:
                 return DesktopAction(
@@ -213,6 +227,22 @@ class SafeDesktopActionPlanner:
                 )
         return None
 
+    def _default_browser(self) -> str | None:
+        try:
+            result = subprocess.run(
+                ("xdg-settings", "get", "default-web-browser"),
+                capture_output=True,
+                check=False,
+                text=True,
+                timeout=2,
+            )
+        except (OSError, subprocess.SubprocessError):
+            return None
+        desktop_id = result.stdout.strip().removesuffix(".desktop")
+        if result.returncode != 0 or not desktop_id:
+            return None
+        return desktop_id if self._applications.contains_id(desktop_id) else None
+
     def rejection_reason(self, request: str) -> str | None:
         value = self._request_value(request)
         if self._EMAIL.fullmatch(value):
@@ -237,6 +267,15 @@ class SafeDesktopActionPlanner:
         if self._UNSAFE_URI.match(value):
             return "Site não aberto. Somente endereços HTTP ou HTTPS válidos são permitidos."
         if self._APPLICATION.fullmatch(value):
+            app_match = self._APPLICATION.fullmatch(value)
+            assert app_match is not None
+            if self._normalize_label(app_match.group(1)) in (
+                self._GENERIC_BROWSER | self._DEFAULT_BROWSER
+            ):
+                return (
+                    "Não encontrei um navegador padrão confiável. Você pode dizer "
+                    "'abra o Firefox', 'abra o Opera' ou o nome de outro navegador instalado."
+                )
             if self._EXPLICIT_NAMED_SITE.match(value):
                 return (
                     "Site não identificado com segurança. Informe o domínio HTTPS "

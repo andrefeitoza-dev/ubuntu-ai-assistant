@@ -11,11 +11,13 @@ class SafeFileOperationPlanner:
     """Planeja alterações limitadas a nomes simples e pastas pessoais conhecidas."""
 
     _CREATE = re.compile(
-        r"^crie\s+(?:(?:uma?|a)\s+)?pasta\s+(.+?)(?:\s+em\s+(.+))?$",
+        r"^crie\s+(?:(?:uma?|a)\s+)?pasta\s+(.+?)"
+        r"(?:\s+(?:dentro\s+da\s+pasta|dentro\s+de|na\s+pasta|em)\s+(.+))?$",
         re.IGNORECASE,
     )
     _CREATE_FILE = re.compile(
-        r"^crie\s+(?:(?:um|o)\s+)?arquivo\s+(.+?)(?:\s+em\s+(.+))?$",
+        r"^crie\s+(?:(?:um|o)\s+)?arquivo\s+(.+?)"
+        r"(?:\s+(?:dentro\s+da\s+pasta|dentro\s+de|na\s+pasta|em)\s+(.+))?$",
         re.IGNORECASE,
     )
     _REMOVE = re.compile(
@@ -163,9 +165,19 @@ class SafeFileOperationPlanner:
         )
 
     def _folder(self, label: str) -> Path | None:
-        names = self._FOLDERS.get(label.strip().casefold())
+        normalized = label.strip().casefold()
+        names = self._FOLDERS.get(normalized)
         if names is None:
-            return None
+            custom_name = re.sub(r"^pasta\s+", "", label.strip(), flags=re.IGNORECASE)
+            if not self._safe_name(custom_name):
+                return None
+            candidate = self._home / custom_name
+            try:
+                resolved = candidate.resolve(strict=True)
+                resolved.relative_to(self._home)
+            except (OSError, RuntimeError, ValueError):
+                return None
+            return resolved if resolved.is_dir() and not candidate.is_symlink() else None
         if not names:
             return self._home
         return next((self._home / name for name in names if (self._home / name).is_dir()), None)

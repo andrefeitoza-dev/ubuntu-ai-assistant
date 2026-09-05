@@ -251,3 +251,11 @@ Especificação: `docs/natural-actions-roadmap.md`.
 - criação de arquivo e remoção para a Lixeira incluídas na rota local determinística;
 - operações continuam limitadas à Home, sem sobrescrita e com confirmação;
 - suíte completa aprovada com 1.205 testes e GUI em 1.396/1.400 linhas.
+
+## Correção v2.3.2
+
+- síntese local opcional adicionada para leitura das respostas;
+- navegador padrão e navegadores instalados reconhecidos por linguagem natural;
+- criação de arquivos em subpastas existentes da Home corrigida para execução real;
+- falsas confirmações conversacionais dessa operação eliminadas;
+- suíte completa aprovada com 1.212 testes e GUI em 1.399/1.400 linhas.

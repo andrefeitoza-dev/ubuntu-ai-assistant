@@ -4,7 +4,7 @@ import threading
 import tkinter as tk
 
 from ubuntu_ai.gui.theme import ERROR, SUCCESS, WARNING
-from ubuntu_ai.voice import VoiceInputService
+from ubuntu_ai.voice import VoiceInputService, VoiceOutputService
 
 
 class VoiceControllerMixin:
@@ -47,3 +47,25 @@ class VoiceControllerMixin:
         self.status_label.configure(text="●  Voz não reconhecida", fg=ERROR)
         self._add_system_message(message, color=ERROR)
         self.request_entry.focus_set()
+
+    def _toggle_speech_output(self) -> None:
+        service = getattr(self, "_voice_output", None) or VoiceOutputService()
+        self._voice_output = service
+        if not service.available:
+            self._add_system_message(
+                "A voz de saída não está disponível. Instale o speech-dispatcher do Ubuntu.",
+                color=WARNING,
+            )
+            return
+        self._speech_enabled = not getattr(self, "_speech_enabled", False)
+        state = "sim" if self._speech_enabled else "não"
+        self.speech_button.configure(text=f"Ouvir respostas: {state}")
+        if self._speech_enabled:
+            service.speak_async("Voz do assistente ativada.")
+
+    def _speak_response(self, message: str) -> None:
+        if not getattr(self, "_speech_enabled", False):
+            return
+        service = getattr(self, "_voice_output", None)
+        if service is not None:
+            service.speak_async(message)

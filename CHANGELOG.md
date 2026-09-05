@@ -1,5 +1,25 @@
 # Changelog
 
+## [2.3.2] - 2026-09-05
+
+### Adicionado
+
+- leitura opcional das respostas em voz alta pelo sintetizador local do Ubuntu;
+- abertura do navegador padrão com “abra o navegador”;
+- reconhecimento de navegadores instalados por nomes naturais, incluindo Opera.
+
+### Corrigido
+
+- criação de arquivos dentro de subpastas existentes da Home usa execução real;
+- respostas conversacionais não confirmam mais falsamente essa criação sem comando;
+- caminhos ausentes ou inseguros continuam recusados antes do planejamento por IA.
+
+### Validação
+
+- 1.212 testes automatizados aprovados;
+- arquitetura, matriz funcional e estilo aprovados;
+- GUI preservada em 1.399 de 1.400 linhas permitidas.
+
 ## [2.3.1] - 2026-09-05
 
 ### Corrigido

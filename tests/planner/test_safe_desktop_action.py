@@ -1,4 +1,5 @@
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 
@@ -77,6 +78,59 @@ def test_launches_discovered_system_application(tmp_path: Path) -> None:
 
     assert plan is not None
     assert plan.steps[0].command == ["gtk-launch", "org.gimp.GIMP"]
+
+
+def test_opens_configured_default_browser(tmp_path: Path, monkeypatch) -> None:
+    entry = tmp_path / "firefox_firefox.desktop"
+    entry.write_text(
+        "[Desktop Entry]\nType=Application\nName=Firefox\nExec=firefox %u\n",
+        encoding="utf-8",
+    )
+    entry.chmod(0o644)
+    monkeypatch.setattr(
+        "ubuntu_ai.planner.builtin.desktop_action.subprocess.run",
+        lambda *_args, **_kwargs: SimpleNamespace(
+            stdout="firefox_firefox.desktop\n", returncode=0
+        ),
+    )
+    planner = SafeDesktopActionPlanner(
+        home=tmp_path,
+        applications=DesktopApplicationCatalog((tmp_path,)),
+    )
+
+    plan = planner.try_create_plan("Abra o navegador.")
+
+    assert plan is not None
+    assert plan.steps[0].command == ["gtk-launch", "firefox_firefox"]
+
+
+def test_browser_name_matches_unique_installed_browser_prefix(tmp_path: Path) -> None:
+    entry = tmp_path / "opera.desktop"
+    entry.write_text(
+        "[Desktop Entry]\nType=Application\nName=Opera Web Browser\nExec=opera %U\n",
+        encoding="utf-8",
+    )
+    entry.chmod(0o644)
+    planner = SafeDesktopActionPlanner(
+        home=tmp_path,
+        applications=DesktopApplicationCatalog((tmp_path,)),
+    )
+
+    plan = planner.try_create_plan("Abra o Opera.")
+
+    assert plan is not None
+    assert plan.steps[0].command == ["gtk-launch", "opera"]
+
+
+def test_generic_browser_explains_installed_browser_choice(monkeypatch) -> None:
+    monkeypatch.setattr(
+        "ubuntu_ai.planner.builtin.desktop_action.subprocess.run",
+        lambda *_args, **_kwargs: SimpleNamespace(stdout="", returncode=1),
+    )
+    planner = SafeDesktopActionPlanner(applications=DesktopApplicationCatalog(()))
+
+    assert planner.try_create_plan("Abra o navegador.") is None
+    assert "abra o Opera" in planner.rejection_reason("Abra o navegador.")
 
 
 def test_email_request_is_ambiguous_and_not_executed() -> None:

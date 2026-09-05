@@ -26,6 +26,25 @@ def test_create_file_uses_fast_safe_plan(tmp_path: Path) -> None:
     assert plan.steps[0].command == ["touch", str(tmp_path / "teste011")]
 
 
+def test_create_file_inside_existing_home_folder(tmp_path: Path) -> None:
+    folder = tmp_path / "Andre07"
+    folder.mkdir()
+
+    plan = SafeFileOperationPlanner(home=tmp_path).try_create_plan(
+        "Crie um arquivo t01 dentro da pasta Andre07."
+    )
+
+    assert plan is not None
+    assert plan.steps[0].command == ["touch", str(folder / "t01")]
+
+
+def test_create_file_rejects_missing_or_unsafe_custom_folder(tmp_path: Path) -> None:
+    planner = SafeFileOperationPlanner(home=tmp_path)
+
+    assert planner.try_create_plan("Crie um arquivo t01 dentro da pasta inexistente.") is None
+    assert planner.try_create_plan("Crie um arquivo t01 dentro de ../../etc.") is None
+
+
 @pytest.mark.parametrize(
     "phrase",
     (

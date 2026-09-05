@@ -55,7 +55,7 @@ class DesktopApplicationCatalog:
 
     def find(self, label: str) -> DesktopApplication | None:
         normalized = self._normalize(label)
-        matches = {
+        exact_matches = {
             application
             for application in self.applications
             if normalized
@@ -64,7 +64,14 @@ class DesktopApplicationCatalog:
                 self._normalize(application.desktop_id),
             }
         }
-        return next(iter(matches)) if len(matches) == 1 else None
+        if len(exact_matches) == 1:
+            return next(iter(exact_matches))
+        partial_matches = {
+            application
+            for application in self.applications
+            if self._normalize(application.name).startswith(f"{normalized} ")
+        }
+        return next(iter(partial_matches)) if len(partial_matches) == 1 else None
 
     def contains_id(self, desktop_id: str) -> bool:
         return any(application.desktop_id == desktop_id for application in self.applications)

@@ -34,12 +34,24 @@ def detect_architecture() -> str:
 
 
 def control_text(version: str, architecture: str) -> str:
+    dependencies = ", ".join(
+        (
+            "libc6 (>= 2.35)",
+            "libx11-6",
+            "libxext6",
+            "libxrender1",
+            "libxft2",
+            "libfontconfig1",
+            "libportaudio2",
+            "speech-dispatcher",
+        )
+    )
     return f"""Package: {APP_ID}
 Version: {version}
 Section: utils
 Priority: optional
 Architecture: {architecture}
-Depends: libc6 (>= 2.35), libx11-6, libxext6, libxrender1, libxft2, libfontconfig1, libportaudio2
+Depends: {dependencies}
 Maintainer: Andre Anderson Feitoza
 Homepage: https://github.com/andrefeitoza-dev/ubuntu-ai-assistant
 Description: Assistente local e seguro para administração do Ubuntu

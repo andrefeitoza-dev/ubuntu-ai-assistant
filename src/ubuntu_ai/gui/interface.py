@@ -46,6 +46,7 @@ class InterfaceWidgets:
     composer: tk.Frame
     request_entry: tk.Entry
     voice_button: tk.Button
+    speech_button: tk.Button
     send_button: tk.Button
 
 
@@ -109,6 +110,7 @@ def build_main_interface(
     on_resize_messages: Callable[..., object],
     on_enter: Callable[..., object],
     on_voice: Callable[[], None],
+    on_toggle_speech: Callable[[], None],
     on_submit: Callable[[], None],
 ) -> InterfaceWidgets:
     header = tk.Frame(
@@ -335,6 +337,22 @@ def build_main_interface(
         takefocus=True,
         font=FONT_SMALL_BOLD,
     )
+    speech_button = tk.Button(
+        composer,
+        text="Ouvir respostas: não",
+        command=on_toggle_speech,
+        bg=SURFACE_ALT,
+        fg=TEXT_MUTED,
+        activebackground=SURFACE_HOVER,
+        activeforeground=TEXT,
+        relief=tk.FLAT,
+        borderwidth=0,
+        padx=12,
+        pady=9,
+        cursor="hand2",
+        takefocus=True,
+        font=FONT_SMALL_BOLD,
+    )
     send_button = tk.Button(
         composer,
         text="Enviar",
@@ -357,6 +375,7 @@ def build_main_interface(
         padx=(14, 0),
     )
     voice_button.pack(side=tk.RIGHT, padx=(12, 0))
+    speech_button.pack(side=tk.RIGHT, padx=(12, 0))
 
     request_entry.focus_set()
 
@@ -379,6 +398,7 @@ def build_main_interface(
         composer=composer,
         request_entry=request_entry,
         voice_button=voice_button,
+        speech_button=speech_button,
         send_button=send_button,
     )
 
