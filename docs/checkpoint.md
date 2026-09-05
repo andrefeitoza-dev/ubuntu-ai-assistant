@@ -267,3 +267,9 @@ Especificação: `docs/natural-actions-roadmap.md`.
 - confirmação de criação agora apresenta o caminho realmente executado;
 - orientação `F5` adicionada para atualizar janelas do gerenciador de arquivos;
 - suíte aprovada com 1.220 testes e cobertura de 80,12%.
+
+## Correção v2.3.4
+
+- criação de arquivo ou pasta passa a abrir/focalizar automaticamente a pasta pai;
+- atualização visual é uma segunda etapa explícita do plano confirmado;
+- suíte aprovada com 1.220 testes e cobertura de 80,13%.

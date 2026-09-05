@@ -96,10 +96,11 @@ class SafeFileOperationPlanner:
             destination = parent / name.strip()
             if destination.exists() or destination.is_symlink():
                 return None
-            return self._plan(
+            return self._creation_plan(
                 "Criar pasta",
                 f"Cria a pasta {destination} sem sobrescrever conteúdo existente.",
                 ("mkdir", str(destination)),
+                parent,
             )
 
         create_file = self._CREATE_FILE.fullmatch(value)
@@ -111,10 +112,11 @@ class SafeFileOperationPlanner:
             destination = parent / name.strip()
             if destination.exists() or destination.is_symlink():
                 return None
-            return self._plan(
+            return self._creation_plan(
                 "Criar arquivo vazio",
                 f"Cria o arquivo vazio {destination} sem sobrescrever conteúdo existente.",
                 ("touch", str(destination)),
+                parent,
             )
 
         transfer = self._TRANSFER.fullmatch(value)
@@ -191,4 +193,22 @@ class SafeFileOperationPlanner:
     def _plan(title: str, description: str, command: tuple[str, ...]) -> Plan:
         plan = Plan(goal=title, estimated_seconds=2, risk=RiskLevel.HIGH, planner="builtin")
         plan.add_step(PlanStep(title=title, description=description, command=list(command)))
+        return plan
+
+    @classmethod
+    def _creation_plan(
+        cls,
+        title: str,
+        description: str,
+        command: tuple[str, ...],
+        parent: Path,
+    ) -> Plan:
+        plan = cls._plan(title, description, command)
+        plan.add_step(
+            PlanStep(
+                title="Atualizar pasta no gerenciador de arquivos",
+                description=f"Abre a pasta {parent} para exibir imediatamente o novo item.",
+                command=["xdg-open", str(parent)],
+            )
+        )
         return plan

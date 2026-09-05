@@ -14,6 +14,7 @@ def test_create_folder_requires_preview_and_nonexistent_destination(tmp_path: Pa
     assert plan is not None
     assert plan.risk is RiskLevel.HIGH
     assert plan.steps[0].command == ["mkdir", str(tmp_path / "Projetos")]
+    assert plan.steps[1].command == ["xdg-open", str(tmp_path)]
 
 
 def test_create_file_uses_fast_safe_plan(tmp_path: Path) -> None:
@@ -24,6 +25,7 @@ def test_create_file_uses_fast_safe_plan(tmp_path: Path) -> None:
     assert plan is not None
     assert plan.risk is RiskLevel.HIGH
     assert plan.steps[0].command == ["touch", str(tmp_path / "teste011")]
+    assert plan.steps[1].command == ["xdg-open", str(tmp_path)]
 
 
 def test_create_file_inside_existing_home_folder(tmp_path: Path) -> None:
@@ -36,6 +38,7 @@ def test_create_file_inside_existing_home_folder(tmp_path: Path) -> None:
 
     assert plan is not None
     assert plan.steps[0].command == ["touch", str(folder / "t01")]
+    assert plan.steps[1].command == ["xdg-open", str(folder)]
 
 
 def test_create_file_rejects_missing_or_unsafe_custom_folder(tmp_path: Path) -> None:

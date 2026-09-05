@@ -1,5 +1,18 @@
 # Changelog
 
+## [2.3.4] - 2026-09-05
+
+### Corrigido
+
+- após criar arquivo ou pasta, o gerenciador abre/focaliza automaticamente a pasta pai;
+- o novo item aparece sem depender da atualização manual da janela Arquivos;
+- a atualização visual faz parte da prévia segura apresentada ao usuário.
+
+### Validação
+
+- 1.220 testes aprovados com 80,13% de cobertura;
+- arquitetura, estilo e GUI aprovados.
+
 ## [2.3.3] - 2026-09-05
 
 ### Alterado

@@ -30,7 +30,7 @@ def test_release_requires_matching_tag_checksums_and_keyless_attestation() -> No
     assert "build_deb.py" in source
     assert "validate_deb.py" in source
     assert "dist/*.deb" in source
-    assert "body_path: docs/releases/v2.3.3.md" in source
+    assert "body_path: docs/releases/v2.3.4.md" in source
     assert "PRIVATE_KEY" not in source
 
 
