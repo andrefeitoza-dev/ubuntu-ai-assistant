@@ -110,9 +110,7 @@ class DefaultExecutionPolicy(ExecutionPolicy):
                 reason="Aplicativo bloqueado pela política de ações desktop.",
             )
 
-        if executable in {"mkdir", "touch", "cp", "mv"} and not self._valid_file_change(
-            arguments
-        ):
+        if executable in {"mkdir", "touch", "cp", "mv"} and not self._valid_file_change(arguments):
             return PolicyDecision(
                 allowed=False,
                 reason="Alteração de arquivo bloqueada pela política de caminhos seguros.",

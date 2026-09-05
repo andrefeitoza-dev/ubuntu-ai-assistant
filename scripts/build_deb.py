@@ -233,9 +233,7 @@ printf '%s\n' 'Abra "Configurar Ubuntu AI Assistant" no menu para preparar a IA 
         desktop.parent.mkdir(parents=True)
         desktop.write_text(desktop_text(), encoding="utf-8")
 
-        setup_desktop = (
-            staging / "usr" / "share" / "applications" / f"{APP_ID}-setup.desktop"
-        )
+        setup_desktop = staging / "usr" / "share" / "applications" / f"{APP_ID}-setup.desktop"
         setup_desktop.write_text(setup_desktop_text(), encoding="utf-8")
 
         source_icon = ROOT / "src" / "ubuntu_ai" / "gui" / "assets" / f"{APP_ID}.png"

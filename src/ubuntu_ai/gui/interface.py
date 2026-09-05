@@ -324,14 +324,14 @@ def build_main_interface(
 
     voice_button = CircularVoiceButton(
         composer,
-        symbol="🎙",
+        icon="microphone",
         tooltip="voice input",
         command=on_voice,
         primary=True,
     )
     speech_button = CircularVoiceButton(
         composer,
-        symbol="🔊",
+        icon="speaker",
         tooltip="voice output",
         command=on_toggle_speech,
     )

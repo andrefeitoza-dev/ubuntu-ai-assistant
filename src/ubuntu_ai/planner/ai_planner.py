@@ -75,9 +75,7 @@ class AIPlanner:
         knowledge_context = self._knowledge_context(request, intent)
         learning_context = self._learning_context(request, context, intent)
         memory_context = (
-            memory.to_prompt()
-            if memory is not None and not memory.is_empty()
-            else None
+            memory.to_prompt() if memory is not None and not memory.is_empty() else None
         )
         intent_context = (
             self._intent_context_builder.prompt_context(intent) if intent is not None else None

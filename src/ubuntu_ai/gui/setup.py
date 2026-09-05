@@ -21,7 +21,13 @@ from ubuntu_ai.gui.theme import (
     WARNING,
     WINDOW_CLASS,
 )
-from ubuntu_ai.voice import VoiceInputService, VoiceModelSetup, VoiceSetupStatus
+from ubuntu_ai.voice import (
+    NaturalVoiceSetup,
+    VoiceInputService,
+    VoiceModelSetup,
+    VoiceOutputService,
+    VoiceSetupStatus,
+)
 
 
 def setup_message(status: FirstRunStatus) -> tuple[str, str]:
@@ -55,6 +61,7 @@ class SetupApp:
     def __init__(self, setup: FirstRunSetup | None = None) -> None:
         self._setup = setup or FirstRunSetup()
         self._voice_setup = VoiceModelSetup()
+        self._natural_voice_setup = NaturalVoiceSetup()
         self._queue: SimpleQueue[tuple[str, object]] = SimpleQueue()
         self.root = tk.Tk(className=WINDOW_CLASS)
         self.root.title("Configurar Ubuntu AI Assistant")
@@ -64,6 +71,7 @@ class SetupApp:
         self._build()
         self.root.after(50, self._drain_queue)
         self._display_voice_status(self._voice_setup.status())
+        self._display_natural_voice_status()
         self.refresh()
 
     def _build(self) -> None:
@@ -165,6 +173,40 @@ class SetupApp:
         )
         self.voice_button.pack(anchor="w")
 
+        output_card = tk.Frame(content, bg=SURFACE_ALT, padx=20, pady=16)
+        output_card.pack(fill=tk.X, pady=(14, 0))
+        tk.Label(
+            output_card,
+            text="Voz natural do assistente",
+            bg=SURFACE_ALT,
+            fg=TEXT,
+            font=FONT_BODY_BOLD,
+            anchor="w",
+        ).pack(fill=tk.X)
+        self.natural_voice_detail = tk.Label(
+            output_card,
+            bg=SURFACE_ALT,
+            fg=TEXT_MUTED,
+            font=FONT_BODY,
+            justify=tk.LEFT,
+            wraplength=470,
+            anchor="w",
+        )
+        self.natural_voice_detail.pack(fill=tk.X, pady=(10, 14))
+        self.natural_voice_button = tk.Button(
+            output_card,
+            text="Baixar voz natural (58 MB)",
+            command=self._download_natural_voice,
+            bg=ACCENT,
+            fg="#101318",
+            relief=tk.FLAT,
+            padx=14,
+            pady=8,
+            font=FONT_SMALL,
+            cursor="hand2",
+        )
+        self.natural_voice_button.pack(anchor="w")
+
     def refresh(self) -> None:
         self._set_busy(True, "Verificando configuração…")
         threading.Thread(target=self._check_worker, daemon=True).start()
@@ -240,6 +282,34 @@ class SetupApp:
         except Exception as exc:
             self._queue.put(("voice-error", str(exc)))
 
+    def _display_natural_voice_status(self) -> None:
+        available = self._natural_voice_setup.available()
+        service = VoiceOutputService(model_path=self._natural_voice_setup.model_path)
+        ready = available and service.neural_available
+        self.natural_voice_detail.configure(
+            text=(
+                "Voz neural brasileira instalada e pronta para uso local."
+                if ready
+                else "Baixe a voz neural brasileira. Ela funciona localmente e soa mais natural."
+            ),
+            fg=SUCCESS if ready else TEXT_MUTED,
+        )
+        self.natural_voice_button.configure(
+            state=tk.DISABLED if ready else tk.NORMAL,
+            text="Voz natural pronta" if ready else "Baixar voz natural (58 MB)",
+        )
+
+    def _download_natural_voice(self) -> None:
+        self.natural_voice_button.configure(state=tk.DISABLED, text="Baixando e verificando…")
+        threading.Thread(target=self._natural_voice_download_worker, daemon=True).start()
+
+    def _natural_voice_download_worker(self) -> None:
+        try:
+            self._natural_voice_setup.install()
+            self._queue.put(("natural-voice-status", True))
+        except Exception as exc:
+            self._queue.put(("natural-voice-error", str(exc)))
+
     def _set_busy(self, busy: bool, message: str) -> None:
         self.primary.configure(state=tk.DISABLED if busy else tk.NORMAL)
         self.progress.configure(text=message, fg=WARNING)
@@ -258,6 +328,15 @@ class SetupApp:
                         state=tk.NORMAL,
                         text="Tentar baixar novamente",
                         command=self._download_voice_model,
+                    )
+                elif kind == "natural-voice-status":
+                    self._display_natural_voice_status()
+                elif kind == "natural-voice-error":
+                    self.natural_voice_detail.configure(text=str(payload), fg=ERROR)
+                    self.natural_voice_button.configure(
+                        state=tk.NORMAL,
+                        text="Tentar baixar novamente",
+                        command=self._download_natural_voice,
                     )
                 else:
                     self._set_busy(False, str(payload))

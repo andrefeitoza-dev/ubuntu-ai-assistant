@@ -8,7 +8,7 @@ def test_voice_controls_are_circular_accessible_and_have_tooltips() -> None:
     source = Path(voice_controls.__file__).read_text(encoding="utf-8")
 
     assert "create_oval(" in source
-    assert 'takefocus=1' in source
+    assert "takefocus=1" in source
     assert 'self.bind("<Return>"' in source
     assert 'self.bind("<space>"' in source
     assert "_show_tooltip" in source
@@ -25,10 +25,10 @@ def _button() -> tuple[voice_controls.CircularVoiceButton, list[tuple]]:
     button = object.__new__(voice_controls.CircularVoiceButton)
     button._enabled = True
     button._active = False
-    button._symbol = "🎙"
+    button._icon = "microphone"
     button._base_fill = "base"
     button._hover_fill = "hover"
-    button._label = 1
+    button._busy_label = 1
     button._circle = 2
     button._command = lambda: events.append(("command",))
     button.configure = lambda **options: events.append(("configure", options))

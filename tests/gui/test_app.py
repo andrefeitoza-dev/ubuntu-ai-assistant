@@ -221,9 +221,7 @@ def test_gui_exposes_capability_catalog_button() -> None:
 
 def test_gui_exposes_computer_care_panel() -> None:
     source = Path(gui_app.__file__).read_text(encoding="utf-8")
-    component_source = (
-        Path(gui_app.__file__).with_name("care_panel.py").read_text(encoding="utf-8")
-    )
+    component_source = Path(gui_app.__file__).with_name("care_panel.py").read_text(encoding="utf-8")
     controller_source = (
         Path(gui_app.__file__).with_name("panel_controller.py").read_text(encoding="utf-8")
     )
@@ -479,10 +477,7 @@ def test_computer_controls_close_when_user_clicks_outside() -> None:
 
     assert "def _hide_remote_controls" in source
     assert "inside_remote_controls" in controller_source
-    assert (
-        "if self._remote_controls_visible and not inside_remote_controls:"
-        in controller_source
-    )
+    assert "if self._remote_controls_visible and not inside_remote_controls:" in controller_source
     assert "self._hide_remote_controls()" in source
     assert "tk.OptionMenu(" in component_source
     assert '"Diagnosticar"' in component_source

@@ -38,9 +38,7 @@ def test_user_can_enable_and_disable_spoken_responses() -> None:
         available=True,
         speak_async=spoken.append,
     )
-    controller.speech_button = SimpleNamespace(
-        set_active=states.append
-    )
+    controller.speech_button = SimpleNamespace(set_active=states.append)
 
     controller._toggle_speech_output()
     controller._speak_response("Resposta do assistente")

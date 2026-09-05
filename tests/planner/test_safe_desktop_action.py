@@ -89,9 +89,7 @@ def test_opens_configured_default_browser(tmp_path: Path, monkeypatch) -> None:
     entry.chmod(0o644)
     monkeypatch.setattr(
         "ubuntu_ai.planner.builtin.desktop_action.subprocess.run",
-        lambda *_args, **_kwargs: SimpleNamespace(
-            stdout="firefox_firefox.desktop\n", returncode=0
-        ),
+        lambda *_args, **_kwargs: SimpleNamespace(stdout="firefox_firefox.desktop\n", returncode=0),
     )
     planner = SafeDesktopActionPlanner(
         home=tmp_path,

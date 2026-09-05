@@ -18,9 +18,7 @@ def test_create_folder_requires_preview_and_nonexistent_destination(tmp_path: Pa
 
 
 def test_create_file_uses_fast_safe_plan(tmp_path: Path) -> None:
-    plan = SafeFileOperationPlanner(home=tmp_path).try_create_plan(
-        "Crie um arquivo teste011."
-    )
+    plan = SafeFileOperationPlanner(home=tmp_path).try_create_plan("Crie um arquivo teste011.")
 
     assert plan is not None
     assert plan.risk is RiskLevel.HIGH

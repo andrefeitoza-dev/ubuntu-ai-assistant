@@ -36,9 +36,7 @@ class VoiceInputService:
 
     def availability(self) -> VoiceAvailability:
         missing = tuple(
-            name
-            for name in ("sounddevice", "vosk")
-            if importlib.util.find_spec(name) is None
+            name for name in ("sounddevice", "vosk") if importlib.util.find_spec(name) is None
         )
         if missing:
             return VoiceAvailability(

@@ -69,7 +69,7 @@ jobs:
       - name: Publish GitHub release
         uses: softprops/action-gh-release@v3
         with:
-          body_path: docs/releases/v2.3.5.md
+          body_path: docs/releases/v2.3.6.md
           files: |
             dist/*.whl
             dist/*.tar.gz

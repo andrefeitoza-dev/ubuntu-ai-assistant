@@ -6,7 +6,7 @@ import zipfile
 
 import pytest
 
-from ubuntu_ai.voice import VoiceModelSetup
+from ubuntu_ai.voice import NaturalVoiceSetup, VoiceModelSetup
 
 
 def model_archive(*, unsafe: bool = False) -> bytes:
@@ -48,3 +48,13 @@ def test_voice_model_rejects_unsafe_archive_paths(monkeypatch, tmp_path) -> None
 
     with pytest.raises(RuntimeError, match="caminho inseguro"):
         VoiceModelSetup(destination=tmp_path / "model").install()
+
+
+def test_natural_voice_setup_recognizes_both_required_files(tmp_path) -> None:
+    setup = NaturalVoiceSetup(destination=tmp_path)
+
+    assert setup.available() is False
+    setup.model_path.touch()
+    assert setup.available() is False
+    setup.model_path.with_suffix(".onnx.json").touch()
+    assert setup.available() is True

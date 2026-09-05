@@ -308,6 +308,7 @@ class CapabilityCatalog:
         "mostrar capacidades",
         "mostre suas capacidades",
     }
+
     @property
     def topics(self) -> tuple[CapabilityTopic, ...]:
         return self._TOPICS

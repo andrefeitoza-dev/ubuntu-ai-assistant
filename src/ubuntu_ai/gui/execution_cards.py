@@ -62,9 +62,7 @@ def file_execution_confirmation(result: object) -> str | None:
     command = getattr(result, "command", "")
     try:
         arguments = (
-            list(command)
-            if isinstance(command, (list, tuple))
-            else shlex.split(str(command))
+            list(command) if isinstance(command, (list, tuple)) else shlex.split(str(command))
         )
     except ValueError:
         return None

@@ -66,10 +66,10 @@ class RuntimeWorkflow:
         shared = shared.with_memory(memory)
 
         plan = self._planner_bridge.create_plan(
-    request=request.request,
-    context=shared.snapshot,
-    memory=shared.memory,
-)
+            request=request.request,
+            context=shared.snapshot,
+            memory=shared.memory,
+        )
 
         if not request.execute:
             return RuntimeCycleResult(
@@ -86,11 +86,7 @@ class RuntimeWorkflow:
 
         learned_memory = self._reflection_memory_builder.build(
             report=reflection,
-            project_name=(
-                snapshot.project_name
-                if snapshot is not None
-                else None
-            ),
+            project_name=(snapshot.project_name if snapshot is not None else None),
         )
 
         if (
@@ -101,16 +97,8 @@ class RuntimeWorkflow:
             self._memory_service.record_execution(
                 session_id=request.session_id,
                 user_request=str(request.request),
-                working_directory=(
-                    snapshot.working_directory
-                    if snapshot is not None
-                    else "."
-                ),
-                project_name=(
-                    snapshot.project_name
-                    if snapshot is not None
-                    else None
-                ),
+                working_directory=(snapshot.working_directory if snapshot is not None else "."),
+                project_name=(snapshot.project_name if snapshot is not None else None),
                 result=execution,
             )
 
@@ -119,11 +107,7 @@ class RuntimeWorkflow:
             and isinstance(execution, ExecutionResult)
             and execution.command is not None
         ):
-            project_name = (
-                snapshot.project_name
-                if snapshot is not None
-                else None
-            )
+            project_name = snapshot.project_name if snapshot is not None else None
             self._learning_service.learn_from_execution(
                 user_request=str(request.request),
                 project_name=project_name,

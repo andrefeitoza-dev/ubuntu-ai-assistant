@@ -27,8 +27,7 @@ def report(path: Path) -> int:
         failures.append(identifier)
     if not failures:
         print(
-            "::error title=Suíte automatizada reprovada::"
-            "O pytest falhou sem caso JUnit associado."
+            "::error title=Suíte automatizada reprovada::O pytest falhou sem caso JUnit associado."
         )
     return 1
 

@@ -1,5 +1,24 @@
 # Changelog
 
+## [2.3.6] - 2026-09-05
+
+### Alterado
+
+- saída de voz neural brasileira local com Piper, mantendo `speech-dispatcher` como reserva;
+- instalador gráfico permite baixar e verificar a voz natural opcional;
+- microfone e alto-falante agora são vetoriais e não dependem de fontes de emojis.
+
+### Corrigido
+
+- modelo português de entrada instalado no caminho de dados correto do usuário;
+- download da voz neural validado por SHA-256 antes da ativação.
+
+### Validação
+
+- geração real de áudio WAV validada com a voz `pt_BR-cadu-medium`;
+- criação real isolada de pasta e arquivo dentro da pasta aprovada;
+- planejamento de remoção recuperável pela Lixeira aprovado.
+
 ## [2.3.5] - 2026-09-05
 
 ### Alterado

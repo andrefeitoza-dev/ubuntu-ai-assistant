@@ -43,8 +43,7 @@ class RuntimeMemoryBridge:
                 project_name=project_name,
             )
             persisted_candidates = tuple(
-                self._execution_memory_builder.build(record)
-                for record in records
+                self._execution_memory_builder.build(record) for record in records
             )
 
         all_candidates = candidates + persisted_candidates
