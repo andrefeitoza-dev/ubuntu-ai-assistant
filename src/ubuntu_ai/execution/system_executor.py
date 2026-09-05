@@ -58,7 +58,7 @@ class SystemExecutor:
             else:
                 command_result = self._shell_service.run(
                     arguments,
-                    timeout=self._timeout,
+                    timeout=self._timeout_for(arguments),
                 )
         except Exception as error:
             duration = perf_counter() - started_at
@@ -103,3 +103,8 @@ class SystemExecutor:
     @staticmethod
     def _failure_message(detail: str) -> str:
         return FailureDiagnosticService.analyze(detail).render()
+
+    def _timeout_for(self, arguments: list[str]) -> int:
+        privileged = arguments[0] == "pkexec" and len(arguments) > 1
+        executable = arguments[1] if privileged else arguments[0]
+        return max(self._timeout, 1800) if executable in {"apt", "apt-get"} else self._timeout

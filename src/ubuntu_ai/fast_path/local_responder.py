@@ -10,6 +10,8 @@ from datetime import datetime
 
 from ubuntu_ai.context.health import SystemHealthService
 from ubuntu_ai.fast_path.capabilities import CapabilityCatalog
+from ubuntu_ai.fast_path.care import CareDiagnosticResponder
+from ubuntu_ai.fast_path.identity import AssistantIdentityResponder
 from ubuntu_ai.fast_path.linux_commands import LinuxCommandCatalog
 from ubuntu_ai.fast_path.linux_knowledge import LinuxKnowledgeResponder
 from ubuntu_ai.fast_path.runtime_status import RuntimeStatusResponder
@@ -108,6 +110,8 @@ class LocalResponder:
         system_facts: SystemFactResponder | None = None,
         commands: LinuxCommandCatalog | None = None,
         capabilities: CapabilityCatalog | None = None,
+        care: CareDiagnosticResponder | None = None,
+        identity: AssistantIdentityResponder | None = None,
         software: InstalledSoftwareResponder | None = None,
         runtime_status: RuntimeStatusResponder | None = None,
         linux_knowledge: LinuxKnowledgeResponder | None = None,
@@ -117,6 +121,8 @@ class LocalResponder:
         self._system_facts = system_facts or SystemFactResponder(health=self._health_service)
         self._commands = commands or LinuxCommandCatalog()
         self._capabilities = capabilities or CapabilityCatalog()
+        self._care = care or CareDiagnosticResponder(health_service=self._health_service)
+        self._identity = identity or AssistantIdentityResponder()
         self._software = software or InstalledSoftwareResponder()
         self._runtime_status = runtime_status or RuntimeStatusResponder()
         self._linux_knowledge = linux_knowledge or LinuxKnowledgeResponder()
@@ -195,6 +201,14 @@ class LocalResponder:
 
     def respond(self, request: str) -> LocalResponse | None:
         normalized = self._normalize(request)
+
+        identity_response = self._identity.respond(normalized)
+        if identity_response is not None:
+            return LocalResponse(identity_response)
+
+        care_response = self._care.respond(normalized)
+        if care_response is not None:
+            return LocalResponse(care_response)
 
         if self._is_date_request(normalized):
             current = self._now()
@@ -276,7 +290,12 @@ class LocalResponder:
             )
 
         findings.append(f"Processos em execução: {metrics.process_count}.")
-        findings.append("Para aprofundar, consulte os processos que mais usam CPU e memória.")
+        findings.extend(
+            (
+                "Próximo pedido: “Liste os processos que mais consomem memória.”",
+                "Nenhum processo foi encerrado e nenhuma configuração foi alterada.",
+            )
+        )
 
         return "Diagnóstico local de desempenho:\n" + "\n".join(
             f"• {finding}" for finding in findings

@@ -35,9 +35,13 @@ class CapabilityPermissions:
 
     def denial_reason(self, command: str) -> str | None:
         try:
-            executable = shlex.split(command)[0]
+            arguments = shlex.split(command)
         except (ValueError, IndexError):
             return None
+        if not arguments:
+            return None
+        privileged = arguments[0] in {"pkexec", "sudo"} and len(arguments) > 1
+        executable = arguments[1] if privileged else arguments[0]
         with self._lock:
             for capability in self._denied:
                 if executable in self._EXECUTABLES[capability]:

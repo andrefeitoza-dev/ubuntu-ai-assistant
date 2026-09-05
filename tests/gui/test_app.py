@@ -185,6 +185,13 @@ def test_gui_prevents_second_action_while_plan_is_pending() -> None:
     assert "Cancele o plano pendente" in source
 
 
+def test_voice_cannot_confirm_a_pending_plan() -> None:
+    source = Path(gui_app.__file__).read_text(encoding="utf-8")
+
+    assert "request_override is not None and confirm_pending" in source
+    assert "Confirmações por voz não são aceitas" in source
+
+
 def test_remote_button_keeps_selected_target_visible() -> None:
     assert gui_app.UbuntuAIApp._remote_button_text("local", expanded=False) == (
         "Computador: local  ▾"
@@ -210,6 +217,25 @@ def test_gui_exposes_capability_catalog_button() -> None:
     assert "panel.place_forget()" in source
     assert "tk.Menu(" not in complete_source
     assert "tk.Toplevel(" not in complete_source
+
+
+def test_gui_exposes_computer_care_panel() -> None:
+    source = Path(gui_app.__file__).read_text(encoding="utf-8")
+    component_source = (
+        Path(gui_app.__file__).with_name("care_panel.py").read_text(encoding="utf-8")
+    )
+    controller_source = (
+        Path(gui_app.__file__).with_name("panel_controller.py").read_text(encoding="utf-8")
+    )
+
+    assert 'text="Cuidados  ▾"' in Path("src/ubuntu_ai/gui/interface.py").read_text(
+        encoding="utf-8"
+    )
+    assert "_show_care_panel" in source
+    assert "_start_care_action" in controller_source
+    assert "Diagnosticar lentidão" in component_source
+    assert "Verificar segurança" in component_source
+    assert "tk.Toplevel(" not in component_source
 
 
 def test_gui_exposes_integrated_multi_agent_progress_panel() -> None:
@@ -254,11 +280,11 @@ def test_multi_agent_flow_requires_confirmation_and_reports_results() -> None:
 
 
 def test_gui_uses_readable_conversation_typography() -> None:
-    assert gui_app.FONT_BODY == ("Sans", 12)
-    assert gui_app.FONT_BODY_BOLD == ("Sans", 12, "bold")
-    assert gui_app.FONT_SMALL == ("Sans", 11)
-    assert gui_app.FONT_TINY == ("Sans", 10)
-    assert gui_app.FONT_MONO == ("Monospace", 11)
+    assert gui_app.FONT_BODY == ("Ubuntu", 14)
+    assert gui_app.FONT_BODY_BOLD == ("Ubuntu", 14, "bold")
+    assert gui_app.FONT_SMALL == ("Ubuntu", 12)
+    assert gui_app.FONT_TINY == ("Ubuntu", 11)
+    assert gui_app.FONT_MONO == ("Ubuntu Mono", 12)
 
     source = "\n".join(
         Path(path).read_text(encoding="utf-8")
@@ -447,10 +473,16 @@ def test_computer_controls_close_when_user_clicks_outside() -> None:
     component_source = (
         Path(gui_app.__file__).with_name("remote_controls.py").read_text(encoding="utf-8")
     )
+    controller_source = (
+        Path(gui_app.__file__).with_name("panel_controller.py").read_text(encoding="utf-8")
+    )
 
     assert "def _hide_remote_controls" in source
-    assert "inside_remote_controls" in source
-    assert "if self._remote_controls_visible and not inside_remote_controls:" in source
+    assert "inside_remote_controls" in controller_source
+    assert (
+        "if self._remote_controls_visible and not inside_remote_controls:"
+        in controller_source
+    )
     assert "self._hide_remote_controls()" in source
     assert "tk.OptionMenu(" in component_source
     assert '"Diagnosticar"' in component_source
@@ -481,6 +513,7 @@ def test_main_interface_and_conversation_are_delegated() -> None:
     assert 'text="Como posso ajudar?"' not in source
     assert 'text="Recursos e ajuda  ▾"' in interface_source
     assert 'text="Agentes e progresso  ▾"' in interface_source
+    assert 'text="Falar"' in interface_source
 
 
 def test_three_header_controls_reveal_only_on_hover_or_keyboard_focus() -> None:

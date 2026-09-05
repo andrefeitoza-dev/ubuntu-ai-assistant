@@ -11,13 +11,16 @@ REQUIRED_PATHS = {
     "./usr/bin/ubuntu-ai",
     "./usr/bin/ubuntu-ai-gui",
     "./usr/bin/ubuntu-ai-setup",
+    "./usr/bin/ubuntu-ai-setup-gui",
     "./usr/share/applications/ubuntu-ai-assistant.desktop",
+    "./usr/share/applications/ubuntu-ai-assistant-setup.desktop",
     "./usr/share/icons/hicolor/512x512/apps/ubuntu-ai-assistant.png",
 }
 PUBLIC_COMMANDS = (
     "ubuntu-ai",
     "ubuntu-ai-gui",
     "ubuntu-ai-setup",
+    "ubuntu-ai-setup-gui",
     "ubuntu-ai-install-launcher",
 )
 

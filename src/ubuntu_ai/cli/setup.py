@@ -2,9 +2,11 @@ from __future__ import annotations
 
 import argparse
 
-from ubuntu_ai.distribution.first_run import DEFAULT_MODEL, FirstRunSetup
-
-OLLAMA_INSTALL_URL = "https://docs.ollama.com/linux"
+from ubuntu_ai.distribution.first_run import (
+    DEFAULT_MODEL,
+    OLLAMA_INSTALL_URL,
+    FirstRunSetup,
+)
 
 
 def parse_args() -> argparse.Namespace:

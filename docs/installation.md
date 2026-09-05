@@ -22,7 +22,15 @@ sudo apt install ./ubuntu-ai-assistant_VERSION_ARQUITETURA.deb
 
 O pacote inclui o runtime necessário, os comandos e a entrada no menu. O Ollama
 e o modelo local permanecem separados por causa do tamanho e são preparados
-depois pelo assistente de configuração.
+depois pelo atalho **Configurar Ubuntu AI Assistant**. O assistente gráfico abre
+as instruções oficiais do Ollama, verifica o serviço e somente baixa o modelo
+local depois da autorização do usuário. A alternativa pelo terminal é
+`ubuntu-ai-setup --pull-model`.
+
+O mesmo configurador oferece separadamente o modelo oficial leve de voz em
+português. O download tem cerca de 31 MB, é validado por SHA-256 e permanece
+nos dados privados do usuário. Nenhum áudio é enviado pela internet ou mantido
+depois do reconhecimento.
 
 Não é recomendado executar instaladores remotos com `curl | sh`.
 

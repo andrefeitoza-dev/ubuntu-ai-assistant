@@ -111,3 +111,9 @@ def test_reports_current_assistant_memory_usage() -> None:
     assert "memória residente" in response
     assert "MiB" in response
     assert "processos considerados" in response
+
+
+def test_apt_update_lines_are_summarized_for_readability() -> None:
+    line = "openssl/jammy-security 3.0.2-0ubuntu1.20 amd64 [upgradable from: old]"
+
+    assert responder()._format_update(line) == "openssl → 3.0.2-0ubuntu1.20"

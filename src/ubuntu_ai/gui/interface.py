@@ -30,6 +30,7 @@ from ubuntu_ai.gui.theme import (
 class InterfaceWidgets:
     header_icon: tk.PhotoImage | None
     status_label: tk.Label
+    care_button: tk.Button
     resources_button: tk.Button
     automation_button: tk.Button
     remote_controls_button: tk.Button
@@ -44,6 +45,7 @@ class InterfaceWidgets:
     composer_outer: tk.Frame
     composer: tk.Frame
     request_entry: tk.Entry
+    voice_button: tk.Button
     send_button: tk.Button
 
 
@@ -97,6 +99,7 @@ def build_main_interface(
     *,
     window_icon: tk.PhotoImage | None,
     on_show_capabilities: Callable[[], None],
+    on_show_care: Callable[[], None],
     on_show_automation: Callable[[], None],
     on_toggle_remote: Callable[[], None],
     on_target_selected: Callable[..., object],
@@ -105,6 +108,7 @@ def build_main_interface(
     on_diagnose_remote: Callable[[], None],
     on_resize_messages: Callable[..., object],
     on_enter: Callable[..., object],
+    on_voice: Callable[[], None],
     on_submit: Callable[[], None],
 ) -> InterfaceWidgets:
     header = tk.Frame(
@@ -155,6 +159,25 @@ def build_main_interface(
         font=FONT_SMALL,
     )
     status_label.pack(side=tk.RIGHT)
+
+    care_button = tk.Button(
+        header,
+        text="Cuidados  ▾",
+        command=on_show_care,
+        bg=BACKGROUND,
+        fg=TEXT_MUTED,
+        activebackground=SURFACE_HOVER,
+        activeforeground=TEXT,
+        relief=tk.FLAT,
+        borderwidth=0,
+        highlightthickness=0,
+        cursor="hand2",
+        takefocus=True,
+        font=FONT_TINY,
+        padx=8,
+        pady=4,
+    )
+    care_button.pack(side=tk.RIGHT, padx=(0, 10))
 
     resources_button = tk.Button(
         header,
@@ -295,6 +318,22 @@ def build_main_interface(
     )
     request_entry.bind("<Return>", on_enter)
 
+    voice_button = tk.Button(
+        composer,
+        text="Falar",
+        command=on_voice,
+        bg=SURFACE_ALT,
+        fg=TEXT_MUTED,
+        activebackground=SURFACE_HOVER,
+        activeforeground=TEXT,
+        relief=tk.FLAT,
+        borderwidth=0,
+        padx=14,
+        pady=9,
+        cursor="hand2",
+        takefocus=True,
+        font=FONT_SMALL_BOLD,
+    )
     send_button = tk.Button(
         composer,
         text="Enviar",
@@ -316,12 +355,14 @@ def build_main_interface(
         side=tk.RIGHT,
         padx=(14, 0),
     )
+    voice_button.pack(side=tk.RIGHT, padx=(12, 0))
 
     request_entry.focus_set()
 
     return InterfaceWidgets(
         header_icon=header_icon,
         status_label=status_label,
+        care_button=care_button,
         resources_button=resources_button,
         automation_button=automation_button,
         remote_controls_button=remote_widgets.button,
@@ -336,6 +377,7 @@ def build_main_interface(
         composer_outer=composer_outer,
         composer=composer,
         request_entry=request_entry,
+        voice_button=voice_button,
         send_button=send_button,
     )
 

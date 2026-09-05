@@ -62,11 +62,12 @@ class CapabilityCatalog:
         ),
         _topic(
             "03",
-            "Diagnóstico do sistema",
+            "Diagnóstico e cuidados do computador",
             (
                 "verificar CPU, memória e discos",
                 "identificar serviços com falha",
                 "explicar problemas e possíveis soluções",
+                "apresentar cuidados de desempenho, atualizações e segurança",
             ),
             ("Por que meu computador está lento?", "Existem serviços com falha?"),
             availability="Local e SSH",
@@ -152,6 +153,7 @@ class CapabilityCatalog:
                 "consultar programas instalados",
                 "verificar versões e procurar pacotes",
                 "preparar instalação, atualização ou remoção",
+                "guiar limpeza e atualização com prévia e confirmação",
             ),
             ("Quais programas tenho instalados?", "Quais atualizações estão disponíveis?"),
             kind="Consulta ou ação",
@@ -225,8 +227,13 @@ class CapabilityCatalog:
         ),
         _topic(
             "17",
-            "Conhecimento e conversação",
-            ("responder dúvidas", "explicar Linux e Ubuntu", "usar conhecimento local"),
+            "Conhecimento, conversação e comandos por voz",
+            (
+                "responder dúvidas",
+                "explicar Linux e Ubuntu",
+                "usar conhecimento local",
+                "receber pedidos por voz com reconhecimento local em português",
+            ),
             ("Explique como funciona o systemd.", "O que é um serviço?"),
         ),
         _topic(
@@ -245,8 +252,13 @@ class CapabilityCatalog:
         ),
         _topic(
             "19",
-            "Instalação e manutenção do assistente",
-            ("mostrar versão e integridade", "atualizar", "remover preservando dados"),
+            "Instalação, configuração da IA e manutenção",
+            (
+                "mostrar versão e integridade",
+                "configurar Ollama e modelos pela interface gráfica",
+                "preparar o reconhecimento local de voz",
+                "atualizar ou remover o assistente preservando dados",
+            ),
             ("Mostre a versão do assistente.", "Verifique a instalação."),
             kind="Consulta ou manutenção",
             risk="Baixo a alto",
@@ -274,12 +286,27 @@ class CapabilityCatalog:
         "o que voce faz",
         "o que voce pode fazer",
         "o que posso pedir",
+        "o que eu posso pedir",
+        "o que posso perguntar",
+        "o que eu posso perguntar",
+        "que perguntas posso fazer",
+        "quais perguntas posso fazer",
+        "me de uma lista do que voce pode fazer",
+        "me diga o que voce pode fazer",
+        "me mostre o que voce pode fazer",
+        "mostre o que voce pode fazer",
+        "me de exemplos do que posso perguntar",
+        "me mostre o que posso perguntar",
+        "me diga o que posso perguntar",
+        "liste o que voce pode fazer",
+        "liste suas funcoes",
+        "quais sao suas funcoes",
+        "quais sao suas capacidades",
         "como voce pode ajudar",
         "quais comandos posso pedir",
         "mostrar capacidades",
         "mostre suas capacidades",
     }
-
     @property
     def topics(self) -> tuple[CapabilityTopic, ...]:
         return self._TOPICS
@@ -293,7 +320,10 @@ class CapabilityCatalog:
 
     def render(self) -> str:
         lines = ["O que o Ubuntu AI Assistant pode fazer:"]
-        lines.extend(f"{topic.code}. {topic.title}" for topic in self._TOPICS)
+        lines.extend(
+            f"{topic.code}. {topic.title}\n   Você pode perguntar: “{topic.examples[0]}”"
+            for topic in self._TOPICS
+        )
         lines.extend(
             (
                 "",

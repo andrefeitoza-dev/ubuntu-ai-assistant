@@ -183,7 +183,7 @@ class OperationalQueryResponder:
             return "O cache local do APT não pôde ser consultado."
 
         packages = tuple(
-            line.strip()
+            OperationalQueryResponder._format_update(line)
             for line in result.stdout.splitlines()
             if line.strip() and not line.startswith("Listing")
         )
@@ -196,7 +196,19 @@ class OperationalQueryResponder:
         if len(packages) > len(preview):
             lines.append(f"• … e mais {len(packages) - len(preview)} pacote(s).")
         lines.append("Nenhuma atualização foi baixada ou instalada.")
+        lines.append("Para aplicar com prévia e confirmação, diga: “Atualize os pacotes.”")
         return "\n".join(lines)
+
+    @staticmethod
+    def _format_update(line: str) -> str:
+        """Resume a saída extensa do APT sem esconder pacote ou versão disponível."""
+
+        fields = line.strip().split()
+        if not fields:
+            return line.strip()
+        package = fields[0].split("/", maxsplit=1)[0]
+        version = fields[1] if len(fields) > 1 else "versão não informada"
+        return f"{package} → {version}"
 
     @staticmethod
     def _tasks(tasks: Iterable[Any]) -> str:

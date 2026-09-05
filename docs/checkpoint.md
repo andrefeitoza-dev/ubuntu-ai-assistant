@@ -228,3 +228,19 @@ Especificação: `docs/natural-actions-roadmap.md`.
 - instalação, atualização e remoção aprovadas em ambiente isolado;
 - próxima etapa: commit candidato e validação remota pelo CI e CodeQL;
 - a tag `v2.2.0` somente poderá ser criada após todas as validações finais.
+
+## Candidata v2.3.0
+
+- apresentação local do assistente e catálogo real de capacidades concluídos;
+- cada uma das 20 áreas apresenta ao menos um exemplo do que o usuário pode perguntar;
+- configuração gráfica do Ollama, modelo de IA e modelo português de voz concluída;
+- configuração incompleta da IA é detectada no primeiro uso sem bloquear recursos locais;
+- comando por voz local exige ativação explícita e não exibe nem persiste a transcrição;
+- painel de cuidados e correções guiadas para limpeza, atualizações e firewall concluídos;
+- metadados, documentação e empacotamento promovidos para `2.3.0`;
+- suíte aprovada com 1.197 testes, Ruff e documentação estrita;
+- arquitetura aprovada sem ciclos e GUI aprovada com oito componentes;
+- wheel, source archive, pacote Debian e checksums da 2.3.0 aprovados;
+- instalação, atualização e remoção aprovadas em ambiente isolado;
+- próxima etapa: commit candidato, instalação local e validação remota;
+- nenhuma tag deve ser criada antes da aprovação do CI e CodeQL.

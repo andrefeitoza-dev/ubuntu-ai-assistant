@@ -146,3 +146,14 @@ def test_capability_permission_never_allows_centrally_blocked_command() -> None:
     executor = ControlledExecutor(DefaultExecutionPolicy(), permissions=permissions)
 
     assert executor.execute(ExecutionRequest(command="rm -rf /")).status is ExecutionStatus.BLOCKED
+
+
+def test_package_permission_applies_through_pkexec_wrapper() -> None:
+    permissions = CapabilityPermissions()
+    permissions.set_allowed("packages", allowed=False)
+    executor = ControlledExecutor(DefaultExecutionPolicy(), permissions=permissions)
+
+    result = executor.execute(ExecutionRequest(command="pkexec apt-get update"))
+
+    assert result.status is ExecutionStatus.BLOCKED
+    assert "packages" in result.message

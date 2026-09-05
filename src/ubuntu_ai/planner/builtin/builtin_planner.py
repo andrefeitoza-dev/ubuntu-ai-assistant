@@ -10,6 +10,7 @@ from ubuntu_ai.planner.builtin.capability_actions import CapabilityActionPlanner
 from ubuntu_ai.planner.builtin.desktop_action import SafeDesktopActionPlanner
 from ubuntu_ai.planner.builtin.file_operations import SafeFileOperationPlanner
 from ubuntu_ai.planner.builtin.file_search import SafeFileSearchPlanner
+from ubuntu_ai.planner.builtin.maintenance import SafeMaintenancePlanner
 from ubuntu_ai.planner.builtin.registry import (
     BUILTIN_COMMANDS,
     BuiltinCommand,
@@ -63,14 +64,20 @@ class BuiltinPlanner:
         desktop_action: SafeDesktopActionPlanner | None = None,
         capability_actions: CapabilityActionPlanner | None = None,
         file_operations: SafeFileOperationPlanner | None = None,
+        maintenance: SafeMaintenancePlanner | None = None,
     ) -> None:
         self._file_search = file_search or SafeFileSearchPlanner()
         self._desktop_action = desktop_action or SafeDesktopActionPlanner()
         self._capability_actions = capability_actions or CapabilityActionPlanner()
         self._file_operations = file_operations or SafeFileOperationPlanner()
+        self._maintenance = maintenance or SafeMaintenancePlanner()
 
     def try_create_plan(self, request: str) -> Plan | None:
         """Retorna um plano builtin ou None quando não houver correspondência."""
+
+        maintenance_plan = self._maintenance.try_create_plan(request)
+        if maintenance_plan is not None:
+            return maintenance_plan
 
         capability_plan = self._capability_actions.try_create_plan(request)
         if capability_plan is not None:

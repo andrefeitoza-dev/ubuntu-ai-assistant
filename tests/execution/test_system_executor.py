@@ -150,6 +150,25 @@ def test_system_executor_preserves_quoted_arguments() -> None:
     )
 
 
+def test_system_executor_allows_long_timeout_for_graphical_apt_authentication() -> None:
+    shell_service = Mock(spec=ShellService)
+    shell_service.run.return_value = CommandResult(
+        command="pkexec apt-get update",
+        return_code=0,
+        stdout="ok",
+        stderr="",
+    )
+
+    SystemExecutor(shell_service=shell_service).execute(
+        ExecutionRequest(command="pkexec apt-get update")
+    )
+
+    shell_service.run.assert_called_once_with(
+        ["pkexec", "apt-get", "update"],
+        timeout=1800,
+    )
+
+
 def test_system_executor_detaches_desktop_application() -> None:
     shell_service = Mock(spec=ShellService)
     shell_service.launch.return_value = CommandResult(

@@ -63,18 +63,20 @@ ollama pull qwen2.5:3b
 
 ### Ubuntu — pacote único recomendado
 
-Baixe `ubuntu-ai-assistant_2.2.0_amd64.deb` na release e abra o arquivo pela
+Baixe `ubuntu-ai-assistant_2.3.0_amd64.deb` na release e abra o arquivo pela
 Central de Aplicativos ou execute:
 
 ```bash
-sudo apt install ./ubuntu-ai-assistant_2.2.0_amd64.deb
-ubuntu-ai-setup
+sudo apt install ./ubuntu-ai-assistant_2.3.0_amd64.deb
 ```
 
 O pacote instala o runtime Python 3.12, a aplicação, suas dependências, os
 comandos, o ícone e a entrada no menu. Portanto, também funciona no Ubuntu
 22.04, cujo Python padrão é o 3.10. O modelo local não é incorporado ao `.deb` porque ocupa
 alguns gigabytes. Depois de instalar o Ollama, sua preparação é guiada por:
+
+- abra **Configurar Ubuntu AI Assistant** no menu de aplicativos; ou
+- use o terminal:
 
 ```bash
 ubuntu-ai-setup --pull-model

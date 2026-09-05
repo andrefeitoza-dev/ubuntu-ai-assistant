@@ -27,6 +27,7 @@ def test_control_uses_bundled_python_and_declares_native_dependencies() -> None:
     assert "Architecture: amd64" in control
     assert "libc6 (>= 2.35)" in control
     assert "libx11-6" in control
+    assert "libportaudio2" in control
     assert "python3-tk" not in control
 
 
@@ -67,11 +68,22 @@ def test_desktop_entry_is_visible_and_uses_packaged_command() -> None:
     assert "Terminal=false" in desktop
 
 
+def test_setup_desktop_entry_exposes_graphical_ollama_assistant() -> None:
+    build_deb = load_script("build_deb")
+
+    desktop = build_deb.setup_desktop_text()
+
+    assert "Name=Configurar Ubuntu AI Assistant" in desktop
+    assert "Exec=/usr/bin/ubuntu-ai-setup-gui" in desktop
+    assert "Terminal=false" in desktop
+
+
 def test_debian_validator_requires_user_commands_and_desktop_assets() -> None:
     validate_deb = load_script("validate_deb")
 
     assert "./usr/bin/ubuntu-ai" in validate_deb.REQUIRED_PATHS
     assert "./usr/bin/ubuntu-ai-setup" in validate_deb.REQUIRED_PATHS
+    assert "./usr/bin/ubuntu-ai-setup-gui" in validate_deb.REQUIRED_PATHS
     assert "./usr/share/applications/ubuntu-ai-assistant.desktop" in (validate_deb.REQUIRED_PATHS)
 
 

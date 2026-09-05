@@ -1,5 +1,27 @@
 # Changelog
 
+## [2.3.0] - 2026-09-05
+
+### Adicionado
+
+- configuração gráfica da IA local, com instalação orientada do Ollama e do modelo;
+- entrada por voz local em português, sem exibir nem armazenar a transcrição;
+- diagnóstico seguro de CPU, memória, disco, processos, rede e proteção do sistema;
+- apresentação do assistente e catálogo ampliado de perguntas e capacidades;
+- ações determinísticas para limpeza, atualização de pacotes e ativação do firewall,
+  sempre com plano e confirmação.
+
+### Alterado
+
+- tipografia e tamanho dos textos da interface para melhorar a leitura;
+- empacotamento Debian para incluir os novos atalhos, dependências e telas.
+
+### Validação
+
+- 1.197 testes automatizados aprovados;
+- arquitetura sem ciclos e GUI preservada dentro do limite estrutural;
+- catálogo com 20 áreas e exemplos naturais sincronizado com a matriz funcional.
+
 Todas as mudanças relevantes deste projeto são registradas neste arquivo.
 
 ## [2.2.0] - 2026-08-31

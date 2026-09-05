@@ -494,3 +494,31 @@ as capacidades, políticas de risco ou compatibilidade pública da v2.0.2.
 - [x] testar frases oficiais e principais variações naturais;
 - [x] criar matriz de segurança e homologação da v2.2.0;
 - [x] documentar arquitetura, limitações e evidências.
+
+### V2.3 — Assistência cotidiana e interação por voz
+
+Objetivo: tornar o produto um assistente Ubuntu útil no dia a dia, mantendo
+execução local, transparência e confirmação proporcional ao risco.
+
+- [x] responder localmente à apresentação e a pedidos de exemplos de uso;
+- [x] criar o painel inicial “Cuidados do computador”;
+- [x] oferecer diagnóstico de lentidão, disco, atualizações e segurança;
+- [x] criar configuração gráfica pós-instalação para Ollama e modelo local;
+- [x] oferecer a configuração da IA automaticamente no primeiro uso;
+- [x] fornecer resumo seguro de memória, processos, disco, rede e segurança;
+- [x] transformar limpeza, atualizações e firewall em correções guiadas e auditáveis;
+- [ ] ampliar organização, busca, resumo e limpeza segura de arquivos;
+- [ ] orientar instalações escolhendo conscientemente APT, Snap ou Flatpak;
+- [ ] adicionar manutenção, backup, segurança e automações recorrentes;
+- [ ] ampliar controles seguros de desktop e conversas contextuais;
+- [ ] criar modo iniciante com sugestões e explicações progressivas;
+- [x] melhorar a legibilidade das respostas com fonte mais clara e tamanho maior;
+- [x] aumentar espaçamento visual e revisar listas extensas na conversa;
+- [ ] validar a tipografia em diferentes resoluções e escalas do Ubuntu;
+- [x] adicionar entrada por voz opcional com transcrição local;
+- [x] exigir ativação explícita do microfone e indicar quando estiver ouvindo;
+- [x] integrar as bibliotecas de voz ao pacote e manter apenas o modelo separado;
+- [x] integrar o download verificado do modelo português ao configurador gráfico;
+- [x] encerrar a captura por detecção de fim de fala, mantendo limite máximo;
+- [x] processar a transcrição sem expor a frase no campo ou no histórico visual;
+- [ ] homologar acessibilidade, privacidade, ruído e operação offline.

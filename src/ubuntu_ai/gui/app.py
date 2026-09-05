@@ -24,12 +24,14 @@ from ubuntu_ai.gui.execution_cards import (
     build_execution_result_card,
     build_plan_card,
 )
+from ubuntu_ai.gui.first_run_controller import FirstRunControllerMixin
 from ubuntu_ai.gui.interface import (
     apply_busy_state,
     bind_hover_reveal,
     build_main_interface,
     scroll_canvas_bottom,
 )
+from ubuntu_ai.gui.panel_controller import PanelControllerMixin
 from ubuntu_ai.gui.presentation import (
     command_text,
     format_duration,
@@ -72,11 +74,12 @@ from ubuntu_ai.gui.theme import (
 from ubuntu_ai.gui.theme import (
     TERMINAL as TERMINAL,
 )
+from ubuntu_ai.gui.voice_controller import VoiceControllerMixin
 from ubuntu_ai.interaction import ChatResponse, InteractionRoute
 from ubuntu_ai.remote.diagnostics import RemoteSystemContext
 
 
-class UbuntuAIApp:
+class UbuntuAIApp(VoiceControllerMixin, FirstRunControllerMixin, PanelControllerMixin):
     """Interface desktop do Ubuntu AI Assistant."""
 
     def __init__(self) -> None:
@@ -86,6 +89,7 @@ class UbuntuAIApp:
         self._operation_started_at: dict[int, float] = {}
         self._active_actions: tk.Frame | None = None
         self._active_plan_card: tk.Frame | None = None
+        self._care_panel: tk.Frame | None = None
         self._resources_panel: tk.Frame | None = None
         self._resources_listbox: tk.Listbox | None = None
         self._resources_detail_label: tk.Label | None = None
@@ -117,12 +121,14 @@ class UbuntuAIApp:
             add="+",
         )
         self.root.bind("<Unmap>", self._hide_automation_panel, add="+")
+        self.root.bind("<Unmap>", self._hide_care_panel, add="+")
         self.root.bind(
             "<Escape>",
             self._hide_capabilities_panel,
             add="+",
         )
         self.root.bind("<Escape>", self._hide_automation_panel, add="+")
+        self.root.bind("<Escape>", self._hide_care_panel, add="+")
         self.root.bind(
             "<Button-1>",
             self._close_capabilities_on_outside_click,
@@ -162,6 +168,7 @@ class UbuntuAIApp:
             self.root,
             window_icon=self._window_icon,
             on_show_capabilities=self._show_capabilities,
+            on_show_care=self._show_care_panel,
             on_show_automation=self._show_automation_panel,
             on_toggle_remote=self._toggle_remote_controls,
             on_target_selected=self._on_target_selected,
@@ -170,11 +177,13 @@ class UbuntuAIApp:
             on_diagnose_remote=self._start_remote_diagnostics,
             on_resize_messages=self._resize_messages,
             on_enter=self._on_enter,
+            on_voice=self._start_voice_input,
             on_submit=self.submit,
         )
 
         self._header_icon = widgets.header_icon
         self.status_label = widgets.status_label
+        self.care_button = widgets.care_button
         self.resources_button = widgets.resources_button
         self.automation_button = widgets.automation_button
         self._remote_controls_visible = False
@@ -190,6 +199,7 @@ class UbuntuAIApp:
         self.composer_outer = widgets.composer_outer
         self.composer = widgets.composer
         self.request_entry = widgets.request_entry
+        self.voice_button = widgets.voice_button
         self.send_button = widgets.send_button
         bind_hover_reveal(
             self.remote_controls_button,
@@ -198,6 +208,7 @@ class UbuntuAIApp:
         )
         bind_hover_reveal(self.automation_button, foreground=TEXT_MUTED)
         bind_hover_reveal(self.resources_button, foreground=TEXT_MUTED)
+        bind_hover_reveal(self.care_button, foreground=TEXT_MUTED)
 
     def _bind_mousewheel(self) -> None:
         """Habilita roda do mouse e touchpad no histórico da conversa."""
@@ -261,6 +272,7 @@ class UbuntuAIApp:
     def _toggle_remote_controls(self) -> None:
         self._hide_capabilities_panel()
         self._hide_automation_panel()
+        self._hide_care_panel()
         if self._remote_controls_visible:
             self._hide_remote_controls()
             return
@@ -403,16 +415,25 @@ class UbuntuAIApp:
         )
         self.welcome = widgets.frame
         self._welcome_icon = widgets.icon
+        self._check_ai_setup()
 
     # ------------------------------------------------------------------
     # Request
     # ------------------------------------------------------------------
 
-    def submit(self) -> None:
+    def submit(
+        self,
+        request_override: str | None = None,
+        display_request: str | None = None,
+    ) -> None:
         if self._busy:
             return
 
-        request = self.request_entry.get().strip()
+        request = (
+            request_override.strip()
+            if request_override is not None
+            else self.request_entry.get().strip()
+        )
         if not request:
             return
         self.request_entry.delete(0, tk.END)
@@ -421,9 +442,15 @@ class UbuntuAIApp:
             self.welcome.destroy()
             self.composer_outer.pack_configure(pady=(0, 24))
 
-        self._add_user_message(request)
+        self._add_user_message(display_request or request)
         confirm_pending = self._backend.is_confirm_pending_request(request)
         cancel_pending = self._backend.is_cancel_pending_request(request)
+        if request_override is not None and confirm_pending:
+            self._add_system_message(
+                "Confirmações por voz não são aceitas. Use o botão do plano para autorizar.",
+                color=WARNING,
+            )
+            return
         if confirm_pending or cancel_pending:
             if not self._backend.has_pending_plan():
                 action = "confirmar" if confirm_pending else "cancelar"
@@ -502,6 +529,7 @@ class UbuntuAIApp:
 
     def _show_capabilities(self) -> None:
         self._hide_automation_panel()
+        self._hide_care_panel()
         panel = getattr(self, "_resources_panel", None)
         if panel is not None and panel.winfo_ismapped():
             self._hide_capabilities_panel()
@@ -777,6 +805,7 @@ class UbuntuAIApp:
 
     def _show_automation_panel(self) -> None:
         self._hide_capabilities_panel()
+        self._hide_care_panel()
         panel = getattr(self, "_automation_panel", None)
         if panel is not None and panel.winfo_ismapped():
             self._hide_automation_panel()
@@ -864,40 +893,6 @@ class UbuntuAIApp:
         button = getattr(self, "automation_button", None)
         if button is not None and button.winfo_exists():
             button.configure(text="Agentes e progresso  ▾")
-
-    def _close_capabilities_on_outside_click(self, event: tk.Event) -> None:
-        panel = getattr(self, "_resources_panel", None)
-        automation_panel = getattr(self, "_automation_panel", None)
-        automation_button = getattr(self, "automation_button", None)
-        remote_controls = getattr(self, "remote_controls", None)
-        remote_button = getattr(self, "remote_controls_button", None)
-
-        inside_resources = False
-        inside_remote_controls = False
-        inside_automation = False
-
-        widget = event.widget
-        while widget is not None:
-            if widget is panel or widget is self.resources_button:
-                inside_resources = True
-            if widget is remote_controls or widget is remote_button:
-                inside_remote_controls = True
-            if widget is automation_panel or widget is automation_button:
-                inside_automation = True
-            widget = getattr(widget, "master", None)
-
-        if panel is not None and panel.winfo_ismapped() and not inside_resources:
-            self._hide_capabilities_panel()
-
-        if self._remote_controls_visible and not inside_remote_controls:
-            self._hide_remote_controls()
-
-        if (
-            automation_panel is not None
-            and automation_panel.winfo_ismapped()
-            and not inside_automation
-        ):
-            self._hide_automation_panel()
 
     def _send_resource_to_conversation(self, code: str) -> None:
         self._hide_capabilities_panel()

@@ -39,7 +39,7 @@ Version: {version}
 Section: utils
 Priority: optional
 Architecture: {architecture}
-Depends: libc6 (>= 2.35), libx11-6, libxext6, libxrender1, libxft2, libfontconfig1
+Depends: libc6 (>= 2.35), libx11-6, libxext6, libxrender1, libxft2, libfontconfig1, libportaudio2
 Maintainer: Andre Anderson Feitoza
 Homepage: https://github.com/andrefeitoza-dev/ubuntu-ai-assistant
 Description: Assistente local e seguro para administração do Ubuntu
@@ -98,6 +98,22 @@ Categories=Utility;System;
 StartupNotify=false
 StartupWMClass=UbuntuAIAssistant
 Keywords=Ubuntu;AI;Assistant;Linux;
+"""
+
+
+def setup_desktop_text() -> str:
+    return f"""[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Configurar Ubuntu AI Assistant
+Comment=Configurar Ollama e o modelo de IA local
+Exec=/usr/bin/ubuntu-ai-setup-gui
+Icon={APP_ID}
+Terminal=false
+Categories=Utility;Settings;
+StartupNotify=false
+StartupWMClass=UbuntuAIAssistant
+Keywords=Ubuntu;AI;Ollama;Setup;
 """
 
 
@@ -179,7 +195,7 @@ if command -v gtk-update-icon-cache >/dev/null; then
     gtk-update-icon-cache -f -t /usr/share/icons/hicolor || true
 fi
 printf '%s\n' 'Ubuntu AI Assistant instalado.'
-printf '%s\n' 'Execute ubuntu-ai-setup para configurar o modelo local.'
+printf '%s\n' 'Abra "Configurar Ubuntu AI Assistant" no menu para preparar a IA local.'
 """
         write_executable(
             postinst,
@@ -190,6 +206,7 @@ printf '%s\n' 'Execute ubuntu-ai-setup para configurar o modelo local.'
             "ubuntu-ai",
             "ubuntu-ai-gui",
             "ubuntu-ai-setup",
+            "ubuntu-ai-setup-gui",
             "ubuntu-ai-install-launcher",
         )
         for name in commands:
@@ -203,6 +220,11 @@ printf '%s\n' 'Execute ubuntu-ai-setup para configurar o modelo local.'
         desktop = staging / "usr" / "share" / "applications" / f"{APP_ID}.desktop"
         desktop.parent.mkdir(parents=True)
         desktop.write_text(desktop_text(), encoding="utf-8")
+
+        setup_desktop = (
+            staging / "usr" / "share" / "applications" / f"{APP_ID}-setup.desktop"
+        )
+        setup_desktop.write_text(setup_desktop_text(), encoding="utf-8")
 
         source_icon = ROOT / "src" / "ubuntu_ai" / "gui" / "assets" / f"{APP_ID}.png"
         target_icon = (

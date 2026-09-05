@@ -1,15 +1,19 @@
 from __future__ import annotations
 
 import tkinter as tk
+from collections.abc import Callable
 from dataclasses import dataclass
 
 from ubuntu_ai.gui.theme import (
+    ACCENT,
     BACKGROUND,
     CONTENT_PAD,
     FONT_BODY,
+    FONT_BODY_BOLD,
     FONT_HERO,
     SURFACE_ALT,
     TEXT,
+    TEXT_MUTED,
 )
 
 
@@ -54,6 +58,53 @@ def build_welcome(
     return WelcomeWidgets(frame=frame, icon=icon)
 
 
+def add_setup_prompt(
+    parent: tk.Misc,
+    *,
+    ollama_available: bool,
+    model: str,
+    on_configure: Callable[[], None],
+) -> tk.Frame:
+    frame = tk.Frame(parent, bg=SURFACE_ALT, padx=18, pady=14)
+    frame.pack(fill=tk.X, padx=CONTENT_PAD, pady=(24, 0))
+    title = "Finalize a configuração da IA local"
+    detail = (
+        f"O modelo {model} ainda precisa ser preparado."
+        if ollama_available
+        else "O Ollama ainda não foi encontrado neste computador."
+    )
+    tk.Label(
+        frame,
+        text=title,
+        bg=SURFACE_ALT,
+        fg=TEXT,
+        font=FONT_BODY_BOLD,
+    ).pack(anchor="w")
+    tk.Label(
+        frame,
+        text=detail + " As respostas locais continuam disponíveis.",
+        bg=SURFACE_ALT,
+        fg=TEXT_MUTED,
+        font=FONT_BODY,
+        justify=tk.LEFT,
+        wraplength=560,
+    ).pack(anchor="w", pady=(6, 12))
+    tk.Button(
+        frame,
+        text="Configurar IA local",
+        command=on_configure,
+        bg=ACCENT,
+        fg="#101318",
+        relief=tk.FLAT,
+        borderwidth=0,
+        padx=14,
+        pady=8,
+        cursor="hand2",
+        font=FONT_BODY_BOLD,
+    ).pack(anchor="w")
+    return frame
+
+
 def add_user_message(
     parent: tk.Misc,
     *,
@@ -78,7 +129,7 @@ def add_user_message(
         justify=tk.LEFT,
         wraplength=560,
         padx=17,
-        pady=12,
+        pady=14,
     )
     bubble.pack(side=tk.RIGHT)
     return frame
@@ -107,7 +158,9 @@ def add_system_message(
         fg=color,
         font=FONT_BODY,
         justify=tk.LEFT,
-        wraplength=650,
+        wraplength=720,
+        padx=2,
+        pady=4,
     ).pack(anchor="w")
 
     return frame

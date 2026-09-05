@@ -42,6 +42,15 @@ class DefaultExecutionPolicy(ExecutionPolicy):
             "org.gnome.Terminal",
         }
     )
+    _PRIVILEGED_COMMANDS = frozenset(
+        {
+            ("apt-get", "update"),
+            ("apt-get", "upgrade", "-y"),
+            ("apt-get", "autoremove", "-y"),
+            ("apt-get", "clean"),
+            ("ufw", "enable"),
+        }
+    )
 
     def __init__(self, applications: DesktopApplicationCatalog | None = None) -> None:
         self._applications = applications or DesktopApplicationCatalog()
@@ -64,6 +73,12 @@ class DefaultExecutionPolicy(ExecutionPolicy):
             return PolicyDecision(False, "Comando com argumentos inválidos.")
 
         executable = arguments[0]
+
+        if executable == "pkexec" and tuple(arguments[1:]) not in self._PRIVILEGED_COMMANDS:
+            return PolicyDecision(
+                allowed=False,
+                reason="Comando privilegiado fora da lista segura.",
+            )
 
         if executable in self._BLOCKED_COMMANDS:
             return PolicyDecision(

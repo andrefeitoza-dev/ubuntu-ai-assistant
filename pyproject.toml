@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "ubuntu-ai-assistant"
-version = "2.2.0"
+version = "2.3.0"
 description = "Framework local para agentes inteligentes e administração segura do Ubuntu"
 readme = "README.md"
 requires-python = ">=3.12"
@@ -35,6 +35,8 @@ dependencies = [
     "requests>=2.32.0",
     "psutil>=7.0.0",
     "pydantic>=2.11.0",
+    "sounddevice>=0.5.1",
+    "vosk>=0.3.45",
 ]
 
 [project.optional-dependencies]
@@ -48,6 +50,7 @@ ubuntu-ai = "ubuntu_ai.cli.app:app"
 ubuntu-ai-gui = "ubuntu_ai.gui.app:main"
 ubuntu-ai-install-launcher = "ubuntu_ai.gui.launcher_installer:main"
 ubuntu-ai-setup = "ubuntu_ai.cli.setup:main"
+ubuntu-ai-setup-gui = "ubuntu_ai.gui.setup:main"
 
 [tool.ruff]
 line-length = 100

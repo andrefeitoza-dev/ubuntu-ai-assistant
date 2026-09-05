@@ -29,6 +29,8 @@ def router() -> InteractionRouter:
         ("qual é o ano atual?", InteractionRoute.LOCAL),
         ("mostre as horas", InteractionRoute.LOCAL),
         ("como está este computador?", InteractionRoute.LOCAL),
+        ("analise por que o disco está cheio", InteractionRoute.LOCAL),
+        ("faça uma auditoria básica de segurança deste computador", InteractionRoute.LOCAL),
         ("qual a versão do Ubuntu?", InteractionRoute.LOCAL),
         ("qual é o kernel deste computador?", InteractionRoute.LOCAL),
         ("qual é o IP local deste computador?", InteractionRoute.LOCAL),
@@ -39,6 +41,8 @@ def router() -> InteractionRouter:
         ("mostre os principais comandos Linux", InteractionRoute.LOCAL),
         ("explique o comando chmod", InteractionRoute.LOCAL),
         ("o que você pode fazer?", InteractionRoute.LOCAL),
+        ("quem é você?", InteractionRoute.LOCAL),
+        ("quais perguntas posso fazer?", InteractionRoute.LOCAL),
         ("quais programas tenho instalados?", InteractionRoute.LOCAL),
         ("qual a memória?", InteractionRoute.LOCAL),
         ("mostre os processos", InteractionRoute.ACTION),
@@ -53,6 +57,9 @@ def router() -> InteractionRouter:
         ("acesse o site ubuntu.com", InteractionRoute.ACTION),
         ("abra o Firefox", InteractionRoute.ACTION),
         ("instale o Docker", InteractionRoute.ACTION),
+        ("faça uma limpeza segura de pacotes", InteractionRoute.ACTION),
+        ("atualize os pacotes", InteractionRoute.ACTION),
+        ("ative o firewall", InteractionRoute.ACTION),
         ("sudo apt update", InteractionRoute.ACTION),
         ("o que é memória RAM?", InteractionRoute.CHAT),
         ("como instalar Docker?", InteractionRoute.CHAT),
@@ -73,6 +80,14 @@ def test_local_route_contains_response(router: InteractionRouter) -> None:
 
     assert decision.route is InteractionRoute.LOCAL
     assert decision.response is not None
+
+
+def test_identity_route_introduces_assistant_without_ollama(router: InteractionRouter) -> None:
+    decision = router.route("Quem é você?")
+
+    assert decision.route is InteractionRoute.LOCAL
+    assert decision.response is not None
+    assert decision.response.startswith("Eu sou o Ubuntu AI Assistant")
 
 
 def test_empty_request_is_rejected(router: InteractionRouter) -> None:

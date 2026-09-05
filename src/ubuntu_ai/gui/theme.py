@@ -21,14 +21,14 @@ BORDER = "#2b3039"
 
 CONTENT_PAD = 105
 
-FONT_HERO = ("Sans", 32, "bold")
-FONT_TITLE = ("Sans", 17, "bold")
-FONT_BODY = ("Sans", 12)
-FONT_BODY_BOLD = ("Sans", 12, "bold")
-FONT_SMALL = ("Sans", 11)
-FONT_SMALL_BOLD = ("Sans", 11, "bold")
-FONT_TINY = ("Sans", 10)
-FONT_MONO = ("Monospace", 11)
-FONT_MONO_SMALL = ("Monospace", 10)
+FONT_HERO = ("Ubuntu", 32, "bold")
+FONT_TITLE = ("Ubuntu", 18, "bold")
+FONT_BODY = ("Ubuntu", 14)
+FONT_BODY_BOLD = ("Ubuntu", 14, "bold")
+FONT_SMALL = ("Ubuntu", 12)
+FONT_SMALL_BOLD = ("Ubuntu", 12, "bold")
+FONT_TINY = ("Ubuntu", 11)
+FONT_MONO = ("Ubuntu Mono", 12)
+FONT_MONO_SMALL = ("Ubuntu Mono", 11)
 
 WINDOW_CLASS = "UbuntuAIAssistant"

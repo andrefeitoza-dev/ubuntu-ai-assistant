@@ -5,6 +5,7 @@ import subprocess
 from dataclasses import dataclass
 
 DEFAULT_MODEL = "qwen2.5:3b"
+OLLAMA_INSTALL_URL = "https://docs.ollama.com/linux"
 
 
 @dataclass(frozen=True, slots=True)

@@ -166,3 +166,34 @@ def test_policy_allows_only_existing_non_symlink_item_to_trash(tmp_path, monkeyp
 
     assert allowed.allowed is True
     assert blocked.allowed is False
+
+
+@pytest.mark.parametrize(
+    "command",
+    (
+        "pkexec apt-get update",
+        "pkexec apt-get upgrade -y",
+        "pkexec apt-get autoremove -y",
+        "pkexec apt-get clean",
+        "pkexec ufw enable",
+    ),
+)
+def test_policy_allows_only_declared_privileged_maintenance(command: str) -> None:
+    assert DefaultExecutionPolicy().evaluate(ExecutionRequest(command=command)).allowed is True
+
+
+@pytest.mark.parametrize(
+    "command",
+    (
+        "pkexec bash",
+        "pkexec apt-get dist-upgrade -y",
+        "pkexec apt-get install unknown -y",
+        "pkexec ufw disable",
+        "pkexec rm -rf /",
+    ),
+)
+def test_policy_blocks_other_privileged_commands(command: str) -> None:
+    decision = DefaultExecutionPolicy().evaluate(ExecutionRequest(command=command))
+
+    assert decision.allowed is False
+    assert "fora da lista segura" in decision.reason
