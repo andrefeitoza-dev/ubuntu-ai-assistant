@@ -16,7 +16,7 @@
 
 ### Validação
 
-- 1.212 testes automatizados aprovados;
+- 1.218 testes automatizados aprovados;
 - arquitetura, matriz funcional e estilo aprovados;
 - GUI preservada em 1.399 de 1.400 linhas permitidas.
 

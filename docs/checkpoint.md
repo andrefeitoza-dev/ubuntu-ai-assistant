@@ -258,4 +258,4 @@ Especificação: `docs/natural-actions-roadmap.md`.
 - navegador padrão e navegadores instalados reconhecidos por linguagem natural;
 - criação de arquivos em subpastas existentes da Home corrigida para execução real;
 - falsas confirmações conversacionais dessa operação eliminadas;
-- suíte completa aprovada com 1.212 testes e GUI em 1.399/1.400 linhas.
+- suíte completa aprovada com 1.218 testes e GUI em 1.399/1.400 linhas.

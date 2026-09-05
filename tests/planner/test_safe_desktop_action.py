@@ -133,6 +133,19 @@ def test_generic_browser_explains_installed_browser_choice(monkeypatch) -> None:
     assert "abra o Opera" in planner.rejection_reason("Abra o navegador.")
 
 
+def test_generic_browser_tolerates_missing_xdg_settings(monkeypatch) -> None:
+    def unavailable(*_args, **_kwargs):
+        raise OSError("xdg-settings indisponível")
+
+    monkeypatch.setattr(
+        "ubuntu_ai.planner.builtin.desktop_action.subprocess.run",
+        unavailable,
+    )
+    planner = SafeDesktopActionPlanner(applications=DesktopApplicationCatalog(()))
+
+    assert planner.try_create_plan("Abra o navegador padrão.") is None
+
+
 def test_email_request_is_ambiguous_and_not_executed() -> None:
     planner = SafeDesktopActionPlanner()
 
