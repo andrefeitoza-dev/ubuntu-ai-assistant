@@ -244,3 +244,10 @@ Especificação: `docs/natural-actions-roadmap.md`.
 - instalação, atualização e remoção aprovadas em ambiente isolado;
 - próxima etapa: commit candidato, instalação local e validação remota;
 - nenhuma tag deve ser criada antes da aprovação do CI e CodeQL.
+
+## Correção v2.3.1
+
+- painel do computador reposicionado abaixo da barra superior;
+- criação de arquivo e remoção para a Lixeira incluídas na rota local determinística;
+- operações continuam limitadas à Home, sem sobrescrita e com confirmação;
+- suíte completa aprovada com 1.205 testes e GUI em 1.396/1.400 linhas.

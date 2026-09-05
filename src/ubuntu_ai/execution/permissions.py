@@ -9,7 +9,7 @@ class CapabilityPermissions:
 
     _EXECUTABLES = {
         "desktop": frozenset({"firefox", "gtk-launch", "xdg-open"}),
-        "files": frozenset({"find", "ls", "du", "mkdir", "cp", "mv", "gio"}),
+        "files": frozenset({"find", "ls", "du", "mkdir", "touch", "cp", "mv", "gio"}),
         "system": frozenset({"df", "free", "ip", "lsblk", "ps", "uname"}),
         "services": frozenset({"journalctl", "systemctl"}),
         "packages": frozenset({"apt", "apt-get", "dpkg"}),

@@ -41,6 +41,7 @@ from ubuntu_ai.gui.presentation import (
     state_message,
 )
 from ubuntu_ai.gui.remote_controls import (
+    place_remote_controls,
     remote_button_text,
 )
 from ubuntu_ai.gui.single_instance import SingleInstance
@@ -278,7 +279,7 @@ class UbuntuAIApp(VoiceControllerMixin, FirstRunControllerMixin, PanelController
             return
 
         self._remote_controls_visible = True
-        self.remote_controls.pack(side=tk.RIGHT, padx=(0, 10))
+        place_remote_controls(self.remote_controls, self.remote_controls_button, self.root)
         self.remote_controls_button.configure(
             text=self._remote_button_text(
                 self.target_variable.get(),
@@ -291,7 +292,7 @@ class UbuntuAIApp(VoiceControllerMixin, FirstRunControllerMixin, PanelController
             return
 
         self._remote_controls_visible = False
-        self.remote_controls.pack_forget()
+        self.remote_controls.place_forget()
         self.remote_controls_button.configure(
             text=self._remote_button_text(
                 self.target_variable.get(),

@@ -1,5 +1,20 @@
 # Changelog
 
+## [2.3.1] - 2026-09-05
+
+### Corrigido
+
+- painel **Computador local** exibido abaixo da barra superior, sem esconder opções;
+- criação de arquivos e remoção de arquivos ou pastas reconhecidas localmente, sem
+  aguardar o planejamento pelo modelo;
+- remoção rápida e recuperável pela Lixeira, ainda protegida por prévia e confirmação.
+
+### Validação
+
+- 1.205 testes automatizados aprovados;
+- arquitetura e estilo aprovados;
+- GUI preservada em 1.396 de 1.400 linhas permitidas.
+
 ## [2.3.0] - 2026-09-05
 
 ### Adicionado

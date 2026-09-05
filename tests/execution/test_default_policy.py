@@ -142,12 +142,22 @@ def test_policy_allows_non_overwriting_change_inside_home(tmp_path, monkeypatch)
     assert decision.allowed is True
 
 
-@pytest.mark.parametrize("executable", ("mkdir", "cp", "mv"))
+def test_policy_allows_new_empty_file_inside_home(tmp_path, monkeypatch) -> None:
+    monkeypatch.setattr(Path, "home", classmethod(lambda _cls: tmp_path))
+
+    decision = DefaultExecutionPolicy().evaluate(
+        ExecutionRequest(command=f"touch {tmp_path / 'novo.txt'}")
+    )
+
+    assert decision.allowed is True
+
+
+@pytest.mark.parametrize("executable", ("mkdir", "touch", "cp", "mv"))
 def test_policy_blocks_file_change_outside_home(tmp_path, monkeypatch, executable) -> None:
     monkeypatch.setattr(Path, "home", classmethod(lambda _cls: tmp_path))
     command = (
         f"{executable} /tmp/fora"
-        if executable == "mkdir"
+        if executable in {"mkdir", "touch"}
         else f"{executable} {tmp_path / 'origem'} /tmp/fora"
     )
 

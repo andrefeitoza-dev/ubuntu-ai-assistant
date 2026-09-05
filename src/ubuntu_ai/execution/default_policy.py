@@ -110,7 +110,9 @@ class DefaultExecutionPolicy(ExecutionPolicy):
                 reason="Aplicativo bloqueado pela política de ações desktop.",
             )
 
-        if executable in {"mkdir", "cp", "mv"} and not self._valid_file_change(arguments):
+        if executable in {"mkdir", "touch", "cp", "mv"} and not self._valid_file_change(
+            arguments
+        ):
             return PolicyDecision(
                 allowed=False,
                 reason="Alteração de arquivo bloqueada pela política de caminhos seguros.",
@@ -138,7 +140,7 @@ class DefaultExecutionPolicy(ExecutionPolicy):
     @staticmethod
     def _valid_file_change(arguments: list[str]) -> bool:
         executable = arguments[0]
-        expected = 2 if executable == "mkdir" else 3
+        expected = 2 if executable in {"mkdir", "touch"} else 3
         if len(arguments) != expected:
             return False
         try:
@@ -151,7 +153,7 @@ class DefaultExecutionPolicy(ExecutionPolicy):
             destination = paths[-1]
             if destination.exists():
                 return False
-            if executable == "mkdir":
+            if executable in {"mkdir", "touch"}:
                 return destination.parent.is_dir() and not destination.parent.is_symlink()
             source = paths[0]
             return source.exists() and not source.is_symlink() and destination.parent.is_dir()

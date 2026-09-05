@@ -14,6 +14,15 @@ class SafeFileOperationPlanner:
         r"^crie\s+(?:(?:uma?|a)\s+)?pasta\s+(.+?)(?:\s+em\s+(.+))?$",
         re.IGNORECASE,
     )
+    _CREATE_FILE = re.compile(
+        r"^crie\s+(?:(?:um|o)\s+)?arquivo\s+(.+?)(?:\s+em\s+(.+))?$",
+        re.IGNORECASE,
+    )
+    _REMOVE = re.compile(
+        r"^(?:remova|apague|delete)\s+(?:(?:o|a|um|uma)\s+)?"
+        r"(?:arquivo|pasta)\s+(.+?)(?:\s+(?:da|do|de|na|no)\s+(.+))?$",
+        re.IGNORECASE,
+    )
     _TRANSFER = re.compile(
         r"^(copie|mova)\s+(?:o\s+)?arquivo\s+(.+?)\s+de\s+(.+?)\s+para\s+(.+)$",
         re.IGNORECASE,
@@ -27,7 +36,10 @@ class SafeFileOperationPlanner:
         r"(?:para\s+a\s+lixeira|à\s+lixeira)$",
         re.IGNORECASE,
     )
-    _INTENT = re.compile(r"^(?:crie\s+.+pasta|copie|mova|renomeie|envie)\b", re.IGNORECASE)
+    _INTENT = re.compile(
+        r"^(?:crie\s+.+(?:pasta|arquivo)|copie|mova|renomeie|envie|remova|apague|delete)\b",
+        re.IGNORECASE,
+    )
     _FOLDERS = {
         "inicio": (),
         "home": (),
@@ -44,6 +56,21 @@ class SafeFileOperationPlanner:
 
     def try_create_plan(self, request: str) -> Plan | None:
         value = request.strip().rstrip(".!?").strip()
+        remove = self._REMOVE.fullmatch(value)
+        if remove:
+            name, folder_label = remove.groups()
+            parent = self._folder(folder_label or "inicio")
+            if parent is None or not self._safe_name(name):
+                return None
+            source = parent / name.strip()
+            if not source.exists() or source.is_symlink():
+                return None
+            return self._plan(
+                "Mover para a Lixeira",
+                f"Move {source} para a Lixeira, permitindo recuperação posterior.",
+                ("gio", "trash", str(source)),
+            )
+
         trash = self._TRASH.fullmatch(value)
         if trash:
             name = trash.group(1)
@@ -71,6 +98,21 @@ class SafeFileOperationPlanner:
                 "Criar pasta",
                 f"Cria a pasta {destination} sem sobrescrever conteúdo existente.",
                 ("mkdir", str(destination)),
+            )
+
+        create_file = self._CREATE_FILE.fullmatch(value)
+        if create_file:
+            name, folder_label = create_file.groups()
+            parent = self._folder(folder_label or "inicio")
+            if parent is None or not self._safe_name(name):
+                return None
+            destination = parent / name.strip()
+            if destination.exists() or destination.is_symlink():
+                return None
+            return self._plan(
+                "Criar arquivo vazio",
+                f"Cria o arquivo vazio {destination} sem sobrescrever conteúdo existente.",
+                ("touch", str(destination)),
             )
 
         transfer = self._TRANSFER.fullmatch(value)

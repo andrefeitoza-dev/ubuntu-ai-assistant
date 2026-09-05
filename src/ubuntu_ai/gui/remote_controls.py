@@ -31,9 +31,24 @@ def remote_button_text(target: str, *, expanded: bool) -> str:
     return f"Computador: {target}  {indicator}"
 
 
+def place_remote_controls(
+    container: tk.Frame,
+    button: tk.Button,
+    root: tk.Misc,
+) -> None:
+    """Exibe as opções abaixo da aba, sem comprimir ou esconder o cabeçalho."""
+
+    root.update_idletasks()
+    button_right = button.winfo_rootx() - root.winfo_rootx() + button.winfo_width()
+    button_bottom = button.winfo_rooty() - root.winfo_rooty() + button.winfo_height()
+    container.place(x=button_right, y=button_bottom + 6, width=500, anchor=tk.NE)
+    container.lift()
+
+
 def build_remote_controls(
     header: tk.Misc,
     *,
+    panel_parent: tk.Misc | None = None,
     on_toggle: Callable[[], object],
     on_target_selected: Callable[[str], object],
     on_add: Callable[[], object],
@@ -61,7 +76,14 @@ def build_remote_controls(
     )
     button.pack(side=tk.RIGHT, padx=(0, 16))
 
-    container = tk.Frame(header, bg=BACKGROUND)
+    container = tk.Frame(
+        panel_parent or header,
+        bg=BACKGROUND,
+        padx=14,
+        pady=12,
+        highlightbackground=SURFACE_HOVER,
+        highlightthickness=1,
+    )
 
     tk.Label(
         container,

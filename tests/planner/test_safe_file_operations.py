@@ -16,6 +16,35 @@ def test_create_folder_requires_preview_and_nonexistent_destination(tmp_path: Pa
     assert plan.steps[0].command == ["mkdir", str(tmp_path / "Projetos")]
 
 
+def test_create_file_uses_fast_safe_plan(tmp_path: Path) -> None:
+    plan = SafeFileOperationPlanner(home=tmp_path).try_create_plan(
+        "Crie um arquivo teste011."
+    )
+
+    assert plan is not None
+    assert plan.risk is RiskLevel.HIGH
+    assert plan.steps[0].command == ["touch", str(tmp_path / "teste011")]
+
+
+@pytest.mark.parametrize(
+    "phrase",
+    (
+        "Remova a pasta test02 da Home.",
+        "Apague a pasta test02.",
+        "Delete a pasta test02 da home.",
+    ),
+)
+def test_remove_folder_uses_recoverable_trash(tmp_path: Path, phrase: str) -> None:
+    source = tmp_path / "test02"
+    source.mkdir()
+
+    plan = SafeFileOperationPlanner(home=tmp_path).try_create_plan(phrase)
+
+    assert plan is not None
+    assert plan.risk is RiskLevel.HIGH
+    assert plan.steps[0].command == ["gio", "trash", str(source)]
+
+
 @pytest.mark.parametrize("verb", ("Copie", "Mova"))
 def test_transfer_file_between_known_personal_folders(tmp_path: Path, verb: str) -> None:
     documents = tmp_path / "Documentos"

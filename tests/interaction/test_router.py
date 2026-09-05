@@ -2,6 +2,7 @@ import pytest
 
 from ubuntu_ai.benchmark import BenchmarkService
 from ubuntu_ai.interaction import InteractionRoute, InteractionRouter
+from ubuntu_ai.planner.builtin import BuiltinPlanner, SafeFileOperationPlanner
 from ubuntu_ai.version import get_version
 
 
@@ -73,6 +74,27 @@ def test_routes_requests(
     expected: InteractionRoute,
 ) -> None:
     assert router.route(phrase).route is expected
+
+
+@pytest.mark.parametrize(
+    "phrase",
+    (
+        "crie um arquivo teste011",
+    ),
+)
+def test_common_file_changes_use_fast_action_route(router: InteractionRouter, phrase: str) -> None:
+    assert router.route(phrase).route is InteractionRoute.ACTION
+
+
+def test_remove_existing_folder_uses_fast_action_route(tmp_path) -> None:
+    (tmp_path / "test02").mkdir()
+    router = InteractionRouter(
+        builtin_planner=BuiltinPlanner(
+            file_operations=SafeFileOperationPlanner(home=tmp_path)
+        )
+    )
+
+    assert router.route("remova a pasta test02 da Home").route is InteractionRoute.ACTION
 
 
 def test_local_route_contains_response(router: InteractionRouter) -> None:

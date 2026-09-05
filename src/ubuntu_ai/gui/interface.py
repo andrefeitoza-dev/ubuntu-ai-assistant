@@ -219,6 +219,7 @@ def build_main_interface(
 
     remote_widgets = build_remote_controls(
         header,
+        panel_parent=root,
         on_toggle=on_toggle_remote,
         on_target_selected=on_target_selected,
         on_add=on_add_remote,
