@@ -273,3 +273,10 @@ Especificação: `docs/natural-actions-roadmap.md`.
 - criação de arquivo ou pasta passa a abrir/focalizar automaticamente a pasta pai;
 - atualização visual é uma segunda etapa explícita do plano confirmado;
 - suíte aprovada com 1.220 testes e cobertura de 80,13%.
+
+## Interface v2.3.5
+
+- entrada de voz convertida em círculo azul com microfone;
+- saída de voz convertida em círculo com alto-falante e estado verde;
+- dicas de hover e navegação por teclado preservadas;
+- suíte aprovada com 1.224 testes e cobertura de 80,01%.

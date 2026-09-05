@@ -9,7 +9,7 @@ def test_transcription_is_processed_without_being_shown() -> None:
     events: list[tuple[str, object]] = []
     controller = VoiceControllerMixin()
     controller.voice_button = SimpleNamespace(
-        configure=lambda **options: events.append(("button", options))
+        set_enabled=lambda enabled: events.append(("button", enabled))
     )
     controller.status_label = SimpleNamespace(
         configure=lambda **options: events.append(("status", options))
@@ -32,14 +32,14 @@ def test_transcription_is_processed_without_being_shown() -> None:
 
 def test_user_can_enable_and_disable_spoken_responses() -> None:
     spoken: list[str] = []
-    labels: list[dict[str, str]] = []
+    states: list[bool] = []
     controller = VoiceControllerMixin()
     controller._voice_output = SimpleNamespace(
         available=True,
         speak_async=spoken.append,
     )
     controller.speech_button = SimpleNamespace(
-        configure=lambda **options: labels.append(options)
+        set_active=states.append
     )
 
     controller._toggle_speech_output()
@@ -47,7 +47,7 @@ def test_user_can_enable_and_disable_spoken_responses() -> None:
     controller._toggle_speech_output()
     controller._speak_response("Não deve ser lida")
 
-    assert [label["text"] for label in labels] == ["voice output", "voice output"]
+    assert states == [True, False]
     assert spoken == ["Voz do assistente ativada.", "Resposta do assistente"]
 
 

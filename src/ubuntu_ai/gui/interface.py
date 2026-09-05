@@ -24,6 +24,7 @@ from ubuntu_ai.gui.theme import (
     TEXT_MUTED,
     WARNING,
 )
+from ubuntu_ai.gui.voice_controls import CircularVoiceButton
 
 
 @dataclass(frozen=True, slots=True)
@@ -45,8 +46,8 @@ class InterfaceWidgets:
     composer_outer: tk.Frame
     composer: tk.Frame
     request_entry: tk.Entry
-    voice_button: tk.Button
-    speech_button: tk.Button
+    voice_button: CircularVoiceButton
+    speech_button: CircularVoiceButton
     send_button: tk.Button
 
 
@@ -321,37 +322,18 @@ def build_main_interface(
     )
     request_entry.bind("<Return>", on_enter)
 
-    voice_button = tk.Button(
+    voice_button = CircularVoiceButton(
         composer,
-        text=">> voice input",
+        symbol="🎙",
+        tooltip="voice input",
         command=on_voice,
-        bg=SURFACE_ALT,
-        fg=TEXT_MUTED,
-        activebackground=SURFACE_HOVER,
-        activeforeground=TEXT,
-        relief=tk.FLAT,
-        borderwidth=0,
-        padx=14,
-        pady=9,
-        cursor="hand2",
-        takefocus=True,
-        font=FONT_SMALL_BOLD,
+        primary=True,
     )
-    speech_button = tk.Button(
+    speech_button = CircularVoiceButton(
         composer,
-        text="voice output",
+        symbol="🔊",
+        tooltip="voice output",
         command=on_toggle_speech,
-        bg=SURFACE_ALT,
-        fg=TEXT_MUTED,
-        activebackground=SURFACE_HOVER,
-        activeforeground=TEXT,
-        relief=tk.FLAT,
-        borderwidth=0,
-        padx=12,
-        pady=9,
-        cursor="hand2",
-        takefocus=True,
-        font=FONT_SMALL_BOLD,
     )
     send_button = tk.Button(
         composer,

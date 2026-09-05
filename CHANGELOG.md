@@ -1,5 +1,20 @@
 # Changelog
 
+## [2.3.5] - 2026-09-05
+
+### Alterado
+
+- `voice input` agora é um botão circular azul com ícone de microfone;
+- `voice output` agora é um botão circular com ícone de alto-falante;
+- saída desligada usa tom neutro e saída ligada usa verde;
+- nomes dos controles aparecem como dicas ao passar o mouse;
+- ativação por teclado com Enter e espaço foi preservada.
+
+### Validação
+
+- 1.224 testes aprovados com 80,01% de cobertura;
+- arquitetura, estilo e GUI aprovados.
+
 ## [2.3.4] - 2026-09-05
 
 ### Corrigido
