@@ -1,3 +1,5 @@
+import pytest
+
 from ubuntu_ai.domain.risk import RiskLevel
 from ubuntu_ai.executor.preview import PreviewBuilder
 from ubuntu_ai.planner.builtin.maintenance import SafeMaintenancePlanner
@@ -14,8 +16,18 @@ def test_cleanup_uses_closed_privileged_commands_and_high_risk() -> None:
     ]
 
 
-def test_package_update_does_not_use_dist_upgrade() -> None:
-    plan = SafeMaintenancePlanner().try_create_plan("Atualize os pacotes")
+@pytest.mark.parametrize(
+    "phrase",
+    (
+        "Atualize os pacotes",
+        "atualize os programas",
+        "Atualizar os programas",
+        "atualizações",
+        "atualize o sistema",
+    ),
+)
+def test_package_update_does_not_use_dist_upgrade(phrase: str) -> None:
+    plan = SafeMaintenancePlanner().try_create_plan(phrase)
 
     assert plan is not None
     assert plan.risk is RiskLevel.HIGH

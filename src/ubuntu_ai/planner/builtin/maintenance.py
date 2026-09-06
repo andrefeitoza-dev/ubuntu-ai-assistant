@@ -16,8 +16,13 @@ class SafeMaintenancePlanner:
         "faca uma limpeza segura de pacotes",
     }
     _UPDATE = {
+        "atualizacoes",
         "atualize os pacotes",
+        "atualize os programas",
+        "atualize meus programas",
+        "atualizar os programas",
         "atualize meu ubuntu",
+        "atualize o sistema",
         "instale as atualizacoes disponiveis",
         "aplique as atualizacoes do sistema",
     }

@@ -99,6 +99,8 @@ class InteractionRouter:
         "processador",
         "processo",
         "processos",
+        "programa",
+        "programas",
         "ram",
         "rede",
         "repositorio",

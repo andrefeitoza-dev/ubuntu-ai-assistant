@@ -1,5 +1,21 @@
 # Changelog
 
+## [2.3.7] - 2026-09-06
+
+### Corrigido
+
+- solicitações como `atualize os programas`, `atualizações` e `atualize o sistema` agora
+  seguem a rota administrativa segura;
+- atualização apresenta prévia e usa autorização gráfica do administrador com `pkexec`;
+- mantida a atualização conservadora com `apt-get update` e `apt-get upgrade`, sem
+  `dist-upgrade`.
+
+### Validado
+
+- criação de pasta na pasta pessoal;
+- criação de arquivo na pasta pessoal;
+- criação de arquivo dentro de uma pasta existente.
+
 ## [2.3.6] - 2026-09-05
 
 ### Alterado
