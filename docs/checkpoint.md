@@ -280,3 +280,10 @@ Especificação: `docs/natural-actions-roadmap.md`.
 - saída de voz convertida em círculo com alto-falante e estado verde;
 - dicas de hover e navegação por teclado preservadas;
 - suíte aprovada com 1.224 testes e cobertura de 80,01%.
+
+## Pauta de documentação do usuário
+
+- próxima versão relevante deve incluir um manual básico atualizado para a interface gráfica;
+- o manual deve ser acessível pelo assistente e publicado no GitHub;
+- a revisão documental deve fazer parte da verificação obrigatória antes da próxima release;
+- pequenas correções continuam acumuladas em `develop/v2.3`, sem criar uma versão por ajuste.

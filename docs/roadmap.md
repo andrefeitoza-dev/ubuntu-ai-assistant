@@ -522,3 +522,14 @@ execução local, transparência e confirmação proporcional ao risco.
 - [x] encerrar a captura por detecção de fim de fala, mantendo limite máximo;
 - [x] processar a transcrição sem expor a frase no campo ou no histórico visual;
 - [ ] homologar acessibilidade, privacidade, ruído e operação offline.
+
+### Documentação básica para a próxima publicação relevante
+
+- [ ] atualizar o guia do usuário com todas as funções atuais da interface gráfica;
+- [ ] organizar exemplos de perguntas por categoria e separar consultas de ações;
+- [ ] documentar voz, painel Cuidados, arquivos, aplicativos e atualizações;
+- [ ] explicar confirmações, níveis de risco, `pkexec`/`sudo` e limites de permissão;
+- [ ] documentar a instalação e configuração gráfica do Ollama e dos modelos de voz;
+- [ ] adicionar um acesso “Abrir manual” dentro do assistente;
+- [ ] publicar e validar o manual navegável no GitHub junto à próxima release relevante;
+- [ ] revisar instalação, solução de problemas e exemplos antes da publicação.
