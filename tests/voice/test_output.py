@@ -3,6 +3,8 @@ import threading
 from pathlib import Path
 from types import SimpleNamespace
 
+import pytest
+
 from ubuntu_ai.voice import VoiceOutputService
 
 
@@ -13,7 +15,15 @@ def test_voice_output_is_optional_without_local_synthesizer() -> None:
     assert service.speak_async("Olá") is False
 
 
-def test_voice_output_removes_route_metadata_and_limits_text(monkeypatch) -> None:
+@pytest.mark.parametrize(
+    "metadata",
+    (
+        "Rota IA local · modelo",
+        "Rota ação segura · 120 ms",
+        "Rota local · recursos",
+    ),
+)
+def test_voice_output_removes_route_metadata_and_limits_text(monkeypatch, metadata) -> None:
     spoken: list[str] = []
     completed = threading.Event()
     service = VoiceOutputService(executable="/usr/bin/spd-say")
@@ -23,7 +33,7 @@ def test_voice_output_removes_route_metadata_and_limits_text(monkeypatch) -> Non
         lambda text: (spoken.append(text), completed.set()),
     )
 
-    assert service.speak_async("Resposta útil.\n\nRota IA local · modelo") is True
+    assert service.speak_async(f"Resposta útil.\n\n{metadata}") is True
 
     assert completed.wait(1)
     assert spoken == ["Resposta útil."]

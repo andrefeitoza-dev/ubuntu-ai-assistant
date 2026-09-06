@@ -1219,7 +1219,7 @@ wheels = [
 
 [[package]]
 name = "ubuntu-ai-assistant"
-version = "2.3.7"
+version = "2.3.8"
 source = { editable = "." }
 dependencies = [
     { name = "piper-tts" },

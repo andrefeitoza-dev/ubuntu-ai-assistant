@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.3.8] - 2026-09-06
+
+### Corrigido
+
+- ativar a saída de voz agora é silencioso;
+- a voz lê apenas o conteúdo útil da resposta;
+- metadados visuais `Rota ação segura`, `Rota IA local` e `Rota local` não são falados.
+
 ## [2.3.7] - 2026-09-06
 
 ### Corrigido

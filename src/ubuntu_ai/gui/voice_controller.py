@@ -58,8 +58,6 @@ class VoiceControllerMixin:
             return
         self._speech_enabled = not getattr(self, "_speech_enabled", False)
         self.speech_button.set_active(self._speech_enabled)
-        if self._speech_enabled:
-            service.speak_async("Voz do assistente ativada.")
 
     def _speak_response(self, message: str) -> None:
         if not getattr(self, "_speech_enabled", False):

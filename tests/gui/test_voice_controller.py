@@ -46,7 +46,7 @@ def test_user_can_enable_and_disable_spoken_responses() -> None:
     controller._speak_response("Não deve ser lida")
 
     assert states == [True, False]
-    assert spoken == ["Voz do assistente ativada.", "Resposta do assistente"]
+    assert spoken == ["Resposta do assistente"]
 
 
 def test_unavailable_spoken_voice_shows_local_install_hint() -> None:

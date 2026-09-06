@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import re
 import shutil
 import subprocess
 import tempfile
@@ -53,11 +54,17 @@ class VoiceOutputService:
     def speak_async(self, text: str) -> bool:
         if not self.available:
             return False
-        spoken = text.split("\n\nRota ", 1)[0].strip()[:1200]
+        spoken = self._spoken_content(text)[:1200]
         if not spoken:
             return False
         threading.Thread(target=self._speak, args=(spoken,), daemon=True).start()
         return True
+
+    @staticmethod
+    def _spoken_content(text: str) -> str:
+        """Remove metadados visuais de rota antes da síntese de voz."""
+        content = re.split(r"\n+\s*Rota\s+", text, maxsplit=1, flags=re.IGNORECASE)[0]
+        return content.strip()
 
     def _speak(self, text: str) -> None:
         if self.neural_available:
