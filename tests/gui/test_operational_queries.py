@@ -6,6 +6,7 @@ from types import SimpleNamespace
 from ubuntu_ai.agents import default_agent_profiles
 from ubuntu_ai.audit import LocalActionAuditRecord
 from ubuntu_ai.autonomy.scheduler import AutomationRisk, ScheduledAutomation
+from ubuntu_ai.gui.backend import GUIBackend
 from ubuntu_ai.gui.operational_queries import OperationalQueryResponder
 from ubuntu_ai.learning import LearningStats
 
@@ -117,3 +118,9 @@ def test_apt_update_lines_are_summarized_for_readability() -> None:
     line = "openssl/jammy-security 3.0.2-0ubuntu1.20 amd64 [upgradable from: old]"
 
     assert responder()._format_update(line) == "openssl → 3.0.2-0ubuntu1.20"
+
+
+def test_care_button_and_typed_update_question_share_the_same_topic() -> None:
+    assert GUIBackend.is_update_query("Quais atualizações estão disponíveis?") is True
+    assert GUIBackend.is_update_query("Mostre as atualizações disponíveis") is True
+    assert GUIBackend.is_update_query("Atualize os programas") is False

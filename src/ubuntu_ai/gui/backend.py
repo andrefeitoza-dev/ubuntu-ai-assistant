@@ -221,6 +221,18 @@ class GUIBackend:
         self._remember_local_query(effective_request, decision)
         return decision
 
+    @staticmethod
+    def is_update_query(request: str) -> bool:
+        """Identifica a consulta somente leitura compartilhada com o painel Cuidados."""
+        return OperationalQueryResponder._topic_for(request) == "updates"
+
+    @staticmethod
+    def available_updates() -> str:
+        """Retorna o mesmo relatório de atualizações usado pelo painel Cuidados."""
+        return OperationalQueryResponder().respond("Quais atualizações estão disponíveis?") or (
+            "Não foi possível consultar as atualizações disponíveis."
+        )
+
     def _remember_local_query(
         self,
         request: str,

@@ -1,8 +1,10 @@
 from __future__ import annotations
 
+import threading
 import tkinter as tk
 
 from ubuntu_ai.gui.care_panel import build_care_panel
+from ubuntu_ai.gui.theme import TEXT
 
 
 class PanelControllerMixin:
@@ -53,6 +55,33 @@ class PanelControllerMixin:
         self.request_entry.delete(0, tk.END)
         self.request_entry.insert(0, request)
         self.submit()
+
+    def _start_update_check_if_requested(self, request: str) -> bool:
+        """Compartilha a consulta do painel Cuidados sem bloquear a interface."""
+        if not self._backend.is_update_query(request):
+            return False
+        operation = self._begin_operation("Verificando atualizações")
+        threading.Thread(
+            target=self._start_update_query,
+            args=(operation,),
+            daemon=True,
+        ).start()
+        return True
+
+    def _start_update_query(self, operation: int) -> None:
+        try:
+            response = self._backend.available_updates()
+        except Exception as exc:
+            self._post_to_ui(self._deliver_error, operation, str(exc))
+            return
+        self._post_to_ui(self._deliver_update_query, operation, response)
+
+    def _deliver_update_query(self, operation: int, response: str) -> None:
+        if operation != self._operation_generation:
+            return
+        self._set_busy(False)
+        self._add_system_message(f"{response}\n\nRota local · Cuidados", color=TEXT)
+        self.request_entry.focus_set()
 
     def _close_capabilities_on_outside_click(self, event: tk.Event) -> None:
         panel = getattr(self, "_resources_panel", None)

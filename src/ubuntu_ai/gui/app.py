@@ -470,7 +470,8 @@ class UbuntuAIApp(VoiceControllerMixin, FirstRunControllerMixin, PanelController
         if self._backend.is_cancel_selected_automation_request(request):
             self._automation_action("cancel")
             return
-
+        if self._start_update_check_if_requested(request):
+            return
         multi_agent_request = self._multi_agent_request(request)
         if multi_agent_request is not None:
             self._show_multi_agent_plan(multi_agent_request)

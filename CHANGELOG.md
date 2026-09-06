@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.3.9] - 2026-09-06
+
+### Corrigido
+
+- a pergunta sobre atualizações usa o mesmo relatório do botão Cuidados;
+- a consulta ao cache do APT ocorre em segundo plano e não bloqueia a interface;
+- consulta de atualizações e aplicação de atualizações permanecem claramente separadas.
+
 ## [2.3.8] - 2026-09-06
 
 ### Corrigido

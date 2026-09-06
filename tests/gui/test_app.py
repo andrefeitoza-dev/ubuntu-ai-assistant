@@ -236,6 +236,18 @@ def test_gui_exposes_computer_care_panel() -> None:
     assert "tk.Toplevel(" not in component_source
 
 
+def test_update_question_uses_async_care_report() -> None:
+    source = Path(gui_app.__file__).read_text(encoding="utf-8")
+    controller_source = (
+        Path(gui_app.__file__).with_name("panel_controller.py").read_text(encoding="utf-8")
+    )
+
+    assert "_start_update_check_if_requested(request)" in source
+    assert "is_update_query(request)" in controller_source
+    assert "target=self._start_update_query" in controller_source
+    assert "Rota local · Cuidados" in controller_source
+
+
 def test_gui_exposes_integrated_multi_agent_progress_panel() -> None:
     source = Path(gui_app.__file__).read_text(encoding="utf-8")
     component_source = (
