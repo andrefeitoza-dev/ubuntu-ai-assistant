@@ -2,4 +2,4 @@ from pathlib import Path
 
 
 def test_version_file():
-    assert Path("VERSION").read_text().strip() == "2.3.9"
+    assert Path("VERSION").read_text().strip() == "2.3.10"

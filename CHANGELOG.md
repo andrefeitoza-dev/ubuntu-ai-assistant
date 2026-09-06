@@ -1,5 +1,19 @@
 # Changelog
 
+## [2.3.10] - 2026-09-06
+
+### Corrigido
+
+- pedidos para mostrar atualizações consultam o mesmo relatório do painel Cuidados;
+- pedidos para executar, instalar ou aplicar atualizações geram um plano administrativo;
+- `atualizações` sozinho é tratado como consulta, evitando execução ambígua;
+- ações administrativas prioritárias não são confundidas com abertura de aplicativos.
+
+### Planejado
+
+- manual básico do usuário, acesso pela interface e publicação no GitHub registrados como
+  requisito da próxima evolução relevante.
+
 ## [2.3.9] - 2026-09-06
 
 ### Corrigido
