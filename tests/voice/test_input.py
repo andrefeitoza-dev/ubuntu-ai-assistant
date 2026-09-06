@@ -1,5 +1,9 @@
 from __future__ import annotations
 
+from types import SimpleNamespace
+
+import pytest
+
 from ubuntu_ai.voice import VoiceInputService
 
 
@@ -50,3 +54,60 @@ def test_recognizer_result_extracts_only_valid_text() -> None:
     )
     assert VoiceInputService._result_text('{"partial": "como"}') == ""
     assert VoiceInputService._result_text("invalid") == ""
+
+
+def test_listen_captures_and_transcribes_local_audio(monkeypatch, tmp_path) -> None:
+    model = tmp_path / "model"
+    model.mkdir()
+    service = VoiceInputService(model_path=model)
+    monkeypatch.setattr(
+        service,
+        "availability",
+        lambda: SimpleNamespace(available=True, message="pronto"),
+    )
+
+    class Stream:
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *_args):
+            return None
+
+        def read(self, _size):
+            return b"audio", False
+
+    class Recognizer:
+        def AcceptWaveform(self, _data):
+            return True
+
+        def Result(self):
+            return '{"text": "crie a pasta teste"}'
+
+        def FinalResult(self):
+            return '{"text": ""}'
+
+    modules = {
+        "sounddevice": SimpleNamespace(RawInputStream=lambda **_options: Stream()),
+        "vosk": SimpleNamespace(
+            Model=lambda _path: object(),
+            KaldiRecognizer=lambda _model, _rate: Recognizer(),
+        ),
+    }
+    monkeypatch.setattr(
+        "ubuntu_ai.voice.input.importlib.import_module",
+        lambda name: modules[name],
+    )
+
+    assert service.listen() == "crie a pasta teste"
+
+
+def test_listen_reports_unavailable_input(monkeypatch, tmp_path) -> None:
+    service = VoiceInputService(model_path=tmp_path / "missing")
+    monkeypatch.setattr(
+        service,
+        "availability",
+        lambda: SimpleNamespace(available=False, message="microfone indisponível"),
+    )
+
+    with pytest.raises(RuntimeError, match="microfone indisponível"):
+        service.listen()

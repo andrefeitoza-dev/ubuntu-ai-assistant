@@ -1,3 +1,4 @@
+import sys
 import threading
 from pathlib import Path
 from types import SimpleNamespace
@@ -69,3 +70,43 @@ def test_neural_voice_is_preferred_when_model_and_player_exist(tmp_path: Path, m
     service._speak("Olá")
 
     assert spoken == ["Olá"]
+
+
+def test_neural_voice_generates_wav_and_plays_it(tmp_path: Path, monkeypatch) -> None:
+    model = tmp_path / "voice.onnx"
+    model.touch()
+    model.with_suffix(".onnx.json").touch()
+    calls: list[tuple] = []
+
+    class FakeVoice:
+        def synthesize_wav(self, text, wav_file) -> None:
+            calls.append(("synthesize", text))
+            wav_file.setnchannels(1)
+            wav_file.setsampwidth(2)
+            wav_file.setframerate(22050)
+            wav_file.writeframes(b"\0\0")
+
+    fake_piper = SimpleNamespace(PiperVoice=SimpleNamespace(load=lambda path: FakeVoice()))
+    monkeypatch.setitem(sys.modules, "piper", fake_piper)
+    monkeypatch.setattr(
+        "ubuntu_ai.voice.output.subprocess.run",
+        lambda arguments, **options: calls.append((arguments, options)),
+    )
+
+    VoiceOutputService(model_path=model, player="/usr/bin/aplay")._speak_neural("Olá")
+
+    assert ("synthesize", "Olá") in calls
+    assert any(
+        call[0][0:2] == ("/usr/bin/aplay", "-q") for call in calls if call[0] != "synthesize"
+    )
+
+
+def test_neural_voice_tolerates_runtime_failure(tmp_path: Path, monkeypatch) -> None:
+    model = tmp_path / "voice.onnx"
+    model.touch()
+    fake_piper = SimpleNamespace(
+        PiperVoice=SimpleNamespace(load=lambda _path: (_ for _ in ()).throw(RuntimeError("bad")))
+    )
+    monkeypatch.setitem(sys.modules, "piper", fake_piper)
+
+    VoiceOutputService(model_path=model, player="/usr/bin/aplay")._speak_neural("Olá")
