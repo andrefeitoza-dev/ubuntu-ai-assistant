@@ -123,4 +123,8 @@ def test_apt_update_lines_are_summarized_for_readability() -> None:
 def test_care_button_and_typed_update_question_share_the_same_topic() -> None:
     assert GUIBackend.is_update_query("Quais atualizações estão disponíveis?") is True
     assert GUIBackend.is_update_query("Mostre as atualizações disponíveis") is True
+    assert GUIBackend.is_update_query("Mostre as atualizações") is True
+    assert GUIBackend.is_update_query("Atualizações disponíveis") is True
+    assert GUIBackend.is_update_query("Atualizações") is True
     assert GUIBackend.is_update_query("Atualize os programas") is False
+    assert GUIBackend.is_update_query("Execute as atualizações") is False

@@ -61,7 +61,7 @@ def router() -> InteractionRouter:
         ("faça uma limpeza segura de pacotes", InteractionRoute.ACTION),
         ("atualize os pacotes", InteractionRoute.ACTION),
         ("atualize os programas", InteractionRoute.ACTION),
-        ("atualizações", InteractionRoute.ACTION),
+        ("atualizações", InteractionRoute.CHAT),
         ("execute as atualizações", InteractionRoute.ACTION),
         ("atualizar", InteractionRoute.ACTION),
         ("ative o firewall", InteractionRoute.ACTION),

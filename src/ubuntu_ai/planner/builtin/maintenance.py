@@ -16,7 +16,6 @@ class SafeMaintenancePlanner:
         "faca uma limpeza segura de pacotes",
     }
     _UPDATE = {
-        "atualizacoes",
         "atualizar",
         "atualize",
         "atualize os pacotes",

@@ -12,8 +12,15 @@ class OperationalQueryResponder:
     """Consulta estado operacional sem executar alterações."""
 
     _UPDATES = {
+        "atualizacoes",
+        "atualizacoes disponiveis",
+        "liste as atualizacoes",
+        "liste as atualizacoes disponiveis",
+        "mostrar as atualizacoes",
+        "mostre as atualizacoes",
         "quais atualizacoes estao disponiveis",
         "mostre as atualizacoes disponiveis",
+        "ver atualizacoes",
     }
     _AUTOMATIONS = {
         "mostre minhas automacoes",
