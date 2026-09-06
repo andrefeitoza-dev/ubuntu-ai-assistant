@@ -62,6 +62,8 @@ def router() -> InteractionRouter:
         ("atualize os pacotes", InteractionRoute.ACTION),
         ("atualize os programas", InteractionRoute.ACTION),
         ("atualizações", InteractionRoute.ACTION),
+        ("execute as atualizações", InteractionRoute.ACTION),
+        ("atualizar", InteractionRoute.ACTION),
         ("ative o firewall", InteractionRoute.ACTION),
         ("sudo apt update", InteractionRoute.ACTION),
         ("o que é memória RAM?", InteractionRoute.CHAT),

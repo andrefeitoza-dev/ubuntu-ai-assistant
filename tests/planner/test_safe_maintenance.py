@@ -23,6 +23,10 @@ def test_cleanup_uses_closed_privileged_commands_and_high_risk() -> None:
         "atualize os programas",
         "Atualizar os programas",
         "atualizações",
+        "atualizar",
+        "execute as atualizações",
+        "execute as atualizações disponíveis",
+        "instale as atualizações",
         "atualize o sistema",
     ),
 )

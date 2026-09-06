@@ -160,6 +160,9 @@ class InteractionRouter:
         if not normalized:
             raise ValueError("Digite uma solicitação.")
 
+        if self._builtin_planner.try_create_priority_plan(request) is not None:
+            return InteractionDecision(InteractionRoute.ACTION)
+
         local = self._local_responder.respond(request)
         if local is not None:
             return InteractionDecision(InteractionRoute.LOCAL, local.text)

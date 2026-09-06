@@ -113,6 +113,10 @@ class BuiltinPlanner:
 
         return self._build_plan(match.command)
 
+    def try_create_priority_plan(self, request: str) -> Plan | None:
+        """Reconhece ações administrativas antes de respostas locais ambíguas."""
+        return self._maintenance.try_create_plan(request)
+
     def rejection_reason(self, request: str) -> str | None:
         """Explica por que uma consulta builtin foi recusada antes do fallback."""
 

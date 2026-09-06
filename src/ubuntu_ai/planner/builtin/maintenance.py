@@ -17,12 +17,18 @@ class SafeMaintenancePlanner:
     }
     _UPDATE = {
         "atualizacoes",
+        "atualizar",
+        "atualize",
         "atualize os pacotes",
         "atualize os programas",
         "atualize meus programas",
         "atualizar os programas",
         "atualize meu ubuntu",
         "atualize o sistema",
+        "execute as atualizacoes",
+        "execute as atualizacoes disponiveis",
+        "executar as atualizacoes",
+        "instale as atualizacoes",
         "instale as atualizacoes disponiveis",
         "aplique as atualizacoes do sistema",
     }
