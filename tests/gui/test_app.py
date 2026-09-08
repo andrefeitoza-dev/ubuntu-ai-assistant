@@ -557,6 +557,7 @@ def test_header_menu_opens_four_options_by_click_or_hover() -> None:
     assert "panel.place(" in navigation_source
     assert "_watch_navigation_panel" in navigation_source
     assert '"<Leave>"' in navigation_source
+    assert "NAVIGATION_LEAVE_DELAY_MS = 1000" in navigation_source
 
 
 def test_three_header_controls_have_no_visible_focus_frame() -> None:
