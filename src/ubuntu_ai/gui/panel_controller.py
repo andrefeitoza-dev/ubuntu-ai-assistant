@@ -25,7 +25,7 @@ class PanelControllerMixin:
             )
             panel = widgets.panel
             self._care_panel = panel
-        self._place_navigation_panel(panel, self.care_button, width=520)
+        self._place_navigation_panel(panel, self.care_button, width=480)
         self._watch_navigation_panel(panel, self._hide_care_panel)
         panel.lift()
         self.care_button.configure(text="Cuidados")

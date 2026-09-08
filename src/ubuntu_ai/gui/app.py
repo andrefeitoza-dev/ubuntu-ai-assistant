@@ -193,6 +193,7 @@ class UbuntuAIApp(
         self.status_label = widgets.status_label
         self.navigation_button = widgets.navigation_button
         self.navigation_menu = widgets.navigation_menu
+        self.navigation_menu.bind("<Leave>", self._schedule_navigation_leave, add="+")
         self.care_button = widgets.care_button
         self.resources_button = widgets.resources_button
         self.automation_button = widgets.automation_button
@@ -556,7 +557,7 @@ class UbuntuAIApp(
         for topic in topics:
             listbox.insert(tk.END, f"{topic.code}. {topic.title}")
 
-        self._place_navigation_panel(panel, self.resources_button, width=560)
+        self._place_navigation_panel(panel, self.resources_button, width=500)
         self._watch_navigation_panel(panel, self._hide_capabilities_panel)
         panel.lift()
 
@@ -803,7 +804,7 @@ class UbuntuAIApp(
             self._automation_panel = panel
 
         self._refresh_automation_panel()
-        self._place_navigation_panel(panel, self.automation_button, width=600)
+        self._place_navigation_panel(panel, self.automation_button, width=540)
         self._watch_navigation_panel(panel, self._hide_automation_panel)
         panel.lift()
         self.automation_button.configure(text="Agentes e progresso")

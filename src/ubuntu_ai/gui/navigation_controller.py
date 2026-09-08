@@ -105,7 +105,29 @@ class NavigationControllerMixin:
         menu_left = self.navigation_menu.winfo_rootx() - self.root.winfo_rootx()
         button_top = button.winfo_rooty() - self.root.winfo_rooty()
         fitted_width = min(width, max(320, menu_left - 36))
-        panel.place(x=menu_left - 8, y=button_top, width=fitted_width, anchor=tk.NE)
+        panel.place(x=menu_left - 3, y=button_top, width=fitted_width, anchor=tk.NE)
+
+    def _schedule_navigation_leave(self, _event: tk.Event | None = None) -> None:
+        self.root.after(160, self._hide_panels_if_outside_navigation)
+
+    def _hide_panels_if_outside_navigation(self) -> None:
+        widget = self.root.winfo_containing(
+            self.root.winfo_pointerx(), self.root.winfo_pointery()
+        )
+        panels = (
+            getattr(self, "remote_controls", None),
+            getattr(self, "_automation_panel", None),
+            getattr(self, "_resources_panel", None),
+            getattr(self, "_care_panel", None),
+        )
+        while widget is not None:
+            if widget is self.navigation_menu or widget in panels:
+                return
+            widget = getattr(widget, "master", None)
+        self._hide_capabilities_panel()
+        self._hide_automation_panel()
+        self._hide_care_panel()
+        self._hide_remote_controls()
 
     def _watch_navigation_panel(self, panel: tk.Widget, hide_callback: object) -> None:
         panel.bind(

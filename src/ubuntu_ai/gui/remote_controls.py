@@ -43,8 +43,8 @@ def place_remote_controls(
     menu = button.master
     menu_left = menu.winfo_rootx() - root.winfo_rootx()
     button_top = button.winfo_rooty() - root.winfo_rooty()
-    fitted_width = min(500, max(320, menu_left - 36))
-    container.place(x=menu_left - 8, y=button_top, width=fitted_width, anchor=tk.NE)
+    fitted_width = min(420, max(320, menu_left - 36))
+    container.place(x=menu_left - 3, y=button_top, width=fitted_width, anchor=tk.NE)
     container.lift()
 
 

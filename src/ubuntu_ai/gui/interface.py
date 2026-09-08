@@ -255,6 +255,13 @@ def build_main_interface(
     ):
         button.pack_forget()
         button.pack(fill=tk.X, pady=1)
+    for button, action in (
+        (remote_widgets.button, on_toggle_remote),
+        (automation_button, on_show_automation),
+        (resources_button, on_show_capabilities),
+        (care_button, on_show_care),
+    ):
+        button.bind("<Enter>", lambda _event, callback=action: callback(), add="+")
 
     content = tk.Frame(root, bg=BACKGROUND)
     content.pack(
