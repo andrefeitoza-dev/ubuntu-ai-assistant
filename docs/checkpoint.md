@@ -316,6 +316,7 @@ Especificação: `docs/natural-actions-roadmap.md`.
 - as opções aparecem ao lado do tópico e permanecem estáveis durante a navegação;
 - o menu fecha pelo botão, pela tecla Esc ou por clique fora, sem sumir enquanto
   o usuário percorre os tópicos;
+- a lista de tópicos permanece na camada superior quando um painel lateral abre;
 - as setas para cima e para baixo percorrem os tópicos e mostram suas opções;
 - ao escolher uma categoria, seu submenu aparece lateralmente e alinhado ao item escolhido;
 - o menu principal permanece organizado e separado do submenu, sem sobreposição entre ambos;

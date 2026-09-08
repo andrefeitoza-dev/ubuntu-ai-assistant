@@ -559,6 +559,8 @@ def test_header_menu_opens_four_options_by_click_or_hover() -> None:
     assert "panel.place(" in navigation_source
     assert "_watch_navigation_panel" in navigation_source
     assert "O painel permanece aberto durante a navegação" in navigation_source
+    assert "_raise_navigation_menu()" in navigation_source
+    assert "self.navigation_menu.lift()" in navigation_source
 
 
 def test_three_header_controls_have_no_visible_focus_frame() -> None:

@@ -79,24 +79,33 @@ class NavigationControllerMixin:
         if not self._remote_controls_visible:
             self._toggle_remote_controls()
         self._watch_navigation_panel(self.remote_controls, self._hide_remote_controls)
+        self._raise_navigation_menu()
 
     def _open_automation_from_menu(self) -> None:
         self._hide_remote_controls()
         panel = getattr(self, "_automation_panel", None)
         if panel is None or not panel.winfo_ismapped():
             self._show_automation_panel()
+        self._raise_navigation_menu()
 
     def _open_resources_from_menu(self) -> None:
         self._hide_remote_controls()
         panel = getattr(self, "_resources_panel", None)
         if panel is None or not panel.winfo_ismapped():
             self._show_capabilities()
+        self._raise_navigation_menu()
 
     def _open_care_from_menu(self) -> None:
         self._hide_remote_controls()
         panel = getattr(self, "_care_panel", None)
         if panel is None or not panel.winfo_ismapped():
             self._show_care_panel()
+        self._raise_navigation_menu()
+
+    def _raise_navigation_menu(self) -> None:
+        """Mantém a lista de tópicos acima dos painéis laterais irmãos."""
+        if self.navigation_menu.winfo_ismapped():
+            self.navigation_menu.lift()
 
     def _place_navigation_panel(
         self, panel: tk.Widget, button: tk.Widget, *, width: int
