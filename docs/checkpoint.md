@@ -324,6 +324,6 @@ Especificação: `docs/natural-actions-roadmap.md`.
   principal fecha toda a navegação;
 - ao escolher uma categoria, seu submenu aparece lateralmente e alinhado ao item escolhido;
 - o menu principal permanece organizado e separado do submenu, sem sobreposição entre ambos;
-- o submenu desaparece quando o ponteiro sai da área de navegação;
+- o painel selecionado permanece aberto até o usuário alcançar outro tópico;
 - clique externo, novo clique no menu ou tecla `Esc` fecham a navegação;
 - funções, confirmações e painéis anteriores foram preservados.

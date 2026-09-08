@@ -63,11 +63,11 @@ ollama pull qwen2.5:3b
 
 ### Ubuntu — pacote único recomendado
 
-Baixe `ubuntu-ai-assistant_2.3.0_amd64.deb` na release e abra o arquivo pela
+Baixe `ubuntu-ai-assistant_2.3.11_amd64.deb` na release e abra o arquivo pela
 Central de Aplicativos ou execute:
 
 ```bash
-sudo apt install ./ubuntu-ai-assistant_2.3.0_amd64.deb
+sudo apt install ./ubuntu-ai-assistant_2.3.11_amd64.deb
 ```
 
 O pacote instala o runtime Python 3.12, a aplicação, suas dependências, os

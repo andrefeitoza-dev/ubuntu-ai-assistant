@@ -1,5 +1,27 @@
 # Changelog
 
+## [2.3.11] - 2026-09-08
+
+### Adicionado
+
+- seleção e persistência de modelos locais realmente instalados no Ollama;
+- menu único no cabeçalho com acesso a Computador, Agentes e progresso,
+  Recursos e ajuda e Cuidados;
+- navegação dos tópicos por passagem do mouse e pelas teclas direcionais.
+
+### Corrigido
+
+- exclusão de arquivos localiza uma origem pessoal única, mostra o caminho na
+  confirmação e explica claramente quando o arquivo não existe;
+- painéis laterais permanecem abertos até outro tópico ser alcançado;
+- eventos internos da interface não fecham mais a lista principal do menu;
+- ícone do menu é desenhado com três linhas vetoriais e independe da fonte.
+
+### Validado
+
+- 145 testes gráficos aprovados;
+- pacote Debian, arquitetura e estilo validados antes da publicação.
+
 ## [2.3.10] - 2026-09-06
 
 ### Corrigido
