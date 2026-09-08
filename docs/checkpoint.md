@@ -313,9 +313,10 @@ Especificação: `docs/natural-actions-roadmap.md`.
 - o botão foi posicionado imediatamente à esquerda do indicador de estado;
 - o menu reúne Computador, Agentes e progresso, Recursos e ajuda e Cuidados;
 - depois de abrir o menu, passar o mouse sobre um tópico abre suas opções;
-- as opções aparecem ao lado do tópico e desaparecem ao sair da área do menu;
-- a troca direta entre tópicos mantém o novo painel aberto e oferece cerca de um
-  segundo para o usuário alcançar as opções antes do fechamento;
+- as opções aparecem ao lado do tópico e permanecem estáveis durante a navegação;
+- o menu fecha pelo botão, pela tecla Esc ou por clique fora, sem sumir enquanto
+  o usuário percorre os tópicos;
+- as setas para cima e para baixo percorrem os tópicos e mostram suas opções;
 - ao escolher uma categoria, seu submenu aparece lateralmente e alinhado ao item escolhido;
 - o menu principal permanece organizado e separado do submenu, sem sobreposição entre ambos;
 - o submenu desaparece quando o ponteiro sai da área de navegação;

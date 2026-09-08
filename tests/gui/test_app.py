@@ -540,7 +540,9 @@ def test_header_menu_opens_four_options_by_click_or_hover() -> None:
     assert "care_button" in interface_source
     assert "lambda _event, callback=action" in interface_source
     assert "<Enter>" in interface_source
-    assert "_schedule_navigation_leave" in source
+    assert '"<FocusIn>"' in interface_source
+    assert '"<Down>"' in interface_source
+    assert '"<Up>"' in interface_source
     assert "on_toggle=on_toggle_remote" in interface_source
     assert "command=on_show_automation" in interface_source
     assert "command=on_show_capabilities" in interface_source
@@ -556,8 +558,7 @@ def test_header_menu_opens_four_options_by_click_or_hover() -> None:
     assert "button_top" in navigation_source
     assert "panel.place(" in navigation_source
     assert "_watch_navigation_panel" in navigation_source
-    assert '"<Leave>"' in navigation_source
-    assert "NAVIGATION_LEAVE_DELAY_MS = 1000" in navigation_source
+    assert "O painel permanece aberto durante a navegação" in navigation_source
 
 
 def test_three_header_controls_have_no_visible_focus_frame() -> None:

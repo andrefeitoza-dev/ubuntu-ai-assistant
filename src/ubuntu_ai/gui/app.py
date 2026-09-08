@@ -193,8 +193,6 @@ class UbuntuAIApp(
         self.status_label = widgets.status_label
         self.navigation_button = widgets.navigation_button
         self.navigation_menu = widgets.navigation_menu
-        self.navigation_menu.bind("<Enter>", self._keep_navigation_open, add="+")
-        self.navigation_menu.bind("<Leave>", self._schedule_navigation_leave, add="+")
         self.care_button = widgets.care_button
         self.resources_button = widgets.resources_button
         self.automation_button = widgets.automation_button

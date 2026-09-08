@@ -255,13 +255,30 @@ def build_main_interface(
     ):
         button.pack_forget()
         button.pack(fill=tk.X, pady=1)
-    for button, action in (
+    navigation_options = (
         (remote_widgets.button, on_toggle_remote),
         (automation_button, on_show_automation),
         (resources_button, on_show_capabilities),
         (care_button, on_show_care),
-    ):
+    )
+    navigation_buttons = tuple(button for button, _action in navigation_options)
+    for index, (button, action) in enumerate(navigation_options):
         button.bind("<Enter>", lambda _event, callback=action: callback(), add="+")
+        button.bind("<FocusIn>", lambda _event, callback=action: callback(), add="+")
+        button.bind(
+            "<Down>",
+            lambda _event, current=index: (
+                navigation_buttons[(current + 1) % len(navigation_buttons)].focus_set()
+                or "break"
+            ),
+        )
+        button.bind(
+            "<Up>",
+            lambda _event, current=index: (
+                navigation_buttons[(current - 1) % len(navigation_buttons)].focus_set()
+                or "break"
+            ),
+        )
 
     content = tk.Frame(root, bg=BACKGROUND)
     content.pack(

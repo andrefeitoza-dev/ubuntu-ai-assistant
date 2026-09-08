@@ -5,8 +5,6 @@ from collections.abc import Callable
 
 from ubuntu_ai.gui.theme import BACKGROUND, SURFACE_HOVER, TEXT, TEXT_MUTED
 
-NAVIGATION_LEAVE_DELAY_MS = 1000
-
 
 class HeaderMenuButton(tk.Canvas):
     """Botão vetorial de menu com três linhas, independente de glifos da fonte."""
@@ -78,27 +76,23 @@ class NavigationControllerMixin:
         self._hide_remote_controls()
 
     def _open_remote_from_menu(self) -> None:
-        self._keep_navigation_open()
         if not self._remote_controls_visible:
             self._toggle_remote_controls()
         self._watch_navigation_panel(self.remote_controls, self._hide_remote_controls)
 
     def _open_automation_from_menu(self) -> None:
-        self._keep_navigation_open()
         self._hide_remote_controls()
         panel = getattr(self, "_automation_panel", None)
         if panel is None or not panel.winfo_ismapped():
             self._show_automation_panel()
 
     def _open_resources_from_menu(self) -> None:
-        self._keep_navigation_open()
         self._hide_remote_controls()
         panel = getattr(self, "_resources_panel", None)
         if panel is None or not panel.winfo_ismapped():
             self._show_capabilities()
 
     def _open_care_from_menu(self) -> None:
-        self._keep_navigation_open()
         self._hide_remote_controls()
         panel = getattr(self, "_care_panel", None)
         if panel is None or not panel.winfo_ismapped():
@@ -113,64 +107,7 @@ class NavigationControllerMixin:
         fitted_width = min(width, max(320, menu_left - 36))
         panel.place(x=menu_left - 3, y=button_top, width=fitted_width, anchor=tk.NE)
 
-    def _schedule_navigation_leave(self, _event: tk.Event | None = None) -> None:
-        generation = getattr(self, "_navigation_hover_generation", 0)
-        self.root.after(
-            NAVIGATION_LEAVE_DELAY_MS,
-            self._hide_panels_if_outside_navigation,
-            generation,
-        )
-
-    def _keep_navigation_open(self, _event: tk.Event | None = None) -> None:
-        self._navigation_hover_generation = (
-            getattr(self, "_navigation_hover_generation", 0) + 1
-        )
-
-    def _hide_panels_if_outside_navigation(self, generation: int) -> None:
-        if generation != getattr(self, "_navigation_hover_generation", 0):
-            return
-        widget = self.root.winfo_containing(
-            self.root.winfo_pointerx(), self.root.winfo_pointery()
-        )
-        panels = (
-            getattr(self, "remote_controls", None),
-            getattr(self, "_automation_panel", None),
-            getattr(self, "_resources_panel", None),
-            getattr(self, "_care_panel", None),
-        )
-        while widget is not None:
-            if widget is self.navigation_menu or widget in panels:
-                return
-            widget = getattr(widget, "master", None)
-        self._hide_capabilities_panel()
-        self._hide_automation_panel()
-        self._hide_care_panel()
-        self._hide_remote_controls()
-
     def _watch_navigation_panel(self, panel: tk.Widget, hide_callback: object) -> None:
-        panel.bind("<Enter>", self._keep_navigation_open, add="+")
-        panel.bind(
-            "<Leave>",
-            lambda _event: self.root.after(
-                NAVIGATION_LEAVE_DELAY_MS,
-                self._hide_if_outside_navigation,
-                panel,
-                hide_callback,
-                getattr(self, "_navigation_hover_generation", 0),
-            ),
-            add="+",
-        )
-
-    def _hide_if_outside_navigation(
-        self, panel: tk.Widget, hide_callback: object, generation: int
-    ) -> None:
-        if generation != getattr(self, "_navigation_hover_generation", 0):
-            return
-        widget = self.root.winfo_containing(
-            self.root.winfo_pointerx(), self.root.winfo_pointery()
-        )
-        while widget is not None:
-            if widget is panel or widget is self.navigation_menu:
-                return
-            widget = getattr(widget, "master", None)
-        hide_callback()  # type: ignore[operator]
+        # O painel permanece aberto durante a navegação. O fechamento acontece
+        # pelo botão do menu, pela tecla Esc ou por um clique fora da navegação.
+        panel.lift()
