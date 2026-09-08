@@ -32,7 +32,6 @@ class InterfaceWidgets:
     status_label: tk.Label
     navigation_button: tk.Button
     navigation_menu: tk.Frame
-    panel_host: tk.Frame
     care_button: tk.Button
     resources_button: tk.Button
     automation_button: tk.Button
@@ -193,9 +192,6 @@ def build_main_interface(
         highlightbackground=BORDER,
         highlightthickness=1,
     )
-    panel_host = tk.Frame(root, bg=BACKGROUND, padx=28)
-    panel_host.pack(fill=tk.X)
-
     care_button = tk.Button(
         navigation_menu,
         text="Cuidados",
@@ -255,7 +251,7 @@ def build_main_interface(
 
     remote_widgets = build_remote_controls(
         navigation_menu,
-        panel_parent=panel_host,
+        panel_parent=root,
         on_toggle=on_toggle_remote,
         on_target_selected=on_target_selected,
         on_add=on_add_remote,
@@ -408,7 +404,6 @@ def build_main_interface(
         status_label=status_label,
         navigation_button=navigation_button,
         navigation_menu=navigation_menu,
-        panel_host=panel_host,
         care_button=care_button,
         resources_button=resources_button,
         automation_button=automation_button,

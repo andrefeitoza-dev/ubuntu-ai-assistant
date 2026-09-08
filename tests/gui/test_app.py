@@ -213,8 +213,8 @@ def test_gui_exposes_capability_catalog_button() -> None:
     assert "_build_capabilities_panel" in source
     assert "_schedule_capability_detail" in source
     assert "_send_resource_to_conversation" in source
-    assert "panel.pack(fill=tk.X" in source
-    assert "panel.pack_forget()" in source
+    assert "_place_navigation_panel(panel" in source
+    assert "panel.place_forget()" in source
     assert "tk.Menu(" not in complete_source
     assert "tk.Toplevel(" not in complete_source
 
@@ -548,9 +548,11 @@ def test_header_uses_visible_menu_with_four_click_options() -> None:
     assert "_toggle_navigation_menu" in source
     assert "navigation_menu.place(" in navigation_source
     assert "_hide_navigation_menu()" in navigation_source
-    assert "panel_host.pack(fill=tk.X)" in interface_source
-    assert "self.panel_host" in source
-    assert "panel.pack(fill=tk.X" in source
+    assert "_place_navigation_panel" in navigation_source
+    assert "button_top" in navigation_source
+    assert "panel.place(" in navigation_source
+    assert "_watch_navigation_panel" in navigation_source
+    assert '"<Leave>"' in navigation_source
 
 
 def test_three_header_controls_have_no_visible_focus_frame() -> None:

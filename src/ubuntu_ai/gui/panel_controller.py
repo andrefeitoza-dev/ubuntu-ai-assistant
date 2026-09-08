@@ -19,20 +19,21 @@ class PanelControllerMixin:
             return
         if panel is None or not panel.winfo_exists():
             widgets = build_care_panel(
-                self.panel_host,
+                self.root,
                 on_close=self._hide_care_panel,
                 on_action=self._start_care_action,
             )
             panel = widgets.panel
             self._care_panel = panel
-        panel.pack(fill=tk.X, pady=(0, 10))
+        self._place_navigation_panel(panel, self.care_button, width=520)
+        self._watch_navigation_panel(panel, self._hide_care_panel)
         panel.lift()
         self.care_button.configure(text="Cuidados")
 
     def _hide_care_panel(self, _event: tk.Event | None = None) -> None:
         panel = getattr(self, "_care_panel", None)
         if panel is not None and panel.winfo_exists():
-            panel.pack_forget()
+            panel.place_forget()
         button = getattr(self, "care_button", None)
         if button is not None and button.winfo_exists():
             button.configure(text="Cuidados")
@@ -100,6 +101,8 @@ class PanelControllerMixin:
             if widget is care_panel or widget is care_button:
                 inside_care = True
             if widget is navigation_menu or widget is navigation_button:
+                inside_navigation = True
+            if widget in (panel, automation_panel, care_panel, remote_controls):
                 inside_navigation = True
             widget = getattr(widget, "master", None)
 

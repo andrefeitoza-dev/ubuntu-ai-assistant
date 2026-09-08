@@ -37,10 +37,15 @@ def place_remote_controls(
     button: tk.Button,
     root: tk.Misc,
 ) -> None:
-    """Exibe as opções na área própria abaixo do cabeçalho."""
+    """Exibe as opções como submenu lateral do item Computador."""
 
-    del button, root
-    container.pack(fill=tk.X, pady=(0, 10))
+    root.update_idletasks()
+    menu = button.master
+    menu_left = menu.winfo_rootx() - root.winfo_rootx()
+    button_top = button.winfo_rooty() - root.winfo_rooty()
+    fitted_width = min(500, max(320, menu_left - 36))
+    container.place(x=menu_left - 8, y=button_top, width=fitted_width, anchor=tk.NE)
+    container.lift()
 
 
 def build_remote_controls(
