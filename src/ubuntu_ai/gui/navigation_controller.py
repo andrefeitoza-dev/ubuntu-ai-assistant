@@ -1,6 +1,48 @@
 from __future__ import annotations
 
 import tkinter as tk
+from collections.abc import Callable
+
+from ubuntu_ai.gui.theme import BACKGROUND, SURFACE_HOVER, TEXT, TEXT_MUTED
+
+
+class HeaderMenuButton(tk.Canvas):
+    """Botão vetorial de menu com três linhas, independente de glifos da fonte."""
+
+    def __init__(self, parent: tk.Misc, *, command: Callable[[], None]) -> None:
+        super().__init__(
+            parent,
+            width=38,
+            height=32,
+            bg=BACKGROUND,
+            highlightthickness=0,
+            borderwidth=0,
+            cursor="hand2",
+            takefocus=1,
+        )
+        self._command = command
+        self._lines = tuple(
+            self.create_line(10, y, 28, y, fill=TEXT_MUTED, width=2)
+            for y in (10, 16, 22)
+        )
+        self.bind("<Button-1>", self._activate)
+        self.bind("<Return>", self._activate)
+        self.bind("<space>", self._activate)
+        self.bind("<Enter>", lambda _event: self._set_visual(True))
+        self.bind("<Leave>", lambda _event: self._set_visual(False))
+        self.bind("<FocusIn>", lambda _event: self._set_visual(True))
+        self.bind("<FocusOut>", lambda _event: self._set_visual(False))
+
+    def _activate(self, _event: tk.Event | None = None) -> str:
+        self.focus_set()
+        self._command()
+        return "break"
+
+    def _set_visual(self, active: bool) -> None:
+        self.configure(bg=SURFACE_HOVER if active else BACKGROUND)
+        color = TEXT if active else TEXT_MUTED
+        for line in self._lines:
+            self.itemconfigure(line, fill=color)
 
 
 class NavigationControllerMixin:
@@ -28,9 +70,6 @@ class NavigationControllerMixin:
         menu = getattr(self, "navigation_menu", None)
         if menu is not None and menu.winfo_exists():
             menu.place_forget()
-        button = getattr(self, "navigation_button", None)
-        if button is not None and button.winfo_exists():
-            button.configure(text="☰")
         self._hide_capabilities_panel()
         self._hide_automation_panel()
         self._hide_care_panel()

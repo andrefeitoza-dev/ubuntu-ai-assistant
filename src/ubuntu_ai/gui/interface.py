@@ -4,6 +4,7 @@ import tkinter as tk
 from collections.abc import Callable
 from dataclasses import dataclass
 
+from ubuntu_ai.gui.navigation_controller import HeaderMenuButton
 from ubuntu_ai.gui.remote_controls import build_remote_controls
 from ubuntu_ai.gui.theme import (
     ACCENT,
@@ -30,7 +31,7 @@ from ubuntu_ai.gui.voice_controls import CircularVoiceButton
 class InterfaceWidgets:
     header_icon: tk.PhotoImage | None
     status_label: tk.Label
-    navigation_button: tk.Button
+    navigation_button: HeaderMenuButton
     navigation_menu: tk.Frame
     care_button: tk.Button
     resources_button: tk.Button
@@ -165,22 +166,9 @@ def build_main_interface(
     )
     status_label.pack(side=tk.RIGHT)
 
-    navigation_button = tk.Button(
+    navigation_button = HeaderMenuButton(
         header,
-        text="☰",
         command=on_toggle_navigation,
-        bg=BACKGROUND,
-        fg=TEXT,
-        activebackground=SURFACE_HOVER,
-        activeforeground=TEXT,
-        relief=tk.FLAT,
-        borderwidth=0,
-        highlightthickness=0,
-        cursor="hand2",
-        takefocus=True,
-        font=("DejaVu Sans", 15, "bold"),
-        padx=10,
-        pady=4,
     )
     navigation_button.pack(side=tk.RIGHT, padx=(0, 12))
 

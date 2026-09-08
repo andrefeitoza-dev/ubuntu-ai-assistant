@@ -530,7 +530,9 @@ def test_header_uses_visible_menu_with_four_click_options() -> None:
         encoding="utf-8"
     )
 
-    assert 'text="☰"' in interface_source
+    assert "HeaderMenuButton(" in interface_source
+    assert "create_line(10, y, 28, y" in navigation_source
+    assert "for y in (10, 16, 22)" in navigation_source
     assert "navigation_button.pack(side=tk.RIGHT" in interface_source
     assert "remote_widgets.button" in interface_source
     assert "automation_button" in interface_source
