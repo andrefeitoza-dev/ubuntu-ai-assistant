@@ -34,7 +34,9 @@ def test_graphical_setup_includes_authorized_voice_model_download() -> None:
     assert "Baixar modelo de voz (31 MB)" in source
     assert "VoiceModelSetup" in source
     assert "validando a integridade" in source
-    assert 'self.root.geometry("640x650")' in source
+    assert 'self.root.geometry("640x720")' in source
+    assert "Usar este modelo" in source
+    assert "self._setup.select_model(model)" in source
 
 
 class FakeWidget:

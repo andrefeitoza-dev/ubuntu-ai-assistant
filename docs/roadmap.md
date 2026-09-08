@@ -542,9 +542,9 @@ As entregas pequenas serão acumuladas em desenvolvimento e somente formarão um
 nova versão quando compuserem um conjunto relevante e homologado.
 
 1. **Modelos de IA locais e externos**
-   - [ ] listar e selecionar modelos já instalados no Ollama;
+   - [x] listar e selecionar modelos já instalados no Ollama;
    - [ ] baixar outro modelo local com progresso, requisitos e confirmação;
-   - [ ] persistir a seleção e testar o modelo antes de ativá-lo;
+   - [x] persistir a seleção e testar o modelo antes de ativá-lo;
    - [ ] criar provedores externos sobre o contrato `AIProvider` existente;
    - [ ] guardar chaves de API no cofre seguro do Ubuntu, nunca em texto aberto;
    - [ ] avisar claramente quando dados serão enviados à internet e poderão gerar custos;

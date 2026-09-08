@@ -4,6 +4,7 @@ import threading
 import tkinter as tk
 import webbrowser
 from queue import Empty, SimpleQueue
+from tkinter import ttk
 
 from ubuntu_ai.distribution.first_run import OLLAMA_INSTALL_URL, FirstRunSetup, FirstRunStatus
 from ubuntu_ai.gui.theme import (
@@ -65,8 +66,8 @@ class SetupApp:
         self._queue: SimpleQueue[tuple[str, object]] = SimpleQueue()
         self.root = tk.Tk(className=WINDOW_CLASS)
         self.root.title("Configurar Ubuntu AI Assistant")
-        self.root.geometry("640x650")
-        self.root.minsize(580, 600)
+        self.root.geometry("640x720")
+        self.root.minsize(580, 650)
         self.root.configure(bg=BACKGROUND)
         self._build()
         self.root.after(50, self._drain_queue)
@@ -108,6 +109,30 @@ class SetupApp:
             anchor="w",
         )
         self.detail_label.pack(fill=tk.X, pady=(8, 12))
+        model_row = tk.Frame(card, bg=SURFACE_ALT)
+        model_row.pack(fill=tk.X, pady=(0, 8))
+        self.model_value = tk.StringVar(value=self._setup.model)
+        self.model_selector = ttk.Combobox(
+            model_row,
+            textvariable=self.model_value,
+            state="disabled",
+            width=32,
+        )
+        self.model_selector.pack(side=tk.LEFT, fill=tk.X, expand=True)
+        self.model_button = tk.Button(
+            model_row,
+            text="Usar este modelo",
+            command=self._select_model,
+            bg=SURFACE_ALT,
+            fg=TEXT,
+            relief=tk.FLAT,
+            padx=10,
+            pady=5,
+            font=FONT_SMALL,
+            cursor="hand2",
+            state=tk.DISABLED,
+        )
+        self.model_button.pack(side=tk.LEFT, padx=(8, 0))
         self.progress = tk.Label(card, text="", bg=SURFACE_ALT, fg=WARNING, font=FONT_SMALL)
         self.progress.pack(anchor="w")
         actions = tk.Frame(card, bg=SURFACE_ALT)
@@ -223,6 +248,13 @@ class SetupApp:
         self.detail_label.configure(text=detail)
         self.progress.configure(text="", fg=SUCCESS if status.ready else WARNING)
         self.primary.configure(state=tk.NORMAL)
+        self.model_selector.configure(values=status.models)
+        self.model_value.set(status.model)
+        selector_state = "readonly" if status.ollama_running and status.models else "disabled"
+        self.model_selector.configure(state=selector_state)
+        self.model_button.configure(
+            state=tk.NORMAL if selector_state == "readonly" else tk.DISABLED
+        )
         if not status.ollama_available:
             self.primary.configure(
                 text="Abrir instruções oficiais",
@@ -241,6 +273,20 @@ class SetupApp:
     def _download_model(self) -> None:
         self._set_busy(True, "Baixando o modelo local… não feche esta janela.")
         threading.Thread(target=self._download_worker, daemon=True).start()
+
+    def _select_model(self) -> None:
+        model = self.model_value.get().strip()
+        self.model_selector.configure(state="disabled")
+        self.model_button.configure(state=tk.DISABLED)
+        self.progress.configure(text=f"Verificando {model}…", fg=WARNING)
+        threading.Thread(target=self._select_model_worker, args=(model,), daemon=True).start()
+
+    def _select_model_worker(self, model: str) -> None:
+        try:
+            self._setup.select_model(model)
+            self._queue.put(("model-selected", self._setup.status()))
+        except Exception as exc:
+            self._queue.put(("model-error", str(exc)))
 
     def _download_worker(self) -> None:
         try:
@@ -320,6 +366,16 @@ class SetupApp:
                 kind, payload = self._queue.get_nowait()
                 if kind == "status":
                     self._display_status(payload)  # type: ignore[arg-type]
+                elif kind == "model-selected":
+                    self._display_status(payload)  # type: ignore[arg-type]
+                    self.progress.configure(
+                        text="Modelo salvo. Reinicie o assistente para aplicar a alteração.",
+                        fg=SUCCESS,
+                    )
+                elif kind == "model-error":
+                    self.progress.configure(text=str(payload), fg=ERROR)
+                    self.model_selector.configure(state="readonly")
+                    self.model_button.configure(state=tk.NORMAL)
                 elif kind == "voice-status":
                     self._display_voice_status(payload)  # type: ignore[arg-type]
                 elif kind == "voice-error":

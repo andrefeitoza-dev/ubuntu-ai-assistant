@@ -1,4 +1,7 @@
+from dataclasses import replace
+
 from ubuntu_ai.agent.runtime import AgentRuntime
+from ubuntu_ai.config import ConfigRepository
 from ubuntu_ai.container import Container
 from ubuntu_ai.core.config import AppConfig
 from ubuntu_ai.interaction import ChatService, InteractionRouter
@@ -47,6 +50,21 @@ def test_config_is_singleton() -> None:
 
     assert isinstance(first, AppConfig)
     assert first is second
+
+
+def test_config_loads_persisted_ai_model(monkeypatch, tmp_path) -> None:
+    monkeypatch.setenv("XDG_CONFIG_HOME", str(tmp_path / "config"))
+    monkeypatch.setenv("XDG_DATA_HOME", str(tmp_path / "data"))
+    monkeypatch.setenv("XDG_CACHE_HOME", str(tmp_path / "cache"))
+    monkeypatch.setenv("XDG_STATE_HOME", str(tmp_path / "state"))
+    repository = ConfigRepository()
+    settings = repository.load()
+    repository.save(replace(settings, ai=replace(settings.ai, model="llama3.2:3b")))
+
+    config = Container().config()
+
+    assert config.ollama_model == "llama3.2:3b"
+    assert config.data_dir == tmp_path / "data" / "ubuntu-ai"
 
 
 def test_ollama_service_is_singleton() -> None:

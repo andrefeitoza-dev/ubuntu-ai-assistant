@@ -297,3 +297,12 @@ Especificação: `docs/natural-actions-roadmap.md`.
 - continuam na pauta: Central diária, diagnóstico, arquivos, manual, automações,
   integração com aplicativos e evolução da voz;
 - pequenas entregas serão salvas em desenvolvimento e agrupadas numa versão relevante.
+
+### Incremento local — seleção de modelo Ollama
+
+- configurador passa a listar os modelos realmente instalados no Ollama;
+- modelo selecionado é verificado pelo Ollama antes de ser salvo;
+- configuração persistida passa a alimentar o runtime principal após reinicialização;
+- seleção não instalada é rejeitada e não altera a configuração anterior;
+- máquina de desenvolvimento reconheceu `qwen2.5:3b` e `qwen2.5-coder:7b`;
+- incremento permanece em desenvolvimento, sem nova versão ou publicação.

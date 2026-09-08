@@ -12,6 +12,7 @@ from ubuntu_ai.audit import LocalActionAuditService
 from ubuntu_ai.autonomy.factory import build_autonomous_runtime
 from ubuntu_ai.autonomy.runtime import AutonomousRuntime
 from ubuntu_ai.benchmark import BenchmarkRecorder, BenchmarkService
+from ubuntu_ai.config import ConfigRepository
 from ubuntu_ai.context.engine import ContextEngine
 from ubuntu_ai.conversation.engine import ConversationEngine
 from ubuntu_ai.conversation.repository import ConversationRepository
@@ -95,7 +96,28 @@ class Container:
     def config(self) -> AppConfig:
         """Retorna a configuração única da aplicação."""
 
-        return self._singleton("config", AppConfig)
+        return self._singleton("config", self._load_app_config)
+
+    @staticmethod
+    def _load_app_config() -> AppConfig:
+        repository = ConfigRepository()
+        if not repository.exists():
+            return AppConfig()
+        settings = repository.load()
+        paths = settings.paths
+        defaults = AppConfig()
+        return AppConfig(
+            ai_provider=settings.ai.provider,
+            ollama_base_url=settings.ai.base_url,
+            ollama_model=settings.ai.model,
+            request_timeout=settings.ai.timeout,
+            ollama_num_predict=settings.ai.max_tokens,
+            ollama_temperature=settings.ai.temperature,
+            ollama_keep_alive=settings.ai.keep_alive,
+            language=settings.ui.language.replace("_", "-"),
+            data_dir=paths.data_directory if paths is not None else defaults.data_dir,
+            log_dir=settings.logging.directory.expanduser(),
+        )
 
     def ollama_service(self) -> OllamaService:
         """Retorna o cliente único do Ollama."""
