@@ -89,6 +89,45 @@ def test_remove_file_inside_home_folder_uses_trash_and_refreshes_parent(
     assert plan.steps[1].command == ["xdg-open", str(folder)]
 
 
+def test_remove_unique_nested_file_without_origin_shows_resolved_path(tmp_path: Path) -> None:
+    folder = tmp_path / "TesteUbuntuAI"
+    folder.mkdir()
+    source = folder / "notas.txt"
+    source.touch()
+
+    plan = SafeFileOperationPlanner(home=tmp_path).try_create_plan("Exclua o arquivo notas.txt.")
+
+    assert plan is not None
+    assert str(source) in plan.steps[0].description
+    assert plan.steps[0].command == ["gio", "trash", str(source)]
+    assert plan.steps[1].command == ["xdg-open", str(folder)]
+
+
+def test_remove_duplicate_name_requires_origin(tmp_path: Path) -> None:
+    for folder_name in ("PastaA", "PastaB"):
+        folder = tmp_path / folder_name
+        folder.mkdir()
+        (folder / "notas.txt").touch()
+    planner = SafeFileOperationPlanner(home=tmp_path)
+
+    request = "Exclua o arquivo notas.txt."
+
+    assert planner.try_create_plan(request) is None
+    reason = planner.rejection_reason(request)
+    assert reason is not None
+    assert "mais de um item" in reason
+    assert str(tmp_path / "PastaA" / "notas.txt") in reason
+    assert str(tmp_path / "PastaB" / "notas.txt") in reason
+
+
+def test_remove_respects_requested_item_kind(tmp_path: Path) -> None:
+    (tmp_path / "notas.txt").mkdir()
+
+    plan = SafeFileOperationPlanner(home=tmp_path).try_create_plan("Exclua o arquivo notas.txt.")
+
+    assert plan is None
+
+
 @pytest.mark.parametrize("verb", ("Copie", "Mova"))
 def test_transfer_file_between_known_personal_folders(tmp_path: Path, verb: str) -> None:
     documents = tmp_path / "Documentos"

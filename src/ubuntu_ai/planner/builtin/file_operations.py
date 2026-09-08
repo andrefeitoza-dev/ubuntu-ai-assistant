@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 import re
 from pathlib import Path
 
@@ -22,7 +23,7 @@ class SafeFileOperationPlanner:
     )
     _REMOVE = re.compile(
         r"^(?:remova|apague|delete|exclua)\s+(?:(?:o|a|um|uma)\s+)?"
-        r"(?:arquivo|pasta)\s+(.+?)(?:\s+(?:dentro\s+da\s+pasta|dentro\s+de|"
+        r"(arquivo|pasta)\s+(.+?)(?:\s+(?:dentro\s+da\s+pasta|dentro\s+de|"
         r"da\s+pasta|na\s+pasta|da|do|de|na|no)\s+(.+))?$",
         re.IGNORECASE,
     )
@@ -61,16 +62,14 @@ class SafeFileOperationPlanner:
         value = request.strip().rstrip(".!?").strip()
         remove = self._REMOVE.fullmatch(value)
         if remove:
-            name, folder_label = remove.groups()
-            parent = self._folder(folder_label or "inicio")
-            if parent is None or not self._safe_name(name):
+            item_kind, name, folder_label = remove.groups()
+            source = self._removal_source(item_kind, name, folder_label)
+            if source is None:
                 return None
-            source = parent / name.strip()
-            if not source.exists() or source.is_symlink():
-                return None
+            parent = source.parent
             return self._trash_plan(
                 "Mover para a Lixeira",
-                f"Move {source} para a Lixeira, permitindo recuperação posterior.",
+                f"Origem: {source}. Move o item para a Lixeira, permitindo recuperação posterior.",
                 ("gio", "trash", str(source)),
                 parent,
             )
@@ -163,10 +162,61 @@ class SafeFileOperationPlanner:
     def rejection_reason(self, request: str) -> str | None:
         if not self.has_file_operation_intent(request) or self.try_create_plan(request):
             return None
+        value = request.strip().rstrip(".!?").strip()
+        remove = self._REMOVE.fullmatch(value)
+        if remove:
+            item_kind, name, folder_label = remove.groups()
+            if folder_label is None and self._safe_name(name):
+                matches = self._matching_items(item_kind, name.strip())
+                if len(matches) > 1:
+                    paths = "\n".join(f"• {path}" for path in matches[:5])
+                    return (
+                        "Encontrei mais de um item com esse nome. Informe a pasta de origem "
+                        f"para escolher com segurança:\n{paths}"
+                    )
         return (
             "Alteração não planejada. Use nomes simples e pastas pessoais conhecidas; "
             "a origem deve existir e o destino não pode existir nem ser um link simbólico."
         )
+
+    def _removal_source(self, item_kind: str, name: str, folder_label: str | None) -> Path | None:
+        if not self._safe_name(name):
+            return None
+        if folder_label is not None:
+            parent = self._folder(folder_label)
+            candidate = parent / name.strip() if parent is not None else None
+            if candidate is not None and self._matches_kind(candidate, item_kind):
+                return candidate
+            return None
+
+        direct = self._home / name.strip()
+        if self._matches_kind(direct, item_kind):
+            return direct
+        matches = self._matching_items(item_kind, name.strip())
+        return matches[0] if len(matches) == 1 else None
+
+    def _matching_items(self, item_kind: str, name: str) -> list[Path]:
+        matches: list[Path] = []
+        for root, directories, files in os.walk(self._home, followlinks=False):
+            directories[:] = [
+                entry
+                for entry in directories
+                if not entry.startswith(".") and not (Path(root) / entry).is_symlink()
+            ]
+            entries = files if item_kind.casefold() == "arquivo" else directories
+            if name in entries:
+                candidate = Path(root) / name
+                if self._matches_kind(candidate, item_kind):
+                    matches.append(candidate)
+                    if len(matches) > 5:
+                        break
+        return matches
+
+    @staticmethod
+    def _matches_kind(path: Path, item_kind: str) -> bool:
+        if path.is_symlink():
+            return False
+        return path.is_file() if item_kind.casefold() == "arquivo" else path.is_dir()
 
     def _folder(self, label: str) -> Path | None:
         normalized = label.strip().casefold()
