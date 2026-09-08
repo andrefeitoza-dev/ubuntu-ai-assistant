@@ -320,6 +320,8 @@ Especificação: `docs/natural-actions-roadmap.md`.
 - as setas para cima e para baixo percorrem os tópicos e mostram suas opções;
 - um controlador único acompanha o ponteiro e evita painéis presos ou perda da
   troca entre tópicos causada por eventos independentes dos botões;
+- eventos `Unmap` de painéis internos são ignorados; somente o `Unmap` da janela
+  principal fecha toda a navegação;
 - ao escolher uma categoria, seu submenu aparece lateralmente e alinhado ao item escolhido;
 - o menu principal permanece organizado e separado do submenu, sem sobreposição entre ambos;
 - o submenu desaparece quando o ponteiro sai da área de navegação;

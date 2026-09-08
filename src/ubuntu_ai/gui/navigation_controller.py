@@ -131,6 +131,11 @@ class NavigationControllerMixin:
         self._hide_care_panel()
         self._hide_remote_controls()
 
+    def _hide_navigation_on_root_unmap(self, event: tk.Event) -> None:
+        """Ignora eventos Unmap propagados por painéis internos."""
+        if event.widget is self.root:
+            self._hide_navigation_menu()
+
     def _open_remote_from_menu(self) -> None:
         if not self._remote_controls_visible:
             self._toggle_remote_controls()

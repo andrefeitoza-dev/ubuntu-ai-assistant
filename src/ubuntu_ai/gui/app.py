@@ -119,14 +119,7 @@ class UbuntuAIApp(
         self._refresh_remote_targets()
         self._bind_accessibility_shortcuts()
         self._bind_mousewheel()
-        self.root.bind(
-            "<Unmap>",
-            self._hide_capabilities_panel,
-            add="+",
-        )
-        self.root.bind("<Unmap>", self._hide_automation_panel, add="+")
-        self.root.bind("<Unmap>", self._hide_care_panel, add="+")
-        self.root.bind("<Unmap>", self._hide_navigation_menu, add="+")
+        self.root.bind("<Unmap>", self._hide_navigation_on_root_unmap, add="+")
         self.root.bind(
             "<Escape>",
             self._hide_capabilities_panel,

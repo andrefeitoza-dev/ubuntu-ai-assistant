@@ -562,6 +562,23 @@ def test_header_menu_opens_four_options_by_click_or_hover() -> None:
     assert "_raise_navigation_menu()" in navigation_source
     assert "self.navigation_menu.lift()" in navigation_source
     assert "_close_navigation_panels_if_outside" in navigation_source
+    assert "if event.widget is self.root" in navigation_source
+    assert source.count('self.root.bind("<Unmap>"') == 1
+
+
+def test_child_unmap_does_not_close_navigation() -> None:
+    application = gui_app.UbuntuAIApp.__new__(gui_app.UbuntuAIApp)
+    application.root = SimpleNamespace()
+    closed: list[bool] = []
+    application._hide_navigation_menu = lambda: closed.append(True)
+
+    application._hide_navigation_on_root_unmap(SimpleNamespace(widget=object()))
+    assert closed == []
+
+    application._hide_navigation_on_root_unmap(
+        SimpleNamespace(widget=application.root)
+    )
+    assert closed == [True]
 
 
 def test_three_header_controls_have_no_visible_focus_frame() -> None:
