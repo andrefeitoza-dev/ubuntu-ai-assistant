@@ -65,6 +65,30 @@ def test_remove_folder_uses_recoverable_trash(tmp_path: Path, phrase: str) -> No
     assert plan.steps[0].command == ["gio", "trash", str(source)]
 
 
+@pytest.mark.parametrize(
+    "phrase",
+    (
+        "Exclua o arquivo notas.txt dentro da pasta TesteUbuntuAI.",
+        "Remova o arquivo notas.txt da pasta TesteUbuntuAI.",
+        "Apague o arquivo notas.txt dentro de TesteUbuntuAI.",
+    ),
+)
+def test_remove_file_inside_home_folder_uses_trash_and_refreshes_parent(
+    tmp_path: Path, phrase: str
+) -> None:
+    folder = tmp_path / "TesteUbuntuAI"
+    folder.mkdir()
+    source = folder / "notas.txt"
+    source.touch()
+
+    plan = SafeFileOperationPlanner(home=tmp_path).try_create_plan(phrase)
+
+    assert plan is not None
+    assert plan.risk is RiskLevel.HIGH
+    assert plan.steps[0].command == ["gio", "trash", str(source)]
+    assert plan.steps[1].command == ["xdg-open", str(folder)]
+
+
 @pytest.mark.parametrize("verb", ("Copie", "Mova"))
 def test_transfer_file_between_known_personal_folders(tmp_path: Path, verb: str) -> None:
     documents = tmp_path / "Documentos"

@@ -97,6 +97,18 @@ def test_remove_existing_folder_uses_fast_action_route(tmp_path) -> None:
     assert router.route("remova a pasta test02 da Home").route is InteractionRoute.ACTION
 
 
+def test_exclude_file_inside_folder_uses_fast_action_route(tmp_path) -> None:
+    folder = tmp_path / "TesteUbuntuAI"
+    folder.mkdir()
+    (folder / "notas.txt").touch()
+    router = InteractionRouter(
+        builtin_planner=BuiltinPlanner(file_operations=SafeFileOperationPlanner(home=tmp_path))
+    )
+
+    request = "exclua o arquivo notas.txt dentro da pasta TesteUbuntuAI"
+    assert router.route(request).route is InteractionRoute.ACTION
+
+
 def test_local_route_contains_response(router: InteractionRouter) -> None:
     decision = router.route("help")
 

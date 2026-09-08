@@ -58,6 +58,7 @@ class InteractionRouter:
         "desinstale",
         "diagnostique",
         "execute",
+        "exclua",
         "finalize",
         "habilite",
         "inicie",

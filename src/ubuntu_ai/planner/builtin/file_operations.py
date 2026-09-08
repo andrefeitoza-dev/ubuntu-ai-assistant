@@ -21,8 +21,9 @@ class SafeFileOperationPlanner:
         re.IGNORECASE,
     )
     _REMOVE = re.compile(
-        r"^(?:remova|apague|delete)\s+(?:(?:o|a|um|uma)\s+)?"
-        r"(?:arquivo|pasta)\s+(.+?)(?:\s+(?:da|do|de|na|no)\s+(.+))?$",
+        r"^(?:remova|apague|delete|exclua)\s+(?:(?:o|a|um|uma)\s+)?"
+        r"(?:arquivo|pasta)\s+(.+?)(?:\s+(?:dentro\s+da\s+pasta|dentro\s+de|"
+        r"da\s+pasta|na\s+pasta|da|do|de|na|no)\s+(.+))?$",
         re.IGNORECASE,
     )
     _TRANSFER = re.compile(
@@ -39,7 +40,7 @@ class SafeFileOperationPlanner:
         re.IGNORECASE,
     )
     _INTENT = re.compile(
-        r"^(?:crie\s+.+(?:pasta|arquivo)|copie|mova|renomeie|envie|remova|apague|delete)\b",
+        r"^(?:crie\s+.+(?:pasta|arquivo)|copie|mova|renomeie|envie|remova|apague|delete|exclua)\b",
         re.IGNORECASE,
     )
     _FOLDERS = {
@@ -67,10 +68,11 @@ class SafeFileOperationPlanner:
             source = parent / name.strip()
             if not source.exists() or source.is_symlink():
                 return None
-            return self._plan(
+            return self._trash_plan(
                 "Mover para a Lixeira",
                 f"Move {source} para a Lixeira, permitindo recuperação posterior.",
                 ("gio", "trash", str(source)),
+                parent,
             )
 
         trash = self._TRASH.fullmatch(value)
@@ -208,6 +210,24 @@ class SafeFileOperationPlanner:
             PlanStep(
                 title="Atualizar pasta no gerenciador de arquivos",
                 description=f"Abre a pasta {parent} para exibir imediatamente o novo item.",
+                command=["xdg-open", str(parent)],
+            )
+        )
+        return plan
+
+    @classmethod
+    def _trash_plan(
+        cls,
+        title: str,
+        description: str,
+        command: tuple[str, ...],
+        parent: Path,
+    ) -> Plan:
+        plan = cls._plan(title, description, command)
+        plan.add_step(
+            PlanStep(
+                title="Atualizar pasta no gerenciador de arquivos",
+                description=f"Abre a pasta {parent} para atualizar a visualização após a exclusão.",
                 command=["xdg-open", str(parent)],
             )
         )
