@@ -287,3 +287,13 @@ Especificação: `docs/natural-actions-roadmap.md`.
 - o manual deve ser acessível pelo assistente e publicado no GitHub;
 - a revisão documental deve fazer parte da verificação obrigatória antes da próxima release;
 - pequenas correções continuam acumuladas em `develop/v2.3`, sem criar uma versão por ajuste.
+
+## Próximo ciclo funcional
+
+- suporte a múltiplas LLMs foi incluído na pauta sem substituir o Ollama local padrão;
+- primeira entrega prevista: selecionar, baixar, testar e persistir modelos do Ollama;
+- provedores via internet virão depois, com cofre de credenciais, aviso de privacidade e custos;
+- a troca de LLM não altera políticas, confirmações nem permissões administrativas;
+- continuam na pauta: Central diária, diagnóstico, arquivos, manual, automações,
+  integração com aplicativos e evolução da voz;
+- pequenas entregas serão salvas em desenvolvimento e agrupadas numa versão relevante.

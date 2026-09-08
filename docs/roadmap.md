@@ -533,3 +533,40 @@ execução local, transparência e confirmação proporcional ao risco.
 - [ ] adicionar um acesso “Abrir manual” dentro do assistente;
 - [ ] publicar e validar o manual navegável no GitHub junto à próxima release relevante;
 - [ ] revisar instalação, solução de problemas e exemplos antes da publicação.
+
+### Próximo ciclo — cérebro do Ubuntu e múltiplas LLMs
+
+Objetivo: evoluir o assistente como interface inteligente entre usuário e sistema
+operacional, preservando privacidade, confirmação humana e limites administrativos.
+As entregas pequenas serão acumuladas em desenvolvimento e somente formarão uma
+nova versão quando compuserem um conjunto relevante e homologado.
+
+1. **Modelos de IA locais e externos**
+   - [ ] listar e selecionar modelos já instalados no Ollama;
+   - [ ] baixar outro modelo local com progresso, requisitos e confirmação;
+   - [ ] persistir a seleção e testar o modelo antes de ativá-lo;
+   - [ ] criar provedores externos sobre o contrato `AIProvider` existente;
+   - [ ] guardar chaves de API no cofre seguro do Ubuntu, nunca em texto aberto;
+   - [ ] avisar claramente quando dados serão enviados à internet e poderão gerar custos;
+   - [ ] permitir modelo principal e reserva sem ampliar permissões de execução.
+2. **Central diária inteligente**
+   - [ ] reunir atualizações, armazenamento, memória, serviços, segurança e tarefas recentes;
+   - [ ] recomendar cuidados verificáveis sem executar alterações automaticamente.
+3. **Diagnóstico e correção de problemas**
+   - [ ] diagnosticar problemas comuns de rede, áudio, desempenho e aplicativos;
+   - [ ] propor correções graduais, com prévia, confirmação e verificação do resultado.
+4. **Produtividade e organização de arquivos**
+   - [ ] pesquisar por nome, conteúdo, tipo e data;
+   - [ ] organizar, renomear, compactar e localizar duplicados com prévia reversível.
+5. **Manual integrado ao aplicativo**
+   - [ ] criar acesso ao manual pela interface e por perguntas naturais;
+   - [ ] cobrir instalação, voz, modelos, arquivos, aplicativos, segurança e automações.
+6. **Rotinas e automações**
+   - [ ] criar rotinas recorrentes visíveis, pausáveis e auditáveis;
+   - [ ] exigir autorização específica para qualquer etapa administrativa.
+7. **Integração mais profunda com aplicativos**
+   - [ ] abrir documentos e acionar funções suportadas por interfaces confiáveis;
+   - [ ] detectar recursos disponíveis sem inventar suporte inexistente.
+8. **Melhorias contínuas de voz**
+   - [ ] aprimorar naturalidade, interrupção, acessibilidade e escolha de vozes;
+   - [ ] manter entrada local privada e indicar claramente qualquer serviço online.
