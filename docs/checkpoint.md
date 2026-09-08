@@ -314,6 +314,7 @@ Especificação: `docs/natural-actions-roadmap.md`.
 - o menu reúne Computador, Agentes e progresso, Recursos e ajuda e Cuidados;
 - depois de abrir o menu, passar o mouse sobre um tópico abre suas opções;
 - as opções aparecem ao lado do tópico e desaparecem ao sair da área do menu;
+- a troca direta entre tópicos mantém o novo painel aberto, sem fechamento atrasado;
 - ao escolher uma categoria, seu submenu aparece lateralmente e alinhado ao item escolhido;
 - o menu principal permanece organizado e separado do submenu, sem sobreposição entre ambos;
 - o submenu desaparece quando o ponteiro sai da área de navegação;

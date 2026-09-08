@@ -76,23 +76,27 @@ class NavigationControllerMixin:
         self._hide_remote_controls()
 
     def _open_remote_from_menu(self) -> None:
+        self._keep_navigation_open()
         if not self._remote_controls_visible:
             self._toggle_remote_controls()
         self._watch_navigation_panel(self.remote_controls, self._hide_remote_controls)
 
     def _open_automation_from_menu(self) -> None:
+        self._keep_navigation_open()
         self._hide_remote_controls()
         panel = getattr(self, "_automation_panel", None)
         if panel is None or not panel.winfo_ismapped():
             self._show_automation_panel()
 
     def _open_resources_from_menu(self) -> None:
+        self._keep_navigation_open()
         self._hide_remote_controls()
         panel = getattr(self, "_resources_panel", None)
         if panel is None or not panel.winfo_ismapped():
             self._show_capabilities()
 
     def _open_care_from_menu(self) -> None:
+        self._keep_navigation_open()
         self._hide_remote_controls()
         panel = getattr(self, "_care_panel", None)
         if panel is None or not panel.winfo_ismapped():
@@ -108,9 +112,17 @@ class NavigationControllerMixin:
         panel.place(x=menu_left - 3, y=button_top, width=fitted_width, anchor=tk.NE)
 
     def _schedule_navigation_leave(self, _event: tk.Event | None = None) -> None:
-        self.root.after(160, self._hide_panels_if_outside_navigation)
+        generation = getattr(self, "_navigation_hover_generation", 0)
+        self.root.after(220, self._hide_panels_if_outside_navigation, generation)
 
-    def _hide_panels_if_outside_navigation(self) -> None:
+    def _keep_navigation_open(self, _event: tk.Event | None = None) -> None:
+        self._navigation_hover_generation = (
+            getattr(self, "_navigation_hover_generation", 0) + 1
+        )
+
+    def _hide_panels_if_outside_navigation(self, generation: int) -> None:
+        if generation != getattr(self, "_navigation_hover_generation", 0):
+            return
         widget = self.root.winfo_containing(
             self.root.winfo_pointerx(), self.root.winfo_pointery()
         )
@@ -130,17 +142,24 @@ class NavigationControllerMixin:
         self._hide_remote_controls()
 
     def _watch_navigation_panel(self, panel: tk.Widget, hide_callback: object) -> None:
+        panel.bind("<Enter>", self._keep_navigation_open, add="+")
         panel.bind(
             "<Leave>",
             lambda _event: self.root.after(
-                160,
+                220,
                 self._hide_if_outside_navigation,
                 panel,
                 hide_callback,
+                getattr(self, "_navigation_hover_generation", 0),
             ),
+            add="+",
         )
 
-    def _hide_if_outside_navigation(self, panel: tk.Widget, hide_callback: object) -> None:
+    def _hide_if_outside_navigation(
+        self, panel: tk.Widget, hide_callback: object, generation: int
+    ) -> None:
+        if generation != getattr(self, "_navigation_hover_generation", 0):
+            return
         widget = self.root.winfo_containing(
             self.root.winfo_pointerx(), self.root.winfo_pointery()
         )
