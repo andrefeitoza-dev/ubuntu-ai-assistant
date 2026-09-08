@@ -318,6 +318,8 @@ Especificação: `docs/natural-actions-roadmap.md`.
   o usuário percorre os tópicos;
 - a lista de tópicos permanece na camada superior quando um painel lateral abre;
 - as setas para cima e para baixo percorrem os tópicos e mostram suas opções;
+- um controlador único acompanha o ponteiro e evita painéis presos ou perda da
+  troca entre tópicos causada por eventos independentes dos botões;
 - ao escolher uma categoria, seu submenu aparece lateralmente e alinhado ao item escolhido;
 - o menu principal permanece organizado e separado do submenu, sem sobreposição entre ambos;
 - o submenu desaparece quando o ponteiro sai da área de navegação;

@@ -263,7 +263,6 @@ def build_main_interface(
     )
     navigation_buttons = tuple(button for button, _action in navigation_options)
     for index, (button, action) in enumerate(navigation_options):
-        button.bind("<Enter>", lambda _event, callback=action: callback(), add="+")
         button.bind("<FocusIn>", lambda _event, callback=action: callback(), add="+")
         button.bind(
             "<Down>",

@@ -65,6 +65,62 @@ class NavigationControllerMixin:
         )
         self.navigation_menu.place(x=button_right, y=button_bottom + 6, width=245, anchor=tk.NE)
         self.navigation_menu.lift()
+        self._active_navigation_topic = None
+
+    def _track_navigation_pointer(self, event: tk.Event) -> None:
+        """Troca o painel pelo botão realmente localizado sob o ponteiro."""
+        menu = getattr(self, "navigation_menu", None)
+        if menu is None or not menu.winfo_ismapped():
+            return
+
+        widget = event.widget
+        topic_actions = {
+            self.remote_controls_button: ("computer", self._open_remote_from_menu),
+            self.automation_button: ("automation", self._open_automation_from_menu),
+            self.resources_button: ("resources", self._open_resources_from_menu),
+            self.care_button: ("care", self._open_care_from_menu),
+        }
+        while widget is not None:
+            selected = topic_actions.get(widget)
+            if selected is not None:
+                topic, action = selected
+                if topic != getattr(self, "_active_navigation_topic", None):
+                    self._active_navigation_topic = topic
+                    action()
+                return
+            widget = getattr(widget, "master", None)
+
+        self._schedule_navigation_panel_close()
+
+    def _schedule_navigation_panel_close(self) -> None:
+        self._navigation_close_generation = (
+            getattr(self, "_navigation_close_generation", 0) + 1
+        )
+        generation = self._navigation_close_generation
+        self.root.after(600, self._close_navigation_panels_if_outside, generation)
+
+    def _close_navigation_panels_if_outside(self, generation: int) -> None:
+        if generation != getattr(self, "_navigation_close_generation", 0):
+            return
+        widget = self.root.winfo_containing(
+            self.root.winfo_pointerx(), self.root.winfo_pointery()
+        )
+        panels = (
+            self.navigation_menu,
+            getattr(self, "remote_controls", None),
+            getattr(self, "_automation_panel", None),
+            getattr(self, "_resources_panel", None),
+            getattr(self, "_care_panel", None),
+        )
+        while widget is not None:
+            if widget in panels:
+                return
+            widget = getattr(widget, "master", None)
+        self._hide_capabilities_panel()
+        self._hide_automation_panel()
+        self._hide_care_panel()
+        self._hide_remote_controls()
+        self._active_navigation_topic = None
 
     def _hide_navigation_menu(self, _event: tk.Event | None = None) -> None:
         menu = getattr(self, "navigation_menu", None)

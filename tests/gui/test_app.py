@@ -538,8 +538,8 @@ def test_header_menu_opens_four_options_by_click_or_hover() -> None:
     assert "automation_button" in interface_source
     assert "resources_button" in interface_source
     assert "care_button" in interface_source
-    assert "lambda _event, callback=action" in interface_source
-    assert "<Enter>" in interface_source
+    assert "_track_navigation_pointer" in source
+    assert 'bind_all("<Motion>"' in source
     assert '"<FocusIn>"' in interface_source
     assert '"<Down>"' in interface_source
     assert '"<Up>"' in interface_source
@@ -561,6 +561,7 @@ def test_header_menu_opens_four_options_by_click_or_hover() -> None:
     assert "O painel permanece aberto durante a navegação" in navigation_source
     assert "_raise_navigation_menu()" in navigation_source
     assert "self.navigation_menu.lift()" in navigation_source
+    assert "_close_navigation_panels_if_outside" in navigation_source
 
 
 def test_three_header_controls_have_no_visible_focus_frame() -> None:

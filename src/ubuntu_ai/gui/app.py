@@ -212,6 +212,7 @@ class UbuntuAIApp(
         self.voice_button = widgets.voice_button
         self.speech_button = widgets.speech_button
         self.send_button = widgets.send_button
+        self.root.bind_all("<Motion>", self._track_navigation_pointer, add="+")
 
     def _bind_mousewheel(self) -> None:
         """Habilita roda do mouse e touchpad no histórico da conversa."""
