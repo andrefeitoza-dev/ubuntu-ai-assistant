@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import os
 import re
+from difflib import get_close_matches
 from pathlib import Path
 
 from ubuntu_ai.domain.plan import Plan, PlanStep
@@ -166,14 +167,29 @@ class SafeFileOperationPlanner:
         remove = self._REMOVE.fullmatch(value)
         if remove:
             item_kind, name, folder_label = remove.groups()
-            if folder_label is None and self._safe_name(name):
+            if self._safe_name(name):
                 matches = self._matching_items(item_kind, name.strip())
-                if len(matches) > 1:
+                if folder_label is None and len(matches) > 1:
                     paths = "\n".join(f"• {path}" for path in matches[:5])
                     return (
                         "Encontrei mais de um item com esse nome. Informe a pasta de origem "
                         f"para escolher com segurança:\n{paths}"
                     )
+                location = "na sua pasta pessoal"
+                if folder_label is not None:
+                    parent = self._folder(folder_label)
+                    location = (
+                        f"em {parent}" if parent is not None else f'na pasta "{folder_label}"'
+                    )
+                message = (
+                    f'Não encontrei {self._item_article(item_kind)} {item_kind} "{name.strip()}" '
+                    f"{location}. Nada foi excluído. Verifique o nome ou informe a pasta de origem."
+                )
+                suggestions = self._similar_items(item_kind, name.strip(), folder_label)
+                if suggestions:
+                    paths = "\n".join(f"• {path}" for path in suggestions)
+                    message += f"\nItens com nomes parecidos:\n{paths}"
+                return message
         return (
             "Alteração não planejada. Use nomes simples e pastas pessoais conhecidas; "
             "a origem deve existir e o destino não pode existir nem ser um link simbólico."
@@ -211,6 +227,42 @@ class SafeFileOperationPlanner:
                     if len(matches) > 5:
                         break
         return matches
+
+    def _similar_items(
+        self, item_kind: str, name: str, folder_label: str | None
+    ) -> list[Path]:
+        if folder_label is not None:
+            parent = self._folder(folder_label)
+            candidates = self._items_in(parent, item_kind) if parent is not None else []
+        else:
+            candidates = []
+            for root, directories, files in os.walk(self._home, followlinks=False):
+                directories[:] = [
+                    entry
+                    for entry in directories
+                    if not entry.startswith(".") and not (Path(root) / entry).is_symlink()
+                ]
+                entries = files if item_kind.casefold() == "arquivo" else directories
+                candidates.extend(Path(root) / entry for entry in entries)
+
+        by_name: dict[str, list[Path]] = {}
+        for candidate in candidates:
+            if self._matches_kind(candidate, item_kind):
+                by_name.setdefault(candidate.name, []).append(candidate)
+        similar_names = get_close_matches(name, by_name, n=3, cutoff=0.6)
+        return [path for similar_name in similar_names for path in by_name[similar_name]][:3]
+
+    @classmethod
+    def _items_in(cls, parent: Path, item_kind: str) -> list[Path]:
+        try:
+            entries = list(parent.iterdir())
+        except OSError:
+            return []
+        return [entry for entry in entries if cls._matches_kind(entry, item_kind)]
+
+    @staticmethod
+    def _item_article(item_kind: str) -> str:
+        return "o" if item_kind.casefold() == "arquivo" else "a"
 
     @staticmethod
     def _matches_kind(path: Path, item_kind: str) -> bool:

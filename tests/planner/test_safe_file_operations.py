@@ -128,6 +128,45 @@ def test_remove_respects_requested_item_kind(tmp_path: Path) -> None:
     assert plan is None
 
 
+def test_missing_file_reports_that_nothing_was_deleted(tmp_path: Path) -> None:
+    planner = SafeFileOperationPlanner(home=tmp_path)
+
+    reason = planner.rejection_reason("Exclua o arquivo inexistente.txt.")
+
+    assert reason is not None
+    assert 'Não encontrei o arquivo "inexistente.txt" na sua pasta pessoal.' in reason
+    assert "Nada foi excluído." in reason
+
+
+def test_missing_file_suggests_similar_names_without_planning_action(tmp_path: Path) -> None:
+    folder = tmp_path / "TesteUbuntuAI"
+    folder.mkdir()
+    similar = folder / "notas.txt"
+    similar.touch()
+    planner = SafeFileOperationPlanner(home=tmp_path)
+
+    request = "Exclua o arquivo nota.txt."
+    reason = planner.rejection_reason(request)
+
+    assert planner.try_create_plan(request) is None
+    assert reason is not None
+    assert "Itens com nomes parecidos:" in reason
+    assert str(similar) in reason
+
+
+def test_missing_file_in_named_folder_mentions_origin(tmp_path: Path) -> None:
+    folder = tmp_path / "TesteUbuntuAI"
+    folder.mkdir()
+    planner = SafeFileOperationPlanner(home=tmp_path)
+
+    reason = planner.rejection_reason(
+        "Exclua o arquivo inexistente.txt dentro da pasta TesteUbuntuAI."
+    )
+
+    assert reason is not None
+    assert f'em {folder}. Nada foi excluído.' in reason
+
+
 @pytest.mark.parametrize("verb", ("Copie", "Mova"))
 def test_transfer_file_between_known_personal_folders(tmp_path: Path, verb: str) -> None:
     documents = tmp_path / "Documentos"
