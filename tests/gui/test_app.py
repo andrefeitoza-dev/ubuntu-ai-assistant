@@ -30,6 +30,11 @@ class FakeHoverWidget:
         self.options.update(options)
 
 
+class FakeNavigationWidget:
+    def __init__(self, master=None) -> None:
+        self.master = master
+
+
 class FakeScrollRoot:
     def __init__(self) -> None:
         self.callbacks = []
@@ -561,7 +566,8 @@ def test_header_menu_opens_four_options_by_click_or_hover() -> None:
     assert "O painel permanece aberto durante a navegação" in navigation_source
     assert "_raise_navigation_menu()" in navigation_source
     assert "self.navigation_menu.lift()" in navigation_source
-    assert "_close_navigation_panels_if_outside" in navigation_source
+    assert "_schedule_navigation_panel_close" not in navigation_source
+    assert "_close_navigation_panels_if_outside" not in navigation_source
     assert "if event.widget is self.root" in navigation_source
     assert source.count('self.root.bind("<Unmap>"') == 1
 
@@ -579,6 +585,32 @@ def test_child_unmap_does_not_close_navigation() -> None:
         SimpleNamespace(widget=application.root)
     )
     assert closed == [True]
+
+
+def test_pointer_keeps_panel_until_another_topic_is_reached() -> None:
+    application = gui_app.UbuntuAIApp.__new__(gui_app.UbuntuAIApp)
+    application.navigation_menu = FakeNavigationWidget()
+    application.navigation_menu.winfo_ismapped = lambda: True
+    application.remote_controls_button = FakeNavigationWidget(application.navigation_menu)
+    application.automation_button = FakeNavigationWidget(application.navigation_menu)
+    application.resources_button = FakeNavigationWidget(application.navigation_menu)
+    application.care_button = FakeNavigationWidget(application.navigation_menu)
+    opened: list[str] = []
+    application._open_remote_from_menu = lambda: opened.append("computer")
+    application._open_automation_from_menu = lambda: opened.append("automation")
+    application._open_resources_from_menu = lambda: opened.append("resources")
+    application._open_care_from_menu = lambda: opened.append("care")
+
+    application._track_navigation_pointer(
+        SimpleNamespace(widget=application.remote_controls_button)
+    )
+    application._track_navigation_pointer(SimpleNamespace(widget=object()))
+    assert opened == ["computer"]
+
+    application._track_navigation_pointer(
+        SimpleNamespace(widget=application.resources_button)
+    )
+    assert opened == ["computer", "resources"]
 
 
 def test_three_header_controls_have_no_visible_focus_frame() -> None:
