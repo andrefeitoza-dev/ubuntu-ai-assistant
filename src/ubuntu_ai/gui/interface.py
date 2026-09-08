@@ -14,7 +14,6 @@ from ubuntu_ai.gui.theme import (
     FONT_BODY,
     FONT_SMALL,
     FONT_SMALL_BOLD,
-    FONT_TINY,
     FONT_TITLE,
     SUCCESS,
     SURFACE_ALT,
@@ -199,7 +198,7 @@ def build_main_interface(
 
     care_button = tk.Button(
         navigation_menu,
-        text="Cuidados  ▾",
+        text="Cuidados",
         command=on_show_care,
         bg=BACKGROUND,
         fg=TEXT_MUTED,
@@ -210,7 +209,7 @@ def build_main_interface(
         highlightthickness=0,
         cursor="hand2",
         takefocus=True,
-        font=FONT_TINY,
+        font=FONT_SMALL,
         padx=8,
         pady=4,
     )
@@ -218,7 +217,7 @@ def build_main_interface(
 
     resources_button = tk.Button(
         navigation_menu,
-        text="Recursos e ajuda  ▾",
+        text="Recursos e ajuda",
         command=on_show_capabilities,
         bg=BACKGROUND,
         fg=TEXT_MUTED,
@@ -229,7 +228,7 @@ def build_main_interface(
         highlightthickness=0,
         cursor="hand2",
         takefocus=True,
-        font=FONT_TINY,
+        font=FONT_SMALL,
         padx=8,
         pady=4,
     )
@@ -237,7 +236,7 @@ def build_main_interface(
 
     automation_button = tk.Button(
         navigation_menu,
-        text="Agentes e progresso  ▾",
+        text="Agentes e progresso",
         command=on_show_automation,
         bg=BACKGROUND,
         fg=TEXT_MUTED,
@@ -248,7 +247,7 @@ def build_main_interface(
         highlightthickness=0,
         cursor="hand2",
         takefocus=True,
-        font=FONT_TINY,
+        font=FONT_SMALL,
         padx=8,
         pady=4,
     )

@@ -27,7 +27,7 @@ class PanelControllerMixin:
             self._care_panel = panel
         panel.pack(fill=tk.X, pady=(0, 10))
         panel.lift()
-        self.care_button.configure(text="Cuidados  ▴")
+        self.care_button.configure(text="Cuidados")
 
     def _hide_care_panel(self, _event: tk.Event | None = None) -> None:
         panel = getattr(self, "_care_panel", None)
@@ -35,7 +35,7 @@ class PanelControllerMixin:
             panel.pack_forget()
         button = getattr(self, "care_button", None)
         if button is not None and button.winfo_exists():
-            button.configure(text="Cuidados  ▾")
+            button.configure(text="Cuidados")
 
     def _start_care_action(self, request: str) -> None:
         self._hide_care_panel()

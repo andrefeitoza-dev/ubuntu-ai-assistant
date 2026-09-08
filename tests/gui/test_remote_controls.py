@@ -9,7 +9,7 @@ def test_remote_button_text_preserves_target_and_state() -> None:
             "local",
             expanded=False,
         )
-        == "Computador: local  ▾"
+        == "Computador: local"
     )
 
     assert (
@@ -17,7 +17,7 @@ def test_remote_button_text_preserves_target_and_state() -> None:
             "servidor-tcc",
             expanded=True,
         )
-        == "Computador: servidor-tcc  ▴"
+        == "Computador: servidor-tcc"
     )
 
 

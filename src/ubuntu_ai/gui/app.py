@@ -560,7 +560,7 @@ class UbuntuAIApp(
         panel.pack(fill=tk.X, pady=(0, 10))
         panel.lift()
 
-        self.resources_button.configure(text="Recursos e ajuda  ▴")
+        self.resources_button.configure(text="Recursos e ajuda")
         self._display_capability_detail(0)
         listbox.focus_set()
 
@@ -662,7 +662,7 @@ class UbuntuAIApp(
 
         button = getattr(self, "resources_button", None)
         if button is not None and button.winfo_exists():
-            button.configure(text="Recursos e ajuda  ▾")
+            button.configure(text="Recursos e ajuda")
 
     @staticmethod
     def _multi_agent_request(request: str) -> str | None:
@@ -805,7 +805,7 @@ class UbuntuAIApp(
         self._refresh_automation_panel()
         panel.pack(fill=tk.X, pady=(0, 10))
         panel.lift()
-        self.automation_button.configure(text="Agentes e progresso  ▴")
+        self.automation_button.configure(text="Agentes e progresso")
 
     def _build_automation_panel(self) -> tk.Frame:
         widgets = build_automation_panel(
@@ -869,7 +869,7 @@ class UbuntuAIApp(
             panel.pack_forget()
         button = getattr(self, "automation_button", None)
         if button is not None and button.winfo_exists():
-            button.configure(text="Agentes e progresso  ▾")
+            button.configure(text="Agentes e progresso")
 
     def _send_resource_to_conversation(self, code: str) -> None:
         self._hide_capabilities_panel()

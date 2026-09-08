@@ -6,6 +6,7 @@ from dataclasses import dataclass
 
 from ubuntu_ai.gui.theme import (
     BACKGROUND,
+    FONT_SMALL,
     FONT_TINY,
     SURFACE_ALT,
     SURFACE_HOVER,
@@ -27,8 +28,8 @@ class RemoteControlsWidgets:
 def remote_button_text(target: str, *, expanded: bool) -> str:
     """Mantém o destino selecionado sempre visível no botão."""
 
-    indicator = "▴" if expanded else "▾"
-    return f"Computador: {target}  {indicator}"
+    del expanded
+    return f"Computador: {target}"
 
 
 def place_remote_controls(
@@ -67,7 +68,7 @@ def build_remote_controls(
         highlightthickness=0,
         cursor="hand2",
         takefocus=True,
-        font=FONT_TINY,
+        font=FONT_SMALL,
         padx=9,
         pady=4,
     )

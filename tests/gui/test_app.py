@@ -194,10 +194,10 @@ def test_voice_cannot_confirm_a_pending_plan() -> None:
 
 def test_remote_button_keeps_selected_target_visible() -> None:
     assert gui_app.UbuntuAIApp._remote_button_text("local", expanded=False) == (
-        "Computador: local  ▾"
+        "Computador: local"
     )
     assert gui_app.UbuntuAIApp._remote_button_text("servidor-tcc", expanded=True) == (
-        "Computador: servidor-tcc  ▴"
+        "Computador: servidor-tcc"
     )
 
 
@@ -208,7 +208,7 @@ def test_gui_exposes_capability_catalog_button() -> None:
     )
     complete_source = source + component_source
 
-    assert 'text="Recursos e ajuda  ▾"' in source
+    assert 'text="Recursos e ajuda"' in source
     assert "tk.Listbox(" in component_source
     assert "_build_capabilities_panel" in source
     assert "_schedule_capability_detail" in source
@@ -225,7 +225,7 @@ def test_gui_exposes_computer_care_panel() -> None:
         Path(gui_app.__file__).with_name("panel_controller.py").read_text(encoding="utf-8")
     )
 
-    assert 'text="Cuidados  ▾"' in Path("src/ubuntu_ai/gui/interface.py").read_text(
+    assert 'text="Cuidados"' in Path("src/ubuntu_ai/gui/interface.py").read_text(
         encoding="utf-8"
     )
     assert "_show_care_panel" in controller_source
@@ -254,7 +254,7 @@ def test_gui_exposes_integrated_multi_agent_progress_panel() -> None:
     )
     complete_source = source + component_source
 
-    assert 'text="Agentes e progresso  ▾"' in source
+    assert 'text="Agentes e progresso"' in source
     assert "_build_automation_panel" in source
     assert "_refresh_automation_panel" in source
     assert "pause_automation" in source
@@ -517,8 +517,8 @@ def test_main_interface_and_conversation_are_delegated() -> None:
     interface_source = Path("src/ubuntu_ai/gui/interface.py").read_text(encoding="utf-8")
 
     assert 'text="Como posso ajudar?"' not in source
-    assert 'text="Recursos e ajuda  ▾"' in interface_source
-    assert 'text="Agentes e progresso  ▾"' in interface_source
+    assert 'text="Recursos e ajuda"' in interface_source
+    assert 'text="Agentes e progresso"' in interface_source
     assert 'tooltip="voice input"' in interface_source
     assert 'tooltip="voice output"' in interface_source
 
@@ -541,6 +541,10 @@ def test_header_uses_visible_menu_with_four_click_options() -> None:
     assert "command=on_show_automation" in interface_source
     assert "command=on_show_capabilities" in interface_source
     assert "command=on_show_care" in interface_source
+    assert interface_source.count("font=FONT_SMALL,") >= 3
+    assert "Recursos e ajuda  ▾" not in interface_source
+    assert "Agentes e progresso  ▾" not in interface_source
+    assert "Cuidados  ▾" not in interface_source
     assert "_toggle_navigation_menu" in source
     assert "navigation_menu.place(" in navigation_source
     assert "_hide_navigation_menu()" in navigation_source
