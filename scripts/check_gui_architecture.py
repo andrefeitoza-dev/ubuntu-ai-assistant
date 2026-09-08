@@ -11,6 +11,7 @@ REQUIRED_COMPONENTS = (
     Path("src/ubuntu_ai/gui/conversation_view.py"),
     Path("src/ubuntu_ai/gui/execution_cards.py"),
     Path("src/ubuntu_ai/gui/interface.py"),
+    Path("src/ubuntu_ai/gui/navigation_controller.py"),
     Path("src/ubuntu_ai/gui/presentation.py"),
     Path("src/ubuntu_ai/gui/remote_controls.py"),
     Path("src/ubuntu_ai/gui/theme.py"),

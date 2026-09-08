@@ -91,11 +91,14 @@ class PanelControllerMixin:
         care_button = getattr(self, "care_button", None)
         remote_controls = getattr(self, "remote_controls", None)
         remote_button = getattr(self, "remote_controls_button", None)
+        navigation_menu = getattr(self, "navigation_menu", None)
+        navigation_button = getattr(self, "navigation_button", None)
 
         inside_resources = False
         inside_remote_controls = False
         inside_automation = False
         inside_care = False
+        inside_navigation = False
 
         widget = event.widget
         while widget is not None:
@@ -107,6 +110,8 @@ class PanelControllerMixin:
                 inside_automation = True
             if widget is care_panel or widget is care_button:
                 inside_care = True
+            if widget is navigation_menu or widget is navigation_button:
+                inside_navigation = True
             widget = getattr(widget, "master", None)
 
         if panel is not None and panel.winfo_ismapped() and not inside_resources:
@@ -121,3 +126,9 @@ class PanelControllerMixin:
             self._hide_automation_panel()
         if care_panel is not None and care_panel.winfo_ismapped() and not inside_care:
             self._hide_care_panel()
+        if (
+            navigation_menu is not None
+            and navigation_menu.winfo_ismapped()
+            and not inside_navigation
+        ):
+            self._hide_navigation_menu()

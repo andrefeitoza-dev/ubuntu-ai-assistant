@@ -31,6 +31,8 @@ from ubuntu_ai.gui.voice_controls import CircularVoiceButton
 class InterfaceWidgets:
     header_icon: tk.PhotoImage | None
     status_label: tk.Label
+    navigation_button: tk.Button
+    navigation_menu: tk.Frame
     care_button: tk.Button
     resources_button: tk.Button
     automation_button: tk.Button
@@ -100,6 +102,7 @@ def build_main_interface(
     root: tk.Misc,
     *,
     window_icon: tk.PhotoImage | None,
+    on_toggle_navigation: Callable[[], None],
     on_show_capabilities: Callable[[], None],
     on_show_care: Callable[[], None],
     on_show_automation: Callable[[], None],
@@ -163,8 +166,36 @@ def build_main_interface(
     )
     status_label.pack(side=tk.RIGHT)
 
-    care_button = tk.Button(
+    navigation_button = tk.Button(
         header,
+        text="☰",
+        command=on_toggle_navigation,
+        bg=BACKGROUND,
+        fg=TEXT,
+        activebackground=SURFACE_HOVER,
+        activeforeground=TEXT,
+        relief=tk.FLAT,
+        borderwidth=0,
+        highlightthickness=0,
+        cursor="hand2",
+        takefocus=True,
+        font=FONT_SMALL_BOLD,
+        padx=10,
+        pady=4,
+    )
+    navigation_button.pack(side=tk.RIGHT, padx=(0, 12))
+
+    navigation_menu = tk.Frame(
+        root,
+        bg=SURFACE_ALT,
+        padx=8,
+        pady=8,
+        highlightbackground=BORDER,
+        highlightthickness=1,
+    )
+
+    care_button = tk.Button(
+        navigation_menu,
         text="Cuidados  ▾",
         command=on_show_care,
         bg=BACKGROUND,
@@ -180,10 +211,10 @@ def build_main_interface(
         padx=8,
         pady=4,
     )
-    care_button.pack(side=tk.RIGHT, padx=(0, 10))
+    care_button.pack(fill=tk.X)
 
     resources_button = tk.Button(
-        header,
+        navigation_menu,
         text="Recursos e ajuda  ▾",
         command=on_show_capabilities,
         bg=BACKGROUND,
@@ -199,10 +230,10 @@ def build_main_interface(
         padx=8,
         pady=4,
     )
-    resources_button.pack(side=tk.RIGHT, padx=(0, 10))
+    resources_button.pack(fill=tk.X)
 
     automation_button = tk.Button(
-        header,
+        navigation_menu,
         text="Agentes e progresso  ▾",
         command=on_show_automation,
         bg=BACKGROUND,
@@ -218,10 +249,10 @@ def build_main_interface(
         padx=8,
         pady=4,
     )
-    automation_button.pack(side=tk.RIGHT, padx=(0, 10))
+    automation_button.pack(fill=tk.X)
 
     remote_widgets = build_remote_controls(
-        header,
+        navigation_menu,
         panel_parent=root,
         on_toggle=on_toggle_remote,
         on_target_selected=on_target_selected,
@@ -229,6 +260,22 @@ def build_main_interface(
         on_remove=on_remove_remote,
         on_diagnose=on_diagnose_remote,
     )
+    remote_widgets.button.pack_forget()
+    for button in (
+        remote_widgets.button,
+        automation_button,
+        resources_button,
+        care_button,
+    ):
+        button.pack_forget()
+        button.pack(fill=tk.X, pady=1)
+    for button, action in (
+        (remote_widgets.button, on_toggle_remote),
+        (automation_button, on_show_automation),
+        (resources_button, on_show_capabilities),
+        (care_button, on_show_care),
+    ):
+        button.bind("<Enter>", lambda _event, callback=action: callback(), add="+")
 
     content = tk.Frame(root, bg=BACKGROUND)
     content.pack(
@@ -364,6 +411,8 @@ def build_main_interface(
     return InterfaceWidgets(
         header_icon=header_icon,
         status_label=status_label,
+        navigation_button=navigation_button,
+        navigation_menu=navigation_menu,
         care_button=care_button,
         resources_button=resources_button,
         automation_button=automation_button,

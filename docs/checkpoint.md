@@ -306,3 +306,12 @@ Especificação: `docs/natural-actions-roadmap.md`.
 - seleção não instalada é rejeitada e não altera a configuração anterior;
 - máquina de desenvolvimento reconheceu `qwen2.5:3b` e `qwen2.5-coder:7b`;
 - incremento permanece em desenvolvimento, sem nova versão ou publicação.
+
+### Incremento local — menu único do cabeçalho
+
+- os quatro controles superiores foram consolidados em um botão `☰` sempre visível;
+- o botão foi posicionado imediatamente à esquerda do indicador de estado;
+- o menu reúne Computador, Agentes e progresso, Recursos e ajuda e Cuidados;
+- passar o mouse sobre uma opção abre o painel existente correspondente;
+- clique externo, novo clique no menu ou tecla `Esc` fecham a navegação;
+- funções, confirmações e painéis anteriores foram preservados.

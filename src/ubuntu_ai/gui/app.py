@@ -27,10 +27,10 @@ from ubuntu_ai.gui.execution_cards import (
 from ubuntu_ai.gui.first_run_controller import FirstRunControllerMixin
 from ubuntu_ai.gui.interface import (
     apply_busy_state,
-    bind_hover_reveal,
     build_main_interface,
     scroll_canvas_bottom,
 )
+from ubuntu_ai.gui.navigation_controller import NavigationControllerMixin
 from ubuntu_ai.gui.panel_controller import PanelControllerMixin
 from ubuntu_ai.gui.presentation import (
     command_text,
@@ -51,7 +51,6 @@ from ubuntu_ai.gui.theme import (
     FONT_TINY,
     SUCCESS,
     SURFACE,
-    SURFACE_ALT,
     TEXT,
     TEXT_MUTED,
     WARNING,
@@ -80,9 +79,13 @@ from ubuntu_ai.interaction import ChatResponse, InteractionRoute
 from ubuntu_ai.remote.diagnostics import RemoteSystemContext
 
 
-class UbuntuAIApp(VoiceControllerMixin, FirstRunControllerMixin, PanelControllerMixin):
+class UbuntuAIApp(
+    VoiceControllerMixin,
+    FirstRunControllerMixin,
+    NavigationControllerMixin,
+    PanelControllerMixin,
+):
     """Interface desktop do Ubuntu AI Assistant."""
-
     def __init__(self) -> None:
         self._backend = GUIBackend()
         self._busy = False
@@ -123,6 +126,7 @@ class UbuntuAIApp(VoiceControllerMixin, FirstRunControllerMixin, PanelController
         )
         self.root.bind("<Unmap>", self._hide_automation_panel, add="+")
         self.root.bind("<Unmap>", self._hide_care_panel, add="+")
+        self.root.bind("<Unmap>", self._hide_navigation_menu, add="+")
         self.root.bind(
             "<Escape>",
             self._hide_capabilities_panel,
@@ -130,6 +134,7 @@ class UbuntuAIApp(VoiceControllerMixin, FirstRunControllerMixin, PanelController
         )
         self.root.bind("<Escape>", self._hide_automation_panel, add="+")
         self.root.bind("<Escape>", self._hide_care_panel, add="+")
+        self.root.bind("<Escape>", self._hide_navigation_menu, add="+")
         self.root.bind(
             "<Button-1>",
             self._close_capabilities_on_outside_click,
@@ -168,10 +173,11 @@ class UbuntuAIApp(VoiceControllerMixin, FirstRunControllerMixin, PanelController
         widgets = build_main_interface(
             self.root,
             window_icon=self._window_icon,
-            on_show_capabilities=self._show_capabilities,
-            on_show_care=self._show_care_panel,
-            on_show_automation=self._show_automation_panel,
-            on_toggle_remote=self._toggle_remote_controls,
+            on_toggle_navigation=self._toggle_navigation_menu,
+            on_show_capabilities=self._open_resources_from_menu,
+            on_show_care=self._open_care_from_menu,
+            on_show_automation=self._open_automation_from_menu,
+            on_toggle_remote=self._open_remote_from_menu,
             on_target_selected=self._on_target_selected,
             on_add_remote=self._add_remote_host,
             on_remove_remote=self._remove_remote_host,
@@ -185,6 +191,8 @@ class UbuntuAIApp(VoiceControllerMixin, FirstRunControllerMixin, PanelController
 
         self._header_icon = widgets.header_icon
         self.status_label = widgets.status_label
+        self.navigation_button = widgets.navigation_button
+        self.navigation_menu = widgets.navigation_menu
         self.care_button = widgets.care_button
         self.resources_button = widgets.resources_button
         self.automation_button = widgets.automation_button
@@ -204,14 +212,6 @@ class UbuntuAIApp(VoiceControllerMixin, FirstRunControllerMixin, PanelController
         self.voice_button = widgets.voice_button
         self.speech_button = widgets.speech_button
         self.send_button = widgets.send_button
-        bind_hover_reveal(
-            self.remote_controls_button,
-            foreground=lambda: WARNING if self._backend.is_remote_selected else TEXT,
-            visible_background=SURFACE_ALT,
-        )
-        bind_hover_reveal(self.automation_button, foreground=TEXT_MUTED)
-        bind_hover_reveal(self.resources_button, foreground=TEXT_MUTED)
-        bind_hover_reveal(self.care_button, foreground=TEXT_MUTED)
 
     def _bind_mousewheel(self) -> None:
         """Habilita roda do mouse e touchpad no histórico da conversa."""

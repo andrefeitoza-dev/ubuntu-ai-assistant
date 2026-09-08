@@ -220,7 +220,6 @@ def test_gui_exposes_capability_catalog_button() -> None:
 
 
 def test_gui_exposes_computer_care_panel() -> None:
-    source = Path(gui_app.__file__).read_text(encoding="utf-8")
     component_source = Path(gui_app.__file__).with_name("care_panel.py").read_text(encoding="utf-8")
     controller_source = (
         Path(gui_app.__file__).with_name("panel_controller.py").read_text(encoding="utf-8")
@@ -229,7 +228,7 @@ def test_gui_exposes_computer_care_panel() -> None:
     assert 'text="Cuidados  ▾"' in Path("src/ubuntu_ai/gui/interface.py").read_text(
         encoding="utf-8"
     )
-    assert "_show_care_panel" in source
+    assert "_show_care_panel" in controller_source
     assert "_start_care_action" in controller_source
     assert "Diagnosticar lentidão" in component_source
     assert "Verificar segurança" in component_source
@@ -524,17 +523,22 @@ def test_main_interface_and_conversation_are_delegated() -> None:
     assert 'tooltip="voice output"' in interface_source
 
 
-def test_three_header_controls_reveal_only_on_hover_or_keyboard_focus() -> None:
+def test_header_uses_visible_menu_with_four_hover_options() -> None:
     source = Path("src/ubuntu_ai/gui/app.py").read_text(encoding="utf-8")
     interface_source = Path("src/ubuntu_ai/gui/interface.py").read_text(encoding="utf-8")
+    navigation_source = Path("src/ubuntu_ai/gui/navigation_controller.py").read_text(
+        encoding="utf-8"
+    )
 
-    assert "bind_hover_reveal(\n            self.remote_controls_button" in source
-    assert "bind_hover_reveal(self.automation_button" in source
-    assert "bind_hover_reveal(self.resources_button" in source
-    assert 'widget.bind("<Enter>"' in interface_source
-    assert 'widget.bind("<Leave>"' in interface_source
-    assert 'widget.bind("<FocusIn>"' in interface_source
-    assert 'widget.bind("<FocusOut>"' in interface_source
+    assert 'text="☰"' in interface_source
+    assert "navigation_button.pack(side=tk.RIGHT" in interface_source
+    assert "remote_widgets.button" in interface_source
+    assert "automation_button" in interface_source
+    assert "resources_button" in interface_source
+    assert "care_button" in interface_source
+    assert 'button.bind("<Enter>"' in interface_source
+    assert "_toggle_navigation_menu" in source
+    assert "navigation_menu.place(" in navigation_source
 
 
 def test_three_header_controls_have_no_visible_focus_frame() -> None:
