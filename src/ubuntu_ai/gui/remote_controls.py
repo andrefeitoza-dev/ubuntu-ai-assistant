@@ -36,13 +36,10 @@ def place_remote_controls(
     button: tk.Button,
     root: tk.Misc,
 ) -> None:
-    """Exibe as opções abaixo da aba, sem comprimir ou esconder o cabeçalho."""
+    """Exibe as opções na área própria abaixo do cabeçalho."""
 
-    root.update_idletasks()
-    button_right = button.winfo_rootx() - root.winfo_rootx() + button.winfo_width()
-    button_bottom = button.winfo_rooty() - root.winfo_rooty() + button.winfo_height()
-    container.place(x=button_right, y=button_bottom + 6, width=500, anchor=tk.NE)
-    container.lift()
+    del button, root
+    container.pack(fill=tk.X, pady=(0, 10))
 
 
 def build_remote_controls(

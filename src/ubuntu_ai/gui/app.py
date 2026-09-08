@@ -193,6 +193,7 @@ class UbuntuAIApp(
         self.status_label = widgets.status_label
         self.navigation_button = widgets.navigation_button
         self.navigation_menu = widgets.navigation_menu
+        self.panel_host = widgets.panel_host
         self.care_button = widgets.care_button
         self.resources_button = widgets.resources_button
         self.automation_button = widgets.automation_button
@@ -294,7 +295,7 @@ class UbuntuAIApp(
             return
 
         self._remote_controls_visible = False
-        self.remote_controls.place_forget()
+        self.remote_controls.pack_forget()
         self.remote_controls_button.configure(
             text=self._remote_button_text(
                 self.target_variable.get(),
@@ -556,24 +557,7 @@ class UbuntuAIApp(
         for topic in topics:
             listbox.insert(tk.END, f"{topic.code}. {topic.title}")
 
-        self.root.update_idletasks()
-        button_right = (
-            self.resources_button.winfo_rootx()
-            - self.root.winfo_rootx()
-            + self.resources_button.winfo_width()
-        )
-        button_bottom = (
-            self.resources_button.winfo_rooty()
-            - self.root.winfo_rooty()
-            + self.resources_button.winfo_height()
-        )
-
-        panel.place(
-            x=button_right,
-            y=button_bottom + 6,
-            width=480,
-            anchor=tk.NE,
-        )
+        panel.pack(fill=tk.X, pady=(0, 10))
         panel.lift()
 
         self.resources_button.configure(text="Recursos e ajuda  ▴")
@@ -582,7 +566,7 @@ class UbuntuAIApp(
 
     def _build_capabilities_panel(self) -> tk.Frame:
         widgets = build_capabilities_panel(
-            self.root,
+            self.panel_host,
             on_close=self._hide_capabilities_panel,
             on_motion=self._schedule_capability_detail,
             on_leave=self._cancel_capability_detail,
@@ -674,7 +658,7 @@ class UbuntuAIApp(
 
         panel = getattr(self, "_resources_panel", None)
         if panel is not None and panel.winfo_exists():
-            panel.place_forget()
+            panel.pack_forget()
 
         button = getattr(self, "resources_button", None)
         if button is not None and button.winfo_exists():
@@ -819,24 +803,13 @@ class UbuntuAIApp(
             self._automation_panel = panel
 
         self._refresh_automation_panel()
-        self.root.update_idletasks()
-        button_right = (
-            self.automation_button.winfo_rootx()
-            - self.root.winfo_rootx()
-            + self.automation_button.winfo_width()
-        )
-        button_bottom = (
-            self.automation_button.winfo_rooty()
-            - self.root.winfo_rooty()
-            + self.automation_button.winfo_height()
-        )
-        panel.place(x=button_right, y=button_bottom + 6, width=540, anchor=tk.NE)
+        panel.pack(fill=tk.X, pady=(0, 10))
         panel.lift()
         self.automation_button.configure(text="Agentes e progresso  ▴")
 
     def _build_automation_panel(self) -> tk.Frame:
         widgets = build_automation_panel(
-            self.root,
+            self.panel_host,
             on_close=self._hide_automation_panel,
             on_action=self._automation_action,
         )
@@ -893,7 +866,7 @@ class UbuntuAIApp(
     def _hide_automation_panel(self, _event: tk.Event | None = None) -> None:
         panel = getattr(self, "_automation_panel", None)
         if panel is not None and panel.winfo_exists():
-            panel.place_forget()
+            panel.pack_forget()
         button = getattr(self, "automation_button", None)
         if button is not None and button.winfo_exists():
             button.configure(text="Agentes e progresso  ▾")

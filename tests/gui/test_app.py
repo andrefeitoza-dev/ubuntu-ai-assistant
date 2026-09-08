@@ -213,8 +213,8 @@ def test_gui_exposes_capability_catalog_button() -> None:
     assert "_build_capabilities_panel" in source
     assert "_schedule_capability_detail" in source
     assert "_send_resource_to_conversation" in source
-    assert "panel.place(" in source
-    assert "panel.place_forget()" in source
+    assert "panel.pack(fill=tk.X" in source
+    assert "panel.pack_forget()" in source
     assert "tk.Menu(" not in complete_source
     assert "tk.Toplevel(" not in complete_source
 
@@ -523,7 +523,7 @@ def test_main_interface_and_conversation_are_delegated() -> None:
     assert 'tooltip="voice output"' in interface_source
 
 
-def test_header_uses_visible_menu_with_four_hover_options() -> None:
+def test_header_uses_visible_menu_with_four_click_options() -> None:
     source = Path("src/ubuntu_ai/gui/app.py").read_text(encoding="utf-8")
     interface_source = Path("src/ubuntu_ai/gui/interface.py").read_text(encoding="utf-8")
     navigation_source = Path("src/ubuntu_ai/gui/navigation_controller.py").read_text(
@@ -536,9 +536,17 @@ def test_header_uses_visible_menu_with_four_hover_options() -> None:
     assert "automation_button" in interface_source
     assert "resources_button" in interface_source
     assert "care_button" in interface_source
-    assert 'button.bind("<Enter>"' in interface_source
+    assert "lambda _event, callback=action" not in interface_source
+    assert "on_toggle=on_toggle_remote" in interface_source
+    assert "command=on_show_automation" in interface_source
+    assert "command=on_show_capabilities" in interface_source
+    assert "command=on_show_care" in interface_source
     assert "_toggle_navigation_menu" in source
     assert "navigation_menu.place(" in navigation_source
+    assert "_hide_navigation_menu()" in navigation_source
+    assert "panel_host.pack(fill=tk.X)" in interface_source
+    assert "self.panel_host" in source
+    assert "panel.pack(fill=tk.X" in source
 
 
 def test_three_header_controls_have_no_visible_focus_frame() -> None:

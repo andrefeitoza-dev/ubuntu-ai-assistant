@@ -19,31 +19,20 @@ class PanelControllerMixin:
             return
         if panel is None or not panel.winfo_exists():
             widgets = build_care_panel(
-                self.root,
+                self.panel_host,
                 on_close=self._hide_care_panel,
                 on_action=self._start_care_action,
             )
             panel = widgets.panel
             self._care_panel = panel
-        self.root.update_idletasks()
-        button_right = (
-            self.care_button.winfo_rootx()
-            - self.root.winfo_rootx()
-            + self.care_button.winfo_width()
-        )
-        button_bottom = (
-            self.care_button.winfo_rooty()
-            - self.root.winfo_rooty()
-            + self.care_button.winfo_height()
-        )
-        panel.place(x=button_right, y=button_bottom + 6, width=470, anchor=tk.NE)
+        panel.pack(fill=tk.X, pady=(0, 10))
         panel.lift()
         self.care_button.configure(text="Cuidados  ▴")
 
     def _hide_care_panel(self, _event: tk.Event | None = None) -> None:
         panel = getattr(self, "_care_panel", None)
         if panel is not None and panel.winfo_exists():
-            panel.place_forget()
+            panel.pack_forget()
         button = getattr(self, "care_button", None)
         if button is not None and button.winfo_exists():
             button.configure(text="Cuidados  ▾")

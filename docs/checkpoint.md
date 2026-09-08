@@ -312,6 +312,8 @@ Especificação: `docs/natural-actions-roadmap.md`.
 - os quatro controles superiores foram consolidados em um botão `☰` sempre visível;
 - o botão foi posicionado imediatamente à esquerda do indicador de estado;
 - o menu reúne Computador, Agentes e progresso, Recursos e ajuda e Cuidados;
-- passar o mouse sobre uma opção abre o painel existente correspondente;
+- passar o mouse apenas destaca a opção; o painel abre somente por clique;
+- ao escolher uma opção, o menu fecha e o painel ocupa uma área própria abaixo do cabeçalho;
+- os painéis participam do layout e não ficam sobrepostos à conversa ou ao menu;
 - clique externo, novo clique no menu ou tecla `Esc` fecham a navegação;
 - funções, confirmações e painéis anteriores foram preservados.
